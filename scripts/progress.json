@@ -16,8 +16,8 @@
     },
     "AGENT_C_FRONTEND": {
       "name": "React + TypeScript + Tailwind Shell",
-      "status": "IN_PROGRESS",
-      "progress_pct": 80,
+      "status": "COMPLETED",
+      "progress_pct": 100,
       "deliverables": ["frontend/src/App.tsx", "frontend/src/components/layout/Shell.tsx", "frontend/src/pages/Dashboard.tsx"]
     },
     "AGENT_D_LLM": {
@@ -34,8 +34,8 @@
     },
     "AGENT_F_QA_CONFIG": {
       "name": "DevOps, Environment & QA",
-      "status": "IN_PROGRESS",
-      "progress_pct": 80,
+      "status": "COMPLETED",
+      "progress_pct": 100,
       "deliverables": [".gitignore", ".env.example", ".env", "ENV_SETUP.md", "PHASE1DONE.md"]
     }
   }
