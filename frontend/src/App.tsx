@@ -10,7 +10,21 @@ import { Reports } from './pages/Reports.tsx';
 import { SettingsPage } from './pages/Settings.tsx';
 
 export default function App() {
-  const [currentTab, setCurrentTab] = useState<NavItem>('overview');
+  const getInitialTab = (): NavItem => {
+    const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+    const validTabs: NavItem[] = ['overview', 'analyze', 'repositories', 'runs', 'findings', 'agents', 'reports', 'settings'];
+    if (validTabs.includes(path as NavItem)) return path as NavItem;
+    const hash = window.location.hash.replace(/^#/, '').toLowerCase();
+    if (validTabs.includes(hash as NavItem)) return hash as NavItem;
+    return 'overview';
+  };
+
+  const [currentTab, setCurrentTab] = useState<NavItem>(getInitialTab());
+
+  const handleTabChange = (tab: NavItem) => {
+    setCurrentTab(tab);
+    window.history.pushState(null, '', `/${tab === 'overview' ? '' : tab}`);
+  };
 
   const renderContent = () => {
     switch (currentTab) {
@@ -36,7 +50,7 @@ export default function App() {
   };
 
   return (
-    <Shell currentTab={currentTab} onSelectTab={setCurrentTab}>
+    <Shell currentTab={currentTab} onSelectTab={handleTabChange}>
       {renderContent()}
     </Shell>
   );
