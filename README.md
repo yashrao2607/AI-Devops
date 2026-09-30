@@ -6,14 +6,16 @@ DeploySafe is a multi-agent AI deployment-readiness intelligence platform. It an
 
 ---
 
-## Current Status: Phase 1 — Foundation & Setup
+## Current Status: Phase 2 — Repository Analysis + RAG Foundation
 
-Phase 1 provides the core foundation of the DeploySafe platform:
-- **FastAPI Backend:** Modular API with health diagnostics, database initialization (SQLite), structured logging, and secret masking.
-- **Frontend App Shell:** Modern developer-security platform interface built with React, TypeScript, and Tailwind CSS.
-- **LLM Abstraction Layer:** Unified `LLMProvider` interface supporting Google Gemini (primary) and Groq Cloud (fallback) with structured output and graceful missing-key handling.
-- **CrewAI Flow Foundation:** Minimal real CrewAI Flow and readiness agent executing structured Pydantic evaluations.
-- **Testing & Verification:** Comprehensive pytest test suite for backend, configuration, LLM abstraction, and CrewAI workflows.
+Phase 2 introduces deep repository ingestion, AST/semantic chunking, Chroma vector storage, and verifiable RAG knowledge retrieval:
+- **Repository Ingestion:** Ingest local repository directories, remote GitHub repositories, and uploaded ZIP archives with Zip-Slip path traversal defense and quota enforcement.
+- **File Discovery & Secret Redaction:** Recursively scans repositories, categorizing files into 8 structural domains (`SOURCE_CODE`, `TEST`, `CONFIG`, `DOCUMENTATION`, `DOCKER`, `CI_CD`, `SCRIPT`, `OTHER`), applying ignore rules and redacting secrets (`***REDACTED_SECRET***`).
+- **Semantic Chunking:** Splits along classes, functions, markdown headings, and docker instruction boundaries with exact source line boundaries (`line_start`, `line_end`) and deterministic hashes.
+- **Embedding Abstraction:** Primary Gemini `text-embedding-004` (768 dimensions) with deterministic fallback `LocalEmbeddingProvider` (384 dimensions).
+- **Chroma Vector Store:** Isolated collections per repository (`CHROMA_PATH`), enforcing strict data isolation and in-memory testing mode.
+- **RAG Retrieval Engine:** Semantic vector search with anti-hallucination thresholding (`FOUND`, `LOW_RELEVANCE`, `NOT_FOUND`).
+- **Interactive UI:** Connected frontend page for repository ingestion, real-time pipeline telemetry, discovered files browser, and code evidence viewer with copyable snippets.
 
 ---
 
@@ -38,9 +40,7 @@ python scripts/status.py
 
 ### 4. Running the Backend
 ```powershell
-cd backend
-python -m pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+uvicorn backend.app.main:app --reload --reload-dir backend --port 8000
 ```
 Backend API will be live at: `http://localhost:8000`  
 Interactive Swagger API docs: `http://localhost:8000/docs`  
@@ -54,16 +54,22 @@ npm run dev
 ```
 Frontend development server will open at: `http://localhost:5173`
 
-### 6. Running Tests
+### 6. Ingest & Query the Demo Repository via CLI
 ```powershell
-pytest backend/tests -v
+python scripts/verify_rag_live.py
+```
+
+### 7. Running the Test Suite
+```powershell
+python -m pytest backend/tests -v
 ```
 
 ---
 
 ## Documentation Links
 - [Product Requirements Document (PRD)](file:///d:/NAVEEN-SIR_PROJECT/prd.md)
-- [Product Scope & Roadmap](file:///d:/NAVEEN-SIR_PROJECT/docs/product-scope.md)
+- [Phase 2 RAG Architecture Specification](file:///d:/NAVEEN-SIR_PROJECT/docs/rag.md)
 - [System Architecture & Diagrams](file:///d:/NAVEEN-SIR_PROJECT/docs/architecture.md)
 - [API Key & Environment Setup Guide](file:///d:/NAVEEN-SIR_PROJECT/ENV_SETUP.md)
 - [Phase 1 Completion Report](file:///d:/NAVEEN-SIR_PROJECT/PHASE1DONE.md)
+- [Phase 2 Completion Report](file:///d:/NAVEEN-SIR_PROJECT/PHASE2DONE.md)

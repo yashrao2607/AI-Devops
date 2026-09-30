@@ -1,42 +1,60 @@
 {
   "project": "DeploySafe",
-  "phase": "Phase 1 - Foundation & Product Setup",
+  "phase": "Phase 2 - Repository Analysis + RAG Foundation",
   "streams": {
-    "AGENT_A_DOCS": {
-      "name": "Product & Architecture Documentation",
+    "AGENT_A_LOADER": {
+      "name": "Repository Ingestion (Local, GitHub, ZIP)",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["docs/product-scope.md", "docs/architecture.md", "README.md"]
+      "deliverables": ["backend/app/services/rag/loader.py"]
     },
-    "AGENT_B_BACKEND": {
-      "name": "FastAPI Backend Foundation",
+    "AGENT_B_DISCOVERY": {
+      "name": "File Discovery, Filtering & Secret Redaction",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/main.py", "backend/app/core/config.py", "backend/app/api/v1/health.py", "backend/tests/test_health.py"]
+      "deliverables": ["backend/app/services/rag/discovery.py"]
     },
-    "AGENT_C_FRONTEND": {
-      "name": "React + TypeScript + Tailwind Shell",
+    "AGENT_C_CHUNKER": {
+      "name": "Intelligent Semantic Chunking & Line Tracking",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["frontend/src/App.tsx", "frontend/src/components/layout/Shell.tsx", "frontend/src/pages/Dashboard.tsx"]
+      "deliverables": ["backend/app/services/rag/chunker.py"]
     },
-    "AGENT_D_LLM": {
-      "name": "LLM Abstraction (Gemini + Groq Fallback)",
+    "AGENT_D_EMBEDDINGS": {
+      "name": "Embedding Abstraction (Gemini + Local Fallback)",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/services/llm/base.py", "backend/app/services/llm/gemini.py", "backend/app/services/llm/groq.py"]
+      "deliverables": ["backend/app/services/rag/embeddings.py"]
     },
-    "AGENT_E_CREWAI": {
-      "name": "CrewAI Minimal Real Flow & Structured Output",
+    "AGENT_E_CHROMA": {
+      "name": "Chroma Vector Store & Repository Isolation",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/agents/initial_flow.py", "backend/tests/test_flow.py"]
+      "deliverables": ["backend/app/services/rag/vector_store.py"]
     },
-    "AGENT_F_QA_CONFIG": {
-      "name": "DevOps, Environment & QA",
+    "AGENT_F_RETRIEVER": {
+      "name": "RAG Retrieval Service & Indexer Pipeline",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": [".gitignore", ".env.example", ".env", "ENV_SETUP.md", "PHASE1DONE.md"]
+      "deliverables": ["backend/app/services/rag/retriever.py", "backend/app/services/rag/indexer.py"]
+    },
+    "AGENT_G_API": {
+      "name": "Repository Ingestion & Search REST APIs",
+      "status": "COMPLETED",
+      "progress_pct": 100,
+      "deliverables": ["backend/app/api/v1/repositories.py"]
+    },
+    "AGENT_H_UI": {
+      "name": "Frontend Ingestion, Indexing & Evidence Viewer",
+      "status": "COMPLETED",
+      "progress_pct": 100,
+      "deliverables": ["frontend/src/pages/Repositories.tsx"]
+    },
+    "AGENT_QA_TESTS": {
+      "name": "QA Tests, Demo Repo & Documentation",
+      "status": "COMPLETED",
+      "progress_pct": 100,
+      "deliverables": ["demo-repos/deploysafe-rag-demo/", "backend/tests/test_rag_*.py", "docs/rag.md", "PHASE2DONE.md"]
     }
   }
 }

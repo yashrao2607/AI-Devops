@@ -119,3 +119,32 @@ deploysafe/
 - **Zero Client-Side Credentials:** API keys (`GEMINI_API_KEY`, `GROQ_API_KEY`, `GITHUB_TOKEN`) are strictly consumed in the backend.
 - **Log Masking:** The structured logging pipeline intercepts all log statements and redacts strings matching API key patterns (`AIza...`, `gsk_...`, `ghp_...`).
 - **Git Protection:** `.gitignore` enforces exclusion of `.env`, `.env.*.local`, `.venv`, and temporary artifacts.
+
+---
+
+## 6. Phase 2: RAG & Vector Storage Foundation
+
+```mermaid
+graph TD
+    Source[Repository Source: Local / GitHub / ZIP] --> Loader[RepositoryLoader]
+    Loader --> Snapshot[RepositorySnapshot]
+    Snapshot --> Discovery[FileDiscoveryService: Categorization & Secret Redaction]
+    Discovery --> Chunker[IntelligentChunker: Semantic & Line-Aware]
+    Chunker --> Chunks[RepositoryChunk: Hash & Line Boundaries]
+    Chunks --> Embedder[EmbeddingProvider: Gemini / Local Fallback]
+    Embedder --> Chroma[(ChromaVectorStore: Isolated Collection)]
+    
+    Query[Developer Question] --> Retriever[RepositoryRetriever]
+    Retriever --> Chroma
+    Chroma --> Evidence[Traceable Evidence: File + Lines + Content]
+    Evidence --> UIViewer[UI Evidence Viewer]
+```
+
+### Components Implemented in Phase 2
+1. **RepositoryLoader:** Ingests local directory snapshots, shallow-clones GitHub repositories, and safely extracts ZIP archives with Zip-Slip path traversal defense.
+2. **FileDiscoveryService:** Discovers and categorizes files into 8 domains (`SOURCE_CODE`, `TEST`, `CONFIG`, `DOCUMENTATION`, `DOCKER`, `CI_CD`, `SCRIPT`, `OTHER`), applying ignore rules and redacting secrets (`***REDACTED_SECRET***`).
+3. **IntelligentChunker:** Creates deterministic chunks (`chk_...`) along class, function, markdown heading, and docker instruction boundaries, recording exact starting and ending line numbers.
+4. **EmbeddingProvider:** Implements Gemini `text-embedding-004` (768 dimensions) and a deterministic fallback `LocalEmbeddingProvider` (384 dimensions) with stop-word filtering.
+5. **ChromaVectorStore:** Enforces strict repository isolation with query filtering (`where={"repository_id": ...}`) and persistence in `CHROMA_PATH`.
+6. **RepositoryRetriever:** Evaluates relevance thresholds (`FOUND`, `LOW_RELEVANCE`, `NOT_FOUND`), preventing hallucinated responses.
+7. **REST Endpoints:** Mounted at `/api/v1/repositories/*` for ingestion, indexing status, semantic search, and file discovery.

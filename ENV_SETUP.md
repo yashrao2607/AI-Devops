@@ -130,16 +130,29 @@ This guide explains every environment variable used by **DeploySafe**, why it is
 ---
 
 ### 6. `CHROMA_PATH`
+ 
+ 1. **Variable Name:** `CHROMA_PATH`
+ 2. **Why DeploySafe Needs It:**
+    Specifies the local directory where Chroma vector embeddings will be persisted (for Phase 2 RAG).
+ 3. **Default Value:**
+    ```env
+    CHROMA_PATH=./chroma_db
+    ```
+ 4. **What Happens If Missing:**
+    Chroma will initialize locally in `./chroma_db` by default.
 
-1. **Variable Name:** `CHROMA_PATH`
-2. **Why DeploySafe Needs It:**
-   Specifies the local directory where Chroma vector embeddings will be persisted (for Phase 2 RAG).
-3. **Default Value:**
-   ```env
-   CHROMA_PATH=./chroma_db
-   ```
-4. **What Happens If Missing:**
-   Chroma will initialize locally in `./chroma_db` by default.
+---
+
+### 7. Phase 2 RAG & Ingestion Limits
+
+| Variable | Purpose | Default | Details |
+| :--- | :--- | :--- | :--- |
+| `EMBEDDING_PROVIDER` | Chooses embedding engine (`gemini` or `local`) | `gemini` | When `gemini`, uses `text-embedding-004`. If key missing, safely falls back to local. |
+| `CHROMA_COLLECTION_PREFIX` | Namespaces repository vector collections | `deploysafe_repo` | Guarantees multi-repo isolation |
+| `MAX_FILE_SIZE_MB` | Maximum single-file indexable size limit | `10` | Files exceeding this limit are skipped with clear logging |
+| `MAX_REPOSITORY_SIZE_MB`| Maximum uncompressed repository volume | `200` | Defends against storage exhaustion attacks |
+| `MAX_FILE_COUNT` | Maximum files discovered per repository | `2000` | Prevents runaway iteration |
+| `TOP_K` | Default evidence chunks returned per search | `5` | Tunable retrieval density |
 
 ---
 

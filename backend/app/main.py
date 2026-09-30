@@ -7,6 +7,7 @@ from backend.app.core.logging import logger
 from backend.app.core.database import init_db
 from backend.app.api.v1.health import router as health_router
 from backend.app.api.v1.flow import router as flow_router
+from backend.app.api.v1.repositories import router as repositories_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -53,6 +54,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 # Include API v1 routers
 app.include_router(health_router, prefix="/api/v1", tags=["System & Health"])
 app.include_router(flow_router, prefix="/api/v1/flow", tags=["CrewAI Flows"])
+app.include_router(repositories_router, prefix="/api/v1/repositories", tags=["Repositories & RAG"])
 
 # Root fallback
 @app.get("/")
