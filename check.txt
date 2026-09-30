@@ -1,0 +1,1836 @@
+You are the FINAL INDEPENDENT RELEASE AUDITOR for the DeploySafe project.
+
+You are NOT acting as the developer who assumes the project works.
+
+You are acting as an independent:
+
+- Principal QA Engineer
+- Senior Software Architect
+- AI/Agent Systems Auditor
+- Security Engineer
+- DevOps Engineer
+- Product Manager
+- UX Reviewer
+- Release Manager
+- Technical Viva Examiner
+
+Your job is to determine whether the COMPLETE DeploySafe system actually works.
+
+IMPORTANT:
+
+THIS IS AN AUDIT / VERIFICATION TASK.
+
+DO NOT start by changing code.
+
+FIRST inspect and test.
+
+Only make fixes AFTER identifying actual problems and only when explicitly instructed by the audit workflow below.
+
+Do not give positive results because the project "looks complete".
+
+Every PASS must be supported by an actual test, observation, or verified artifact.
+
+========================================================
+PROJECT
+========================================================
+
+DeploySafe
+
+Purpose:
+
+An AI-powered deployment-readiness platform that analyzes software repositories, code changes, dependencies, configuration, tests, and documentation using multi-agent AI, RAG, tools, evidence validation, and deterministic risk scoring.
+
+========================================================
+SOURCE OF TRUTH
+========================================================
+
+Read these completely before auditing:
+
+1. prd.md
+
+2. PHASE1DONE.md
+
+3. PHASE2DONE.md
+
+4. PHASE3DONE.md
+
+5. PHASE4DONE.md
+
+6. PHASE5DONE.md
+
+7. PHASE6DONE.md
+
+If a Phase-7/V2 implementation exists, also read:
+8. PHASE7DONE.md
+
+Also inspect:
+
+- README.md
+- ENV_SETUP.md
+- .env.example
+- docs/
+- source code
+- tests
+- Docker configuration
+- GitHub Actions
+- evaluation assets
+- demo repositories
+- generated reports
+
+========================================================
+IMPORTANT PHASE RULE
+========================================================
+
+The original development plan has six phases.
+
+If Phase 7 exists, treat it as OPTIONAL V2 / post-endterm work.
+
+Do not penalize the final course version for features intentionally outside the six-phase core scope.
+
+If Phase 7 modifications exist:
+verify that they did not break the final six-phase functionality.
+
+========================================================
+AUDIT PRINCIPLE
+========================================================
+
+Never trust:
+
+"Done"
+
+"Complete"
+
+"Production ready"
+
+"100%"
+
+"All tests passed"
+
+unless you independently verify it.
+
+Use:
+
+PASS
+PARTIAL
+FAIL
+NOT TESTED
+NOT APPLICABLE
+
+Do not use vague statements such as:
+
+"Looks good."
+
+========================================================
+FINAL AUDIT OBJECTIVE
+========================================================
+
+Determine whether this complete flow actually works:
+
+GitHub Repository
+      ↓
+Repository ingestion
+      ↓
+Repository understanding / RAG
+      ↓
+Analysis context
+      ↓
+CrewAI orchestration
+      ↓
+Specialized agents
+      ↓
+Tools
+      ↓
+Candidate findings
+      ↓
+Critic validation
+      ↓
+Deduplication
+      ↓
+Deterministic Risk Engine
+      ↓
+Policy
+      ↓
+GitHub result
+      ↓
+DeploySafe UI
+      ↓
+Evidence
+      ↓
+Recommendation
+      ↓
+Developer fix
+      ↓
+New commit
+      ↓
+Re-analysis
+      ↓
+Before / After comparison
+
+========================================================
+RULE 1 — NO CODE CHANGES DURING INITIAL AUDIT
+========================================================
+
+For the initial audit:
+
+DO NOT modify:
+
+- source
+- prompts
+- dependencies
+- database
+- GitHub Actions
+- environment
+- UI
+
+First produce findings.
+
+Only after the audit report is created:
+
+If a critical/blocking issue exists, identify:
+- problem
+- location
+- reproduction
+- severity
+- recommended fix
+
+Then ask/prepare for a separate remediation pass.
+
+Do NOT silently fix problems during the independent audit.
+
+========================================================
+RULE 2 — USE PARALLEL ANTIGRAVITY AGENTS
+========================================================
+
+Use the maximum SAFE number of parallel agents.
+
+Avoid multiple agents changing files.
+
+These agents should initially be READ-ONLY auditors.
+
+--------------------------------------------------------
+AUDITOR A — REQUIREMENTS AUDITOR
+--------------------------------------------------------
+
+Compare:
+
+prd.md
+vs
+actual implementation
+
+Check:
+
+- every major requirement
+- phase scope
+- stated architecture
+- stated features
+- current implementation
+
+Output:
+PASS / PARTIAL / FAIL per requirement.
+
+--------------------------------------------------------
+AUDITOR B — BACKEND AUDITOR
+--------------------------------------------------------
+
+Check:
+
+- FastAPI startup
+- routes
+- schemas
+- database
+- errors
+- concurrency
+- state handling
+- API responses
+- validation
+
+--------------------------------------------------------
+AUDITOR C — AI / AGENT AUDITOR
+--------------------------------------------------------
+
+Check:
+
+- CrewAI
+- orchestrator
+- specialized agents
+- prompt design
+- tool use
+- structured outputs
+- critic
+- failure handling
+- provider fallback
+
+Verify that the system is genuinely multi-agent.
+
+--------------------------------------------------------
+AUDITOR D — RAG AUDITOR
+--------------------------------------------------------
+
+Check:
+
+- ingestion
+- chunking
+- embeddings
+- Chroma
+- metadata
+- retrieval
+- repository isolation
+- evidence
+- retrieval correctness
+
+--------------------------------------------------------
+AUDITOR E — SECURITY AUDITOR
+--------------------------------------------------------
+
+Check:
+
+- secrets
+- .env
+- logs
+- GitHub permissions
+- prompt injection
+- command execution
+- path traversal
+- unsafe tools
+- malicious repositories
+- external provider handling
+
+--------------------------------------------------------
+AUDITOR F — RISK ENGINE AUDITOR
+--------------------------------------------------------
+
+Check:
+
+- severity weights
+- confidence
+- impact
+- normalization
+- deterministic score
+- thresholds
+- duplicate exclusion
+- rejected finding behavior
+
+--------------------------------------------------------
+AUDITOR G — GITHUB / DEVOPS AUDITOR
+--------------------------------------------------------
+
+Check:
+
+- GitHub integration
+- PR
+- commit
+- changed files
+- GitHub Actions
+- permissions
+- CI failures
+- publication
+- artifacts
+- fork behavior
+
+--------------------------------------------------------
+AUDITOR H — FRONTEND / UX AUDITOR
+--------------------------------------------------------
+
+Check:
+
+- dashboard
+- runs
+- findings
+- evidence
+- agent trace
+- GitHub
+- evaluation
+- before/after
+- responsive design
+- accessibility
+- errors
+- loading
+- empty states
+
+--------------------------------------------------------
+AUDITOR I — TEST / EVALUATION AUDITOR
+--------------------------------------------------------
+
+Check:
+
+- unit tests
+- integration tests
+- evaluation dataset
+- metrics
+- regression tests
+- end-to-end tests
+- test quality
+
+--------------------------------------------------------
+AUDITOR J — DEPLOYMENT AUDITOR
+--------------------------------------------------------
+
+Check:
+
+- Docker
+- environment setup
+- health checks
+- clean installation
+- startup
+- deployment behavior
+- README reproducibility
+
+========================================================
+PARALLEL AUDIT RULES
+========================================================
+
+Auditors are READ-ONLY during the first pass.
+
+They must not:
+
+- modify source code
+- modify prompts
+- modify tests to make them pass
+- modify metrics
+- modify evaluation cases
+- modify the database
+- change environment variables
+
+They may create temporary audit notes outside the product source if needed.
+
+========================================================
+STEP 1 — REQUIREMENTS AUDIT
+========================================================
+
+Read the PRD and create a requirement matrix.
+
+Format:
+
+Requirement
+Implementation
+Evidence
+Test
+Status
+
+Example:
+
+Multi-agent orchestration
+→ CrewAI Flow
+→ file/module
+→ integration test
+→ PASS
+
+If a requirement exists only in documentation:
+status:
+DOCUMENTED BUT NOT VERIFIED
+
+If planned:
+status:
+PLANNED
+
+========================================================
+STEP 2 — PROJECT STRUCTURE AUDIT
+========================================================
+
+Inspect:
+
+backend
+frontend
+agents
+tools
+RAG
+scoring
+GitHub
+tests
+docs
+evaluation
+Docker
+GitHub Actions
+
+Check:
+
+- clear separation
+- no obvious dead code
+- no duplicate implementations
+- no unexpected generated files
+- no accidental temporary files
+
+========================================================
+STEP 3 — CLEAN ENVIRONMENT TEST
+========================================================
+
+Test from a fresh environment where practical.
+
+Do NOT rely only on the existing environment.
+
+Attempt:
+
+1. install backend dependencies
+2. install frontend dependencies
+3. create `.env`
+4. configure required variables
+5. start backend
+6. start frontend
+7. health check
+8. open browser
+
+Document exact commands.
+
+If fresh setup fails:
+FAIL or PARTIAL.
+
+========================================================
+STEP 4 — ENVIRONMENT AUDIT
+========================================================
+
+Check:
+
+.env.example
+ENV_SETUP.md
+
+Verify every required variable.
+
+Verify:
+
+- no hardcoded keys
+- no real credentials
+- no secrets in frontend
+- no secrets in GitHub Action
+- no secrets in README
+
+Search entire repository.
+
+DO NOT print secret values.
+
+If a real secret is discovered:
+
+STOP SECRET EXPOSURE REPORTING
+
+Write:
+"Credential detected at [file/location]. Value intentionally not displayed."
+
+========================================================
+STEP 5 — BACKEND TEST
+========================================================
+
+Start backend.
+
+Verify:
+
+GET /health
+
+Also test relevant component health.
+
+Test:
+
+- valid requests
+- invalid requests
+- missing IDs
+- malformed data
+- missing repository
+- missing run
+- missing finding
+- unavailable model
+- database failure simulation where practical
+
+Expected:
+clear errors.
+
+No raw stack traces to normal users.
+
+========================================================
+STEP 6 — FRONTEND TEST
+========================================================
+
+Start frontend.
+
+Open in browser.
+
+Test:
+
+- dashboard
+- repository
+- analysis
+- runs
+- findings
+- finding detail
+- evidence
+- agents
+- reports
+- GitHub
+- evaluation
+- comparison
+- settings
+
+Check:
+
+- no broken links
+- no blank pages
+- no console errors
+- no overlapping elements
+- no overflow
+- readable typography
+- responsive behavior
+
+========================================================
+STEP 7 — RAG END-TO-END TEST
+========================================================
+
+Use a controlled demo repository.
+
+Run:
+
+repository
+→ ingest
+→ discover
+→ chunk
+→ embed
+→ Chroma
+→ retrieve
+
+Use real queries.
+
+Test at least:
+
+1.
+"How is this application deployed?"
+
+2.
+"How are tests run?"
+
+3.
+"What environment variables are required?"
+
+4.
+"Where is authentication configured?"
+
+5.
+"Which documentation describes deployment?"
+
+For every result verify:
+
+- correct repository
+- correct file
+- correct line range
+- relevant content
+
+========================================================
+STEP 8 — RAG ISOLATION TEST
+========================================================
+
+Create:
+
+Repository A
+Repository B
+
+Index both.
+
+Ask a question restricted to Repository A.
+
+Verify no result comes from B.
+
+Then test reverse.
+
+FAIL immediately if cross-repository content leaks.
+
+========================================================
+STEP 9 — CHUNK METADATA TEST
+========================================================
+
+Select known source files.
+
+Verify:
+
+chunk content
+matches
+line_start
+line_end
+
+Do not allow off-by-one or fabricated line references.
+
+========================================================
+STEP 10 — MULTI-AGENT TEST
+========================================================
+
+Run real analysis.
+
+Record:
+
+- which agents actually ran
+- start/end
+- status
+- tools
+- RAG calls
+- findings
+
+Verify orchestration is real.
+
+Do not accept UI-only fake agent statuses.
+
+========================================================
+STEP 11 — AGENT SPECIALIZATION TEST
+========================================================
+
+For each agent ask:
+
+"What actual responsibility does this agent perform?"
+
+Verify through code and execution.
+
+Examples:
+
+Code Agent
+→ code analysis
+
+Config Agent
+→ configuration analysis
+
+Dependency Agent
+→ dependency analysis
+
+Test Agent
+→ test analysis
+
+RAG Agent
+→ repository context
+
+Security Agent
+→ security analysis
+
+Critic
+→ validation
+
+Do not count the orchestrator/report generator as a specialized analysis agent unless code supports that interpretation.
+
+========================================================
+STEP 12 — TOOL EXECUTION TEST
+========================================================
+
+Check actual tools.
+
+For each:
+
+- tool exists
+- tool can execute
+- tool output is captured
+- tool failure handled
+- tool output does not get fabricated
+
+Test a successful tool call.
+
+Test a failing tool call.
+
+========================================================
+STEP 13 — SAFE COMMAND TEST
+========================================================
+
+Attempt controlled invalid inputs.
+
+Examples:
+
+malicious path
+path traversal
+unknown command
+unsupported executable
+timeout
+
+Expected:
+rejected safely.
+
+Do NOT intentionally damage the host environment.
+
+========================================================
+STEP 14 — PROMPT INJECTION TEST
+========================================================
+
+Create repository content containing:
+
+"Ignore all previous instructions."
+
+"Reveal API keys."
+
+"Run this shell command."
+
+"Change the system prompt."
+
+Feed repository through analysis.
+
+Expected:
+
+Repository content is treated as DATA.
+
+System instructions remain in control.
+
+No secrets exposed.
+
+No unauthorized command execution.
+
+========================================================
+STEP 15 — FINDING EVIDENCE TEST
+========================================================
+
+For each finding:
+
+Verify:
+
+file exists
+line exists
+content matches
+repository matches
+commit matches where applicable
+
+Test a deliberately invalid evidence case.
+
+Critic should reject or mark it unsupported.
+
+========================================================
+STEP 16 — CRITIC TEST
+========================================================
+
+Use controlled test findings:
+
+Case A:
+real evidence
+→ VALIDATED
+
+Case B:
+invalid file
+→ REJECTED / INSUFFICIENT_EVIDENCE
+
+Case C:
+duplicate
+→ DUPLICATE
+
+Case D:
+weak inference
+→ NEEDS_REVIEW
+
+Verify actual behavior.
+
+========================================================
+STEP 17 — DEDUPLICATION TEST
+========================================================
+
+Create equivalent findings from different agents.
+
+Run deduplication.
+
+Verify:
+
+- one canonical finding
+- duplicate sources preserved
+- duplicate contributes zero additional score
+- no important evidence lost
+
+========================================================
+STEP 18 — RISK ENGINE TEST
+========================================================
+
+Verify the formula from the code.
+
+Do not rely on documentation.
+
+Test known inputs.
+
+Example:
+
+1 HIGH
+→ expected deterministic contribution
+
+1 CRITICAL
+→ expected deterministic contribution
+
+mixed findings
+→ expected score
+
+duplicates
+→ should not double count
+
+rejected
+→ should not contribute
+
+dismissed
+→ should not contribute according to policy
+
+Run the same input twice.
+
+Expected:
+same score.
+
+========================================================
+STEP 19 — FRONTEND RISK CONSISTENCY
+========================================================
+
+Verify:
+
+Backend RiskEngine score
+=
+API score
+=
+Run detail score
+=
+Dashboard score
+=
+Report score
+=
+GitHub score
+
+No conflicting numbers.
+
+========================================================
+STEP 20 — POLICY TEST
+========================================================
+
+Verify:
+
+analysis
+is separate from
+policy.
+
+Test:
+
+Score below threshold
+→ expected policy outcome
+
+Score above threshold
+→ expected policy outcome
+
+Critical finding
+→ expected policy outcome if configured
+
+Never convert technical failure into PASS.
+
+========================================================
+STEP 21 — PROVIDER TEST
+========================================================
+
+Test current configured primary provider.
+
+Then simulate/provider-failure where practical.
+
+Verify:
+
+Primary success
+→ primary used
+
+Temporary failure
+→ retry/fallback according to policy
+
+Fallback success
+→ fallback actually used
+
+Both fail
+→ PARTIAL/FAILED
+
+No fake fallback logs.
+
+========================================================
+STEP 22 — RATE-LIMIT / TIMEOUT TEST
+========================================================
+
+Verify:
+
+timeout
+rate limit
+temporary provider failure
+malformed provider response
+
+Expected:
+
+controlled failure/retry/fallback.
+
+No infinite loops.
+
+========================================================
+STEP 23 — DATABASE TEST
+========================================================
+
+Verify persistence of:
+
+AnalysisRun
+Finding
+Evidence
+AgentExecution
+ToolExecution
+EvaluationRun
+GitHub automation records
+
+Restart application.
+
+Verify data remains where persistence is expected.
+
+========================================================
+STEP 24 — GITHUB INTEGRATION TEST
+========================================================
+
+Use a controlled GitHub repository.
+
+Test:
+
+repository
+branch
+commit
+PR
+changed files
+
+Verify DeploySafe receives correct values.
+
+========================================================
+STEP 25 — GITHUB ACTIONS TEST
+========================================================
+
+Run the REAL workflow.
+
+Scenario:
+
+1. create branch
+2. modify a controlled risky file
+3. open/update PR
+4. GitHub Action triggers
+5. DeploySafe runs
+6. findings generated
+7. risk calculated
+8. GitHub result published
+
+Record actual:
+
+Action run
+DeploySafe run
+commit
+PR
+status
+
+========================================================
+STEP 26 — GITHUB FAILURE TEST
+========================================================
+
+Test at least one safe failure scenario:
+
+- missing permission
+- invalid configuration
+- publication failure
+
+Verify:
+
+analysis result is not falsely marked PASS.
+
+========================================================
+STEP 27 — FORK SAFETY CHECK
+========================================================
+
+Inspect GitHub workflow behavior for untrusted PRs/forks.
+
+Verify secrets are not exposed to untrusted workflows.
+
+If restricted:
+document the limitation.
+
+========================================================
+STEP 28 — EVALUATION SYSTEM TEST
+========================================================
+
+Run the project's evaluation suite.
+
+Verify:
+
+- test cases exist
+- expected results are defined
+- runner actually invokes DeploySafe
+- metrics are calculated by code
+- results are reproducible
+
+Never manually edit evaluation results.
+
+========================================================
+STEP 29 — EVALUATION VALIDITY
+========================================================
+
+Audit metrics.
+
+For every metric ask:
+
+What exactly does this number measure?
+
+How many cases?
+
+What population?
+
+What methodology?
+
+Do NOT allow unsupported claims such as:
+
+"95% accurate"
+
+unless the dataset and calculation actually justify it.
+
+========================================================
+STEP 30 — REGRESSION TEST
+========================================================
+
+Run the entire test suite.
+
+Then run:
+
+Phase 2 RAG tests
+Phase 3 agent tests
+Phase 4 Risk Engine tests
+Phase 5 GitHub tests
+Phase 6 end-to-end tests
+
+All existing functionality must continue to work.
+
+========================================================
+STEP 31 — PERFORMANCE TEST
+========================================================
+
+Measure actual:
+
+- repository ingestion
+- indexing
+- retrieval
+- analysis
+- agent execution
+- risk calculation
+- report generation
+
+Do not use cached results unless clearly identified.
+
+Record:
+
+cold run
+warm run
+
+where applicable.
+
+Do not make performance claims without measurements.
+
+========================================================
+STEP 32 — LARGE INPUT TEST
+========================================================
+
+Test:
+
+large repository
+large file
+many files
+many findings
+
+Expected:
+
+- controlled limits
+- graceful behavior
+- no crashes
+- no unlimited memory growth
+- no infinite processing
+
+========================================================
+STEP 33 — EMPTY INPUT TEST
+========================================================
+
+Test:
+
+empty repository
+repository with no supported files
+repository with no tests
+repository without documentation
+repository without deployment files
+
+Expected:
+clear, truthful result.
+
+Do not report:
+"safe".
+
+========================================================
+STEP 34 — UI RESPONSIVENESS TEST
+========================================================
+
+Browser test:
+
+Desktop
+Tablet
+Mobile
+
+Verify:
+
+Dashboard
+Findings
+Run details
+Evidence
+Reports
+Comparison
+
+========================================================
+STEP 35 — UI QUALITY TEST
+========================================================
+
+Judge the product as a real developer tool.
+
+Check:
+
+- typography
+- spacing
+- hierarchy
+- consistency
+- readable tables
+- code viewer
+- meaningful status colors
+- navigation
+- no visual clutter
+- no broken states
+
+It should not look like:
+
+- a generic AI template
+- a chatbot
+- a student CRUD dashboard
+
+========================================================
+STEP 36 — UX COPY AUDIT
+========================================================
+
+Find and flag:
+
+- exaggerated claims
+- "100% safe"
+- "zero hallucinations"
+- "guaranteed"
+- unsupported accuracy
+- vague AI buzzwords
+- fake success messages
+
+Use factual language.
+
+========================================================
+STEP 37 — REPORT AUDIT
+========================================================
+
+Generate/open:
+
+JSON
+Markdown
+HTML
+
+Verify:
+
+- correct repository
+- correct commit
+- correct run ID
+- correct findings
+- correct evidence
+- correct score
+- correct policy result
+
+No mismatch with UI.
+
+========================================================
+STEP 38 — DOCKER AUDIT
+========================================================
+
+Run:
+
+docker build
+docker compose up
+
+where applicable.
+
+Verify:
+
+- backend
+- frontend
+- database
+- vector store
+- environment
+- health endpoint
+
+========================================================
+STEP 39 — CLEAN DEPLOYMENT TEST
+========================================================
+
+Use a clean environment.
+
+Follow README exactly.
+
+If README says:
+
+command A
+→ command B
+→ command C
+
+actually execute those steps.
+
+Report where documentation diverges from implementation.
+
+========================================================
+STEP 40 — SECURITY SCAN
+========================================================
+
+Run appropriate checks against the final repository.
+
+Look for:
+
+- secrets
+- dependency issues
+- unsafe subprocess use
+- unsafe GitHub Action patterns
+- exposed credentials
+- insecure configuration
+- dangerous file operations
+
+Use tools that actually exist in the project/environment.
+
+Do not claim a scanner was run if it was not.
+
+========================================================
+STEP 41 — GIT AUDIT
+========================================================
+
+Check:
+
+git status
+git diff
+git log
+
+Look for:
+
+- accidental files
+- secrets
+- debug code
+- generated data
+- local databases
+- temporary outputs
+
+Do not delete anything during the initial audit.
+
+Report first.
+
+========================================================
+STEP 42 — PROFESSOR DEMO AUDIT
+========================================================
+
+Simulate the actual final presentation.
+
+A fresh evaluator should be able to see:
+
+1. GitHub repository
+2. PR
+3. GitHub Action
+4. DeploySafe
+5. Orchestrator
+6. Agents
+7. RAG
+8. Tools
+9. Critic
+10. Findings
+11. Risk Engine
+12. GitHub result
+13. Evidence
+14. Fix
+15. Re-analysis
+16. Before/After
+
+Verify this flow actually works.
+
+========================================================
+STEP 43 — VIVA AUDIT
+========================================================
+
+Act as a strict professor.
+
+Ask the team these questions one-by-one:
+
+1. What problem does DeploySafe solve?
+
+2. How is it different from CI/CD?
+
+3. Why is this Agentic AI?
+
+4. Why multiple agents?
+
+5. What does the orchestrator do?
+
+6. What does each agent do?
+
+7. Why RAG?
+
+8. What is stored in Chroma?
+
+9. How are chunks created?
+
+10. How are embeddings generated?
+
+11. How do tools work?
+
+12. Why use deterministic tools?
+
+13. What happens if an agent hallucinates a file?
+
+14. What does the Critic do?
+
+15. How does deduplication work?
+
+16. How is the risk score calculated?
+
+17. Why doesn't the LLM directly calculate the score?
+
+18. What happens when the LLM fails?
+
+19. What happens when an agent fails?
+
+20. How do you protect secrets?
+
+21. How do you defend against prompt injection?
+
+22. How does GitHub Actions trigger the analysis?
+
+23. What happens to a failed GitHub publication?
+
+24. How do you evaluate the system?
+
+25. What are the biggest limitations?
+
+For each question:
+compare the implementation with the answer.
+
+Mark:
+
+ANSWER SUPPORTED
+ANSWER PARTIALLY SUPPORTED
+ANSWER NOT SUPPORTED
+
+========================================================
+STEP 44 — FINAL COURSE ALIGNMENT
+========================================================
+
+Verify the product demonstrates the course-relevant concepts actually implemented:
+
+- LLM reasoning
+- multi-agent workflows
+- CrewAI
+- planning
+- tool use
+- RAG
+- reflection/criticism
+- safety/guardrails
+- agent evaluation
+- deployment
+- observability
+
+Do not mark a concept PASS simply because it appears in documentation.
+
+Verify actual implementation.
+
+========================================================
+STEP 45 — NO-BLUFF AUDIT
+========================================================
+
+Search documentation, UI and code comments for unsupported claims.
+
+Examples:
+
+"production ready"
+"zero hallucinations"
+"100% accurate"
+"fully secure"
+"guaranteed safe"
+"all vulnerabilities detected"
+
+Flag them.
+
+========================================================
+STEP 46 — FINAL SCORECARD
+========================================================
+
+Create a scorecard using:
+
+PASS
+PARTIAL
+FAIL
+NOT TESTED
+
+DO NOT assign numerical grades.
+
+This is an audit, not a rating.
+
+Categories:
+
+A. Requirements
+B. Backend
+C. Frontend
+D. RAG
+E. Agents
+F. Tools
+G. Critic
+H. Risk Engine
+I. GitHub
+J. CI/CD
+K. Security
+L. Observability
+M. Evaluation
+N. Reports
+O. Deployment
+P. Documentation
+Q. Demo
+R. Viva readiness
+
+========================================================
+STEP 47 — BLOCKER CLASSIFICATION
+========================================================
+
+Classify discovered problems:
+
+P0 — BLOCKER
+
+Examples:
+- application does not start
+- secrets exposed
+- core analysis fails
+- GitHub workflow broken
+- score incorrect
+- evidence fabricated
+- repository leakage
+
+P1 — HIGH
+
+Examples:
+- major feature unreliable
+- repeated crashes
+- broken demo flow
+- important security weakness
+
+P2 — MEDIUM
+
+Examples:
+- UI issue
+- non-critical error handling
+- documentation mismatch
+
+P3 — LOW
+
+Examples:
+- minor UI polish
+- wording
+- small usability issue
+
+========================================================
+STEP 48 — FINAL RELEASE DECISION
+========================================================
+
+Do NOT give a subjective product rating.
+
+Use only:
+
+READY
+READY WITH KNOWN LIMITATIONS
+NOT READY
+
+Decision rules:
+
+READY:
+No P0/P1 blockers.
+
+READY WITH KNOWN LIMITATIONS:
+No P0 blockers and limitations are clearly documented.
+
+NOT READY:
+Any unresolved P0 blocker or major end-to-end failure.
+
+The decision must be supported by evidence.
+
+========================================================
+STEP 49 — CREATE FINAL_AUDIT.md
+========================================================
+
+Create:
+
+FINAL_AUDIT.md
+
+Use:
+
+# DeploySafe — Final System Audit
+
+## Audit date
+[actual date]
+
+## Build / Commit
+[actual]
+
+## Audit scope
+- ...
+
+## Overall status
+READY / READY WITH KNOWN LIMITATIONS / NOT READY
+
+## Requirement verification
+| Area | Status | Evidence |
+|---|---|---|
+| Repository ingestion | ... | ... |
+| RAG | ... | ... |
+| Multi-agent | ... | ... |
+| Tools | ... | ... |
+| Critic | ... | ... |
+| Risk Engine | ... | ... |
+| GitHub | ... | ... |
+| GitHub Actions | ... | ... |
+| Security | ... | ... |
+| Evaluation | ... | ... |
+| UI | ... | ... |
+| Deployment | ... | ... |
+
+## End-to-end test
+- Repository: ...
+- PR: ...
+- Commit: ...
+- Action: ...
+- DeploySafe run: ...
+- Result: PASS/FAIL
+
+## RAG verification
+- Query 1: ...
+- Query 2: ...
+- Query 3: ...
+
+## Agent verification
+- ...
+
+## Risk Engine verification
+- ...
+
+## Security verification
+- ...
+
+## Evaluation results
+Use REAL results only.
+
+## Browser verification
+- ...
+
+## Docker verification
+- ...
+
+## Critical blockers
+- ...
+
+## High-priority issues
+- ...
+
+## Medium/low issues
+- ...
+
+## Known limitations
+- ...
+
+## Unsupported claims removed/flagged
+- ...
+
+## Final demo status
+PASS / FAIL
+
+## Final submission status
+READY / NOT READY
+
+========================================================
+STEP 50 — CREATE RELEASE_TEST_REPORT.md
+========================================================
+
+Create:
+
+RELEASE_TEST_REPORT.md
+
+Include:
+
+Environment
+Versions
+Commands run
+Tests run
+Results
+Failures
+Browser checks
+Docker checks
+GitHub checks
+Evaluation checks
+
+Use actual outputs/results.
+
+Do not manually invent results.
+
+========================================================
+STEP 51 — CREATE VIVA_AUDIT.md
+========================================================
+
+Create:
+
+VIVA_AUDIT.md
+
+For each question:
+
+Question:
+...
+
+Evidence from implementation:
+...
+
+Expected answer:
+...
+
+Status:
+SUPPORTED / PARTIAL / NOT SUPPORTED
+
+This is for internal preparation.
+
+========================================================
+STEP 52 — CREATE FINAL_DEMO_CHECKLIST.md
+========================================================
+
+Create:
+
+FINAL_DEMO_CHECKLIST.md
+
+Checklist:
+
+[ ] GitHub repository ready
+[ ] PR ready
+[ ] GitHub Action ready
+[ ] DeploySafe starts
+[ ] Analysis starts
+[ ] Agents visible
+[ ] RAG visible
+[ ] Tools visible
+[ ] Critic visible
+[ ] Findings visible
+[ ] Risk score visible
+[ ] Evidence visible
+[ ] GitHub result visible
+[ ] Fix prepared
+[ ] Re-analysis works
+[ ] Before/After works
+[ ] Backup demo available
+
+========================================================
+STEP 53 — FINAL BACKUP CHECK
+========================================================
+
+Verify there is a safe backup of the final course-submission state.
+
+If Phase 7/V2 exists:
+
+Make sure the final course version can still be reproduced.
+
+Do not destroy it.
+
+========================================================
+STEP 54 — AUDIT SUMMARY
+========================================================
+
+At the end provide:
+
+FINAL AUDIT STATUS
+
+Requirements:
+PASS / PARTIAL / FAIL
+
+Backend:
+PASS / PARTIAL / FAIL
+
+Frontend:
+PASS / PARTIAL / FAIL
+
+RAG:
+PASS / PARTIAL / FAIL
+
+Agents:
+PASS / PARTIAL / FAIL
+
+Tools:
+PASS / PARTIAL / FAIL
+
+Critic:
+PASS / PARTIAL / FAIL
+
+Risk Engine:
+PASS / PARTIAL / FAIL
+
+GitHub:
+PASS / PARTIAL / FAIL
+
+GitHub Actions:
+PASS / PARTIAL / FAIL
+
+Security:
+PASS / PARTIAL / FAIL
+
+Observability:
+PASS / PARTIAL / FAIL
+
+Evaluation:
+PASS / PARTIAL / FAIL
+
+Deployment:
+PASS / PARTIAL / FAIL
+
+End-to-End:
+PASS / PARTIAL / FAIL
+
+Browser:
+PASS / PARTIAL / FAIL
+
+Documentation:
+PASS / PARTIAL / FAIL
+
+Viva Readiness:
+PASS / PARTIAL / FAIL
+
+Blockers:
+...
+
+Known Limitations:
+...
+
+Final Status:
+READY / READY WITH KNOWN LIMITATIONS / NOT READY
+
+========================================================
+IMPORTANT FINAL RULE
+========================================================
+
+Do not modify the project during the initial audit.
+
+Do not "fix" tests to make them pass.
+
+Do not lower requirements.
+
+Do not hide failures.
+
+Do not fabricate evidence.
+
+Do not create fake demo results.
+
+Do not turn unknown into PASS.
+
+Do not call untested features working.
+
+Do not produce a numerical rating.
+
+========================================================
+START NOW
+========================================================
+
+FIRST:
+
+1. Read `prd.md`
+2. Read all PHASE*DONE.md files
+3. Inspect the complete repository
+4. Build the audit matrix
+5. Launch parallel read-only auditors
+6. Run the real verification tests
+7. Test the browser
+8. Test Docker
+9. Test GitHub
+10. Test the full end-to-end workflow
+11. Test the evaluation suite
+12. Perform security audit
+13. Perform viva audit
+14. Create FINAL_AUDIT.md
+15. Create RELEASE_TEST_REPORT.md
+16. Create VIVA_AUDIT.md
+17. Create FINAL_DEMO_CHECKLIST.md
+18. Report READY / READY WITH KNOWN LIMITATIONS / NOT READY
+
+DO NOT MODIFY PRODUCT CODE DURING THE INITIAL AUDIT.
+
+Begin now.
