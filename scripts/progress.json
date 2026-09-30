@@ -1,60 +1,72 @@
 {
   "project": "DeploySafe",
-  "phase": "Phase 2 - Repository Analysis + RAG Foundation",
+  "phase": "Phase 3 — Core Multi-Agent DeploySafe",
   "streams": {
-    "AGENT_A_LOADER": {
-      "name": "Repository Ingestion (Local, GitHub, ZIP)",
+    "AGENT_A_ORCHESTRATOR": {
+      "name": "CrewAI Flow Orchestration & State Model",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/services/rag/loader.py"]
+      "deliverables": ["backend/app/agents/analysis_flow.py", "backend/app/models/analysis_schemas.py"]
     },
-    "AGENT_B_DISCOVERY": {
-      "name": "File Discovery, Filtering & Secret Redaction",
+    "AGENT_B_CODE": {
+      "name": "Code Analysis Agent & Pattern Checks",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/services/rag/discovery.py"]
+      "deliverables": ["backend/app/agents/specialized/code_agent.py", "backend/app/agents/prompts/code_agent.md"]
     },
-    "AGENT_C_CHUNKER": {
-      "name": "Intelligent Semantic Chunking & Line Tracking",
+    "AGENT_C_DEP": {
+      "name": "Dependency Agent & Manifest Parsers",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/services/rag/chunker.py"]
+      "deliverables": ["backend/app/agents/specialized/dependency_agent.py", "backend/app/agents/prompts/dependency_agent.md"]
     },
-    "AGENT_D_EMBEDDINGS": {
-      "name": "Embedding Abstraction (Gemini + Local Fallback)",
+    "AGENT_D_CONFIG": {
+      "name": "Configuration Agent & Docker/Env Audits",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/services/rag/embeddings.py"]
+      "deliverables": ["backend/app/agents/specialized/config_agent.py", "backend/app/agents/prompts/config_agent.md"]
     },
-    "AGENT_E_CHROMA": {
-      "name": "Chroma Vector Store & Repository Isolation",
+    "AGENT_E_TEST": {
+      "name": "Test Agent & Sandboxed Safe Execution",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/services/rag/vector_store.py"]
+      "deliverables": ["backend/app/agents/specialized/test_agent.py", "backend/app/services/tools/test_tools.py"]
     },
-    "AGENT_F_RETRIEVER": {
-      "name": "RAG Retrieval Service & Indexer Pipeline",
+    "AGENT_F_RAG": {
+      "name": "Documentation / RAG Context Correlation",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/services/rag/retriever.py", "backend/app/services/rag/indexer.py"]
+      "deliverables": ["backend/app/agents/specialized/rag_agent.py", "backend/app/services/tools/rag_tools.py"]
     },
-    "AGENT_G_API": {
-      "name": "Repository Ingestion & Search REST APIs",
+    "AGENT_G_SEC": {
+      "name": "Security Analysis Agent & Secret Masking",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/api/v1/repositories.py"]
+      "deliverables": ["backend/app/agents/specialized/security_agent.py", "backend/app/services/tools/security_tools.py"]
     },
-    "AGENT_H_UI": {
-      "name": "Frontend Ingestion, Indexing & Evidence Viewer",
+    "AGENT_H_CRITIC": {
+      "name": "Critic Validation & Anti-Hallucination Gate",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["frontend/src/pages/Repositories.tsx"]
+      "deliverables": ["backend/app/agents/specialized/critic_agent.py", "backend/app/agents/prompts/critic_agent.md"]
+    },
+    "AGENT_I_REPORT": {
+      "name": "Report Synthesis & Severity Metrics",
+      "status": "COMPLETED",
+      "progress_pct": 100,
+      "deliverables": ["backend/app/agents/specialized/report_agent.py", "backend/app/agents/prompts/report_agent.md"]
+    },
+    "AGENT_J_UI": {
+      "name": "React Analysis Dashboard & Evidence Viewer",
+      "status": "COMPLETED",
+      "progress_pct": 100,
+      "deliverables": ["frontend/src/pages/Analyze.tsx", "frontend/src/pages/Agents.tsx", "frontend/src/pages/Findings.tsx"]
     },
     "AGENT_QA_TESTS": {
-      "name": "QA Tests, Demo Repo & Documentation",
+      "name": "Pytest Suite (50/50 Pass) & Demo Repo",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["demo-repos/deploysafe-rag-demo/", "backend/tests/test_rag_*.py", "docs/rag.md", "PHASE2DONE.md"]
+      "deliverables": ["demo-repos/deploysafe-analysis-demo/", "backend/tests/test_phase3_*.py", "docs/agents.md", "PHASE3DONE.md"]
     }
   }
 }

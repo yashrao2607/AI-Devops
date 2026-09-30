@@ -148,3 +148,56 @@ graph TD
 5. **ChromaVectorStore:** Enforces strict repository isolation with query filtering (`where={"repository_id": ...}`) and persistence in `CHROMA_PATH`.
 6. **RepositoryRetriever:** Evaluates relevance thresholds (`FOUND`, `LOW_RELEVANCE`, `NOT_FOUND`), preventing hallucinated responses.
 7. **REST Endpoints:** Mounted at `/api/v1/repositories/*` for ingestion, indexing status, semantic search, and file discovery.
+
+---
+
+## 7. Phase 3: Core Multi-Agent Intelligence Layer
+
+```mermaid
+graph TD
+    Repo[Ingested Repository Snapshot] --> Flow[DeploySafeAnalysisFlow]
+    Flow --> Ctx[Analysis Context Builder]
+    Ctx --> Plan[Orchestrator Planning]
+    
+    subgraph Parallel Analysis Execution
+        Plan --> CodeAgent[Code Analysis Agent]
+        Plan --> DepAgent[Dependency Agent]
+        Plan --> ConfigAgent[Configuration Agent]
+        Plan --> TestAgent[Test Agent]
+        Plan --> RAGAgent[Documentation / RAG Agent]
+        Plan --> SecAgent[Security Analysis Agent]
+    end
+    
+    subgraph Tool Layer & Sandbox
+        CodeAgent & ConfigAgent --> RepoTools[RepositoryTools: Line Slicing & Diff]
+        DepAgent --> ManifestTools[Manifest Parsers]
+        TestAgent --> SafeExec[SafeCommandExecutor: Sandboxed Pytest]
+        RAGAgent --> ChromaStore[(Chroma Vector Store)]
+        SecAgent --> Scanners[Bandit & Secret Redaction Scanner]
+    end
+    
+    CodeAgent & DepAgent & ConfigAgent & TestAgent & RAGAgent & SecAgent --> Aggregator[Finding Aggregator]
+    Aggregator --> Critic[Critic Agent: Ground Truth Gatekeeper]
+    
+    Critic -->|Physical File Check| DiskCheck{File Exists on Disk?}
+    DiskCheck -- Yes --> GroundCheck{Evidence Substantial?}
+    DiskCheck -- No --> Reject[Status: REJECTED]
+    GroundCheck -- Yes --> DupCheck{Duplicate Check}
+    GroundCheck -- No --> LowEv[Status: INSUFFICIENT_EVIDENCE]
+    DupCheck -- Unique --> Valid[Status: VALIDATED]
+    DupCheck -- Redundant --> Merged[Status: DUPLICATE]
+    
+    Valid & Merged & Reject & LowEv --> ReportAgent[Report Synthesis Agent]
+    ReportAgent --> FinalReport[Structured Analysis Report]
+    FinalReport --> RESTAPI[/api/v1/analysis/*]
+    RESTAPI --> WebUI[React Analysis Dashboard & Evidence Viewer]
+```
+
+### Key Components Implemented in Phase 3
+1. **`DeploySafeAnalysisFlow`:** Orchestrates context preparation, dynamic planning based on repository technologies, parallel agent execution, Critic gatekeeping, and report compilation.
+2. **Specialized Agents:** 6 domain-specific agents (`CodeAnalysisAgent`, `DependencyAnalysisAgent`, `ConfigurationAnalysisAgent`, `TestAnalysisAgent`, `DocumentationRAGAgent`, `SecurityAnalysisAgent`) operating under prompt-injection isolation boundaries.
+3. **`CriticAgent`:** Adversarial reflection gatekeeper verifying physical file presence, line ranges, and merging duplicates.
+4. **Typed Tool Layer:** Sandboxed command execution with strict binary allowlists, path traversal defenses, secret redaction, and semantic retrieval.
+5. **Real-Time Telemetry:** Tracks per-agent duration, tools called, finding counts, and flow execution states.
+6. **Web Dashboard:** Interactive repository analysis interface with live agent timeline, severity metrics, filterable findings table, and line-accurate code evidence viewer.
+

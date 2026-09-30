@@ -6,41 +6,68 @@ import { Badge } from '../components/common/Badge.tsx';
 export const Agents: React.FC = () => {
   const agents = [
     {
-      name: 'Repository Readiness Agent',
-      role: 'Foundation Inspector',
-      desc: 'Performs baseline deployment artifact checks, repository discovery, and structured Pydantic assessment.',
-      phase: 'Phase 1'
+      name: 'Orchestrator Agent',
+      role: 'CrewAI Flow Controller',
+      desc: 'Coordinates repository analysis, formulates dynamic plans based on discovered tech stack, manages thread pool execution, and sequences Critic review.',
+      phase: 'Phase 3 Active',
+      tools: ['ThreadPoolExecutor', 'RepositoryTools', 'ChromaVectorStore']
     },
     {
       name: 'Code Analysis Agent',
-      role: 'AST & Pattern Inspector',
-      desc: 'Analyzes changed files, exception handling, breaking API changes, and hardcoded secrets.',
-      phase: 'Phase 3'
+      role: 'AST & Deployment Risk Inspector',
+      desc: 'Inspects changed files and source code for deployment risks: unhandled exceptions, breaking API signatures, and hardcoded localhost/dev endpoints.',
+      phase: 'Phase 3 Active',
+      tools: ['get_file_content', 'get_git_diff', 'code_check']
     },
     {
       name: 'Dependency Agent',
       role: 'Supply Chain Inspector',
-      desc: 'Checks added/removed packages, version changes, license conflicts, and security advisories.',
-      phase: 'Phase 3'
+      desc: 'Parses requirements.txt, package.json, pyproject.toml to flag unpinned versions, missing lockfiles, and hazardous upgrades.',
+      phase: 'Phase 3 Active',
+      tools: ['get_dependency_manifests']
     },
     {
       name: 'Configuration Agent',
-      role: 'Environment & Docker Inspector',
-      desc: 'Validates .env files, Dockerfiles, YAML manifests, and production configuration drift.',
-      phase: 'Phase 3'
+      role: 'Docker & Environment Inspector',
+      desc: 'Analyzes Dockerfiles, compose files, YAML manifests, and environment variables to flag unpinned base images and missing production configs.',
+      phase: 'Phase 3 Active',
+      tools: ['get_file_content', 'docker_check']
     },
     {
       name: 'Test Agent',
-      role: 'Regression & Coverage Inspector',
-      desc: 'Verifies test execution, reports failed tests, and flags missing regression coverage.',
-      phase: 'Phase 3'
+      role: 'Regression & Safety Inspector',
+      desc: 'Discovers test suites, safely runs sandboxed pytest runners, and strictly distinguishes observed test results from inferred test coverage.',
+      phase: 'Phase 3 Active',
+      tools: ['run_tests_safe', 'get_test_files']
+    },
+    {
+      name: 'Documentation / RAG Agent',
+      role: 'Chroma Vector Store Investigator',
+      desc: 'Queries indexed repository documentation and correlates documented deployment requirements (e.g. REDIS_URL) against actual configuration manifests.',
+      phase: 'Phase 3 Active',
+      tools: ['search_repository_context', 'ChromaRetriever']
+    },
+    {
+      name: 'Security Analysis Agent',
+      role: 'Static & Secret Scanner',
+      desc: 'Runs deterministic static scanners and regex secret detectors with automatic credential masking (***REDACTED_SECRET***).',
+      phase: 'Phase 3 Active',
+      tools: ['run_security_scan', 'BanditScanner', 'SecretScanner']
     },
     {
       name: 'Critic Agent',
-      role: 'Reflection & Evidence Validator',
-      desc: 'Cross-checks AI findings against repository citations, removes duplicates, and flags false positives.',
-      phase: 'Phase 3'
+      role: 'Ground-Truth Gatekeeper & Deduplicator',
+      desc: 'Cross-verifies all findings against concrete repository evidence, rejects hallucinations, marks duplicates, and audits confidence levels.',
+      phase: 'Phase 3 Active',
+      tools: ['verify_file_existence', 'anti_hallucination_gate']
     },
+    {
+      name: 'Report Synthesis Agent',
+      role: 'Executive Summary Formatter',
+      desc: 'Compiles validated findings, computes true severity counts, and generates actionable deployment-readiness intelligence reports.',
+      phase: 'Phase 3 Active',
+      tools: ['summarize_report']
+    }
   ];
 
   return (
@@ -51,23 +78,39 @@ export const Agents: React.FC = () => {
           CrewAI Multi-Agent Roster
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Specialized autonomous agents collaborating within the DeploySafe deployment readiness pipeline.
+          Specialized autonomous agents collaborating with deterministic tools and Critic validation in Phase 3.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {agents.map((agent) => (
-          <Card key={agent.name} className="border-slate-800">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-white">{agent.name}</h3>
-                <span className="text-xs font-mono text-emerald-400">{agent.role}</span>
+          <Card key={agent.name} className="border-slate-800 flex flex-col justify-between">
+            <div>
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-sm font-semibold text-white">{agent.name}</h3>
+                  <span className="text-xs font-mono text-emerald-400">{agent.role}</span>
+                </div>
+                <Badge variant="success">
+                  {agent.phase}
+                </Badge>
               </div>
-              <Badge variant={agent.phase === 'Phase 1' ? 'success' : 'neutral'}>
-                {agent.phase === 'Phase 1' ? 'PHASE 1 ACTIVE' : 'PHASE 3 ROADMAP'}
-              </Badge>
+              <p className="text-xs text-slate-400 mt-3 leading-relaxed">{agent.desc}</p>
             </div>
-            <p className="text-xs text-slate-400 mt-3">{agent.desc}</p>
+
+            <div className="mt-4 pt-3 border-t border-slate-800/80">
+              <span className="text-[10px] font-mono uppercase text-slate-500 block mb-1">Invoked Tools</span>
+              <div className="flex flex-wrap gap-1">
+                {agent.tools.map((tool) => (
+                  <span
+                    key={tool}
+                    className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-950 text-slate-300 border border-slate-800"
+                  >
+                    {tool}
+                  </span>
+                ))}
+              </div>
+            </div>
           </Card>
         ))}
       </div>

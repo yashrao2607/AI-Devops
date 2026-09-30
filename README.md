@@ -6,16 +6,20 @@ DeploySafe is a multi-agent AI deployment-readiness intelligence platform. It an
 
 ---
 
-## Current Status: Phase 2 — Repository Analysis + RAG Foundation
+## Current Status: Phase 3 — Core Multi-Agent DeploySafe
 
-Phase 2 introduces deep repository ingestion, AST/semantic chunking, Chroma vector storage, and verifiable RAG knowledge retrieval:
-- **Repository Ingestion:** Ingest local repository directories, remote GitHub repositories, and uploaded ZIP archives with Zip-Slip path traversal defense and quota enforcement.
-- **File Discovery & Secret Redaction:** Recursively scans repositories, categorizing files into 8 structural domains (`SOURCE_CODE`, `TEST`, `CONFIG`, `DOCUMENTATION`, `DOCKER`, `CI_CD`, `SCRIPT`, `OTHER`), applying ignore rules and redacting secrets (`***REDACTED_SECRET***`).
-- **Semantic Chunking:** Splits along classes, functions, markdown headings, and docker instruction boundaries with exact source line boundaries (`line_start`, `line_end`) and deterministic hashes.
-- **Embedding Abstraction:** Primary Gemini `text-embedding-004` (768 dimensions) with deterministic fallback `LocalEmbeddingProvider` (384 dimensions).
-- **Chroma Vector Store:** Isolated collections per repository (`CHROMA_PATH`), enforcing strict data isolation and in-memory testing mode.
-- **RAG Retrieval Engine:** Semantic vector search with anti-hallucination thresholding (`FOUND`, `LOW_RELEVANCE`, `NOT_FOUND`).
-- **Interactive UI:** Connected frontend page for repository ingestion, real-time pipeline telemetry, discovered files browser, and code evidence viewer with copyable snippets.
+Phase 3 implements the autonomous multi-agent intelligence layer coordinating 8 specialized agents, dynamic orchestrator planning, typed deterministic tools, RAG repository cross-correlation, and an adversarial Critic validation gatekeeper:
+- **Orchestrator Flow:** Dynamically formulates an `AnalysisPlan` based on discovered technologies and executes independent agents concurrently in a thread pool.
+- **Specialized Domain Agents:**
+  - `CodeAnalysisAgent`: Detects hardcoded localhost/dev endpoints, unhandled exceptions, and deployment hazards.
+  - `DependencyAnalysisAgent`: Parses package manifests (`requirements.txt`, `package.json`, etc.) to flag unpinned versions and missing lockfiles.
+  - `ConfigurationAnalysisAgent`: Inspects Dockerfiles and compose manifests for unpinned base images and configuration drift.
+  - `TestAnalysisAgent`: Safely executes sandboxed pytest runners and strictly distinguishes OBSERVED failures from INFERRED test coverage.
+  - `DocumentationRAGAgent`: Queries Chroma vector store, cross-correlating documented requirements (e.g. `REDIS_URL`) against actual deployment manifests.
+  - `SecurityAnalysisAgent`: Combines static analysis and credential detection with automatic secret masking (`***REDACTED_SECRET***`).
+- **Critic Agent Gatekeeper:** Adversarial verification enforcing physical file existence on disk, checking line numbers, merging duplicates, and guarding against LLM hallucinations.
+- **Report Synthesis Agent:** Aggregates audited findings and compiles real severity counts without fake risk scores.
+- **Full Web UI:** Interactive React analysis console with live agent execution timeline, severity summary cards, filterable findings table, and line-accurate code evidence viewer.
 
 ---
 
@@ -68,8 +72,12 @@ python -m pytest backend/tests -v
 
 ## Documentation Links
 - [Product Requirements Document (PRD)](file:///d:/NAVEEN-SIR_PROJECT/prd.md)
+- [Phase 3 Multi-Agent Architecture & Roster](file:///d:/NAVEEN-SIR_PROJECT/docs/agents.md)
+- [Phase 3 Typed Tool Layer & Security Sandbox](file:///d:/NAVEEN-SIR_PROJECT/docs/tools.md)
+- [Phase 3 Midterm Demonstration Guide](file:///d:/NAVEEN-SIR_PROJECT/docs/phase3-demo.md)
 - [Phase 2 RAG Architecture Specification](file:///d:/NAVEEN-SIR_PROJECT/docs/rag.md)
 - [System Architecture & Diagrams](file:///d:/NAVEEN-SIR_PROJECT/docs/architecture.md)
 - [API Key & Environment Setup Guide](file:///d:/NAVEEN-SIR_PROJECT/ENV_SETUP.md)
 - [Phase 1 Completion Report](file:///d:/NAVEEN-SIR_PROJECT/PHASE1DONE.md)
 - [Phase 2 Completion Report](file:///d:/NAVEEN-SIR_PROJECT/PHASE2DONE.md)
+- [Phase 3 Completion Report](file:///d:/NAVEEN-SIR_PROJECT/PHASE3DONE.md)
