@@ -9,6 +9,7 @@ interface CardProps {
   headerClassName?: string;
   bodyClassName?: string;
   hoverEffect?: boolean;
+  noPadding?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -20,6 +21,7 @@ export const Card: React.FC<CardProps> = ({
   headerClassName = '',
   bodyClassName = '',
   hoverEffect = false,
+  noPadding = false,
 }) => {
   return (
     <div
@@ -36,7 +38,7 @@ export const Card: React.FC<CardProps> = ({
           {action && <div className="shrink-0">{action}</div>}
         </div>
       )}
-      <div className={`p-5 ${bodyClassName}`}>{children}</div>
+      <div className={`${noPadding ? 'p-0' : 'p-5'} ${bodyClassName}`}>{children}</div>
     </div>
   );
 };

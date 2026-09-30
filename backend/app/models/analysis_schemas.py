@@ -62,13 +62,20 @@ class Finding(BaseModel):
         "NEEDS_REVIEW",
         "DUPLICATE",
         "REJECTED",
-        "INSUFFICIENT_EVIDENCE"
+        "INSUFFICIENT_EVIDENCE",
+        "DISMISSED"
     ] = "NEW"
     tool_name: Optional[str] = Field(default=None, description="Deterministic tool name if applicable")
     rule_id: Optional[str] = Field(default=None, description="Linter or scanner rule ID if applicable")
     retrieval_context: Optional[str] = Field(default=None, description="RAG retrieved context if used")
     related_files: List[str] = Field(default_factory=list, description="Related correlated files")
     critic_notes: Optional[str] = Field(default=None, description="Review remarks from Critic Agent")
+    dedup_group_id: Optional[str] = Field(default=None, description="Group ID linking duplicate findings")
+    merged_finding_ids: List[str] = Field(default_factory=list, description="IDs of duplicate findings merged into this one")
+    merged_agents: List[str] = Field(default_factory=list, description="All agents that discovered this issue")
+    validation_reason: Optional[str] = Field(default=None, description="Audit justification for validation status")
+    score_contribution: float = Field(default=0.0, description="Points contributed by this finding to overall risk score")
+    impact_level: Literal["CRITICAL", "HIGH", "MEDIUM", "LOW"] = Field(default="HIGH", description="Operational blast radius")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -153,10 +160,13 @@ class AnalysisRun(BaseModel):
     validated_findings_count: int = 0
     needs_review_count: int = 0
     rejected_count: int = 0
+    risk_score: float = Field(default=0.0, description="Normalized deterministic risk score (0-100)")
+    risk_level: Literal["LOW", "MODERATE", "HIGH", "CRITICAL"] = Field(default="LOW", description="Risk level tier")
+    score_breakdown: Dict[str, Any] = Field(default_factory=dict, description="Score explanation by severity")
     error: Optional[str] = None
 
 # ------------------------------------------------------------------------------
-# Final Analysis Report Schema (Step 21)
+# Final Analysis Report Schema (Step 21 & Phase 4)
 # ------------------------------------------------------------------------------
 class AnalysisReport(BaseModel):
     run_id: str
@@ -169,6 +179,10 @@ class AnalysisReport(BaseModel):
     status: Literal["COMPLETED", "PARTIAL", "FAILED"] = "COMPLETED"
     agents_executed: List[str] = Field(default_factory=list)
     tools_used: List[str] = Field(default_factory=list)
+    risk_score: float = Field(default=0.0, description="Deterministic risk score (0-100)")
+    risk_level: Literal["LOW", "MODERATE", "HIGH", "CRITICAL"] = Field(default="LOW", description="Risk tier")
+    score_breakdown: Dict[str, Any] = Field(default_factory=dict, description="Itemized score contributors")
+    dedup_summary: Dict[str, Any] = Field(default_factory=dict, description="Deduplication statistics")
     findings: List[Finding] = Field(default_factory=list)
     validated_findings: List[Finding] = Field(default_factory=list)
     needs_review_findings: List[Finding] = Field(default_factory=list)
@@ -178,3 +192,54 @@ class AnalysisReport(BaseModel):
     )
     summary: str = Field(description="Executive deployment-readiness intelligence summary")
     recommendations: List[str] = Field(default_factory=list)
+
+# ------------------------------------------------------------------------------
+# Phase 4 Deterministic Risk Engine Models (Parts 6 - 10)
+# ------------------------------------------------------------------------------
+class ScoreContributor(BaseModel):
+    finding_id: str
+    title: str
+    severity: Literal["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+    confidence: Literal["HIGH", "MEDIUM", "LOW"]
+    impact_level: Literal["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+    points: float
+    file_path: str
+    line_start: Optional[int] = None
+
+class RiskEvaluation(BaseModel):
+    risk_score: float = Field(ge=0.0, le=100.0, description="Normalized score bounded between 0 and 100")
+    risk_level: Literal["LOW", "MODERATE", "HIGH", "CRITICAL"]
+    raw_score: float
+    contributors: List[ScoreContributor] = Field(default_factory=list)
+    excluded_findings: List[Dict[str, str]] = Field(default_factory=list)
+    severity_breakdown: Dict[str, float] = Field(default_factory=dict)
+    formula_explanation: str = Field(
+        default="Score = min(100, round(sum(severity_weight * confidence_factor * impact_factor)))"
+    )
+
+# ------------------------------------------------------------------------------
+# Phase 4 Dashboard Summary Model (Part 11 & 14)
+# ------------------------------------------------------------------------------
+class DashboardSummary(BaseModel):
+    total_runs: int = 0
+    latest_run_id: Optional[str] = None
+    latest_repository_id: Optional[str] = None
+    latest_risk_score: float = 0.0
+    latest_risk_level: str = "LOW"
+    total_findings_detected: int = 0
+    validated_findings_count: int = 0
+    severity_distribution: Dict[str, int] = Field(
+        default_factory=lambda: {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0}
+    )
+    status_distribution: Dict[str, int] = Field(
+        default_factory=lambda: {
+            "VALIDATED": 0,
+            "NEEDS_REVIEW": 0,
+            "DUPLICATE": 0,
+            "REJECTED": 0,
+            "DISMISSED": 0
+        }
+    )
+    recent_runs: List[Dict[str, Any]] = Field(default_factory=list)
+    top_findings: List[Finding] = Field(default_factory=list)
+

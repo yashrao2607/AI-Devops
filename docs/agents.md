@@ -138,3 +138,31 @@ DeploySafe transforms deterministic static analysis and RAG knowledge retrieval 
 - **Individual Agent Failure:** If an agent encounters an exception, its state is marked `FAILED` with the captured error message; other agents continue unobstructed.
 - **Critic Fallback:** If the Critic Agent fails, candidate findings remain in `NEEDS_REVIEW` rather than falsely asserting `VALIDATED`.
 - **Provider Fallback:** LLM provider abstraction supports primary (Gemini/Groq) and fallback diagnostic modes.
+
+---
+
+## 5. Phase 4 Risk Engine Integration
+
+In Phase 4, agent outputs do **NOT** produce the final risk score. Instead, findings flow through a multi-stage verification and scoring pipeline:
+
+```
+[Specialized Agents]
+         ↓
+  Candidate Findings
+         ↓
+   [Critic Agent]  ──> Anti-hallucination & physical file grounding
+         ↓
+ [Deduplication]   ──> Multi-agent clustering & canonical election
+         ↓
+ [Validated Set]   ──> Validated findings with ground truth
+         ↓
+  [Risk Engine]    ──> Deterministic formula: min(100, sum(w * conf * impact))
+         ↓
+ [Analysis Report] ──> Executive summaries, UI dashboards, & exports
+```
+
+1. **Critic Grounding:** Checks physical files and rejects non-existent paths.
+2. **Finding Deduplication (`FindingDeduplicationService`):** Combines overlapping line ranges and rule IDs across agents (e.g. Code Agent and Security Agent both citing Dockerfile or compose). Merges reporting agents without losing attribution.
+3. **Deterministic Scoring (`RiskEngine`):** Applies mathematical formula with project-defined severity weights (35, 25, 15, 7) and confidence multipliers (1.0, 0.8, 0.6). Excludes duplicate or rejected items with audit reasons.
+4. **Authoritative Single Source:** The exact same score and breakdown appear across API, Overview Dashboard, Run Details, and exportable reports.
+

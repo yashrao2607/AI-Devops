@@ -201,3 +201,40 @@ graph TD
 5. **Real-Time Telemetry:** Tracks per-agent duration, tools called, finding counts, and flow execution states.
 6. **Web Dashboard:** Interactive repository analysis interface with live agent timeline, severity metrics, filterable findings table, and line-accurate code evidence viewer.
 
+---
+
+## 7. Phase 4 Architecture: Deterministic Risk Engine & Product UI
+
+```mermaid
+graph TD
+    Agents[Specialized Agents] --> RawFindings[Candidate Findings]
+    RawFindings --> Critic[Critic Agent: Physical File & Grounding Gatekeeper]
+    Critic --> ValidatedCandidate[Grounded Findings]
+    
+    subgraph Phase 4 Deterministic Layer
+        ValidatedCandidate --> Dedup[FindingDeduplicationService]
+        Dedup --> CanonicalFindings[Canonical Findings & Merged Groups]
+        CanonicalFindings --> RiskEngine[RiskEngine]
+        RiskEngine --> Formula["Score = min(100, round(sum(w * conf * impact)))"]
+        Formula --> RiskScore[Deterministic Risk Score & Level]
+    end
+    
+    RiskScore --> ReportService[ReportService]
+    ReportService --> JSONExport[JSON Contract]
+    ReportService --> MDExport[Markdown Report]
+    ReportService --> HTMLExport[Standalone HTML Report]
+    
+    RiskScore --> APIRoutes[REST API: /api/v1/dashboard, /api/v1/runs, /api/v1/findings]
+    APIRoutes --> UIOverview[Overview Dashboard with Risk Hero & Formula Modal]
+    APIRoutes --> UIRuns[Run History & Agent Telemetry Inspector]
+    APIRoutes --> UIFindings[Findings Directory with Status Triage]
+    APIRoutes --> UIReports[Interactive Multi-Format Report Viewer]
+```
+
+### Phase 4 Architectural Guarantees
+1. **Non-LLM Scoring:** The Risk Engine calculates scores through pure, reproducible mathematics. LLMs never emit the final deployment risk number.
+2. **Deduplication Identity:** Identifies overlapping line ranges and matching scanner rules across agents, consolidating duplicates while preserving attribution.
+3. **Auditability:** Complete itemization of contributors (+pts) and exclusions with justifications (e.g. DUPLICATE, DISMISSED).
+4. **Multi-Format Exportability:** Deterministic reports ready for pipeline gates (JSON), documentation (Markdown), and human audit (standalone styled HTML).
+
+

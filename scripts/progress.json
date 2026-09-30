@@ -1,72 +1,87 @@
 {
   "project": "DeploySafe",
-  "phase": "Phase 3 — Core Multi-Agent DeploySafe",
+  "phase": "Phase 4 — Risk Engine + Professional Product UI",
   "streams": {
-    "AGENT_A_ORCHESTRATOR": {
-      "name": "CrewAI Flow Orchestration & State Model",
+    "AGENT_A_RISK_ENGINE": {
+      "name": "Deterministic Risk Engine & Mathematical Scoring",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/agents/analysis_flow.py", "backend/app/models/analysis_schemas.py"]
+      "deliverables": [
+        "backend/app/services/risk_engine.py",
+        "backend/tests/test_phase4_risk_engine.py",
+        "docs/risk-model.md"
+      ]
     },
-    "AGENT_B_CODE": {
-      "name": "Code Analysis Agent & Pattern Checks",
+    "AGENT_B_DEDUP": {
+      "name": "Finding Deduplication & Multi-Attribute Clustering",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/agents/specialized/code_agent.py", "backend/app/agents/prompts/code_agent.md"]
+      "deliverables": [
+        "backend/app/services/deduplication.py",
+        "backend/tests/test_phase4_dedup.py"
+      ]
     },
-    "AGENT_C_DEP": {
-      "name": "Dependency Agent & Manifest Parsers",
+    "AGENT_C_FINDINGS_LIFECYCLE": {
+      "name": "Finding Lifecycle Management & Status Triage API",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/agents/specialized/dependency_agent.py", "backend/app/agents/prompts/dependency_agent.md"]
+      "deliverables": [
+        "backend/app/models/analysis_schemas.py",
+        "backend/app/api/v1/findings.py",
+        "backend/app/api/v1/runs.py"
+      ]
     },
-    "AGENT_D_CONFIG": {
-      "name": "Configuration Agent & Docker/Env Audits",
+    "AGENT_D_REPORTS_SERVICE": {
+      "name": "Multi-Format Report Preparation Service (HTML/MD/JSON)",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/agents/specialized/config_agent.py", "backend/app/agents/prompts/config_agent.md"]
+      "deliverables": [
+        "backend/app/services/report_service.py",
+        "backend/tests/test_phase4_reports.py"
+      ]
     },
-    "AGENT_E_TEST": {
-      "name": "Test Agent & Sandboxed Safe Execution",
+    "AGENT_E_DASHBOARD_UI": {
+      "name": "Overview Dashboard with Risk Hero & Formula Modal",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/agents/specialized/test_agent.py", "backend/app/services/tools/test_tools.py"]
+      "deliverables": [
+        "frontend/src/pages/Dashboard.tsx",
+        "backend/app/api/v1/dashboard.py"
+      ]
     },
-    "AGENT_F_RAG": {
-      "name": "Documentation / RAG Context Correlation",
+    "AGENT_F_RUNS_UI": {
+      "name": "Run History & Agent Telemetry Inspector",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/agents/specialized/rag_agent.py", "backend/app/services/tools/rag_tools.py"]
+      "deliverables": [
+        "frontend/src/pages/Runs.tsx"
+      ]
     },
-    "AGENT_G_SEC": {
-      "name": "Security Analysis Agent & Secret Masking",
+    "AGENT_G_FINDINGS_UI": {
+      "name": "Findings Directory & Live Status Triage Modal",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/agents/specialized/security_agent.py", "backend/app/services/tools/security_tools.py"]
+      "deliverables": [
+        "frontend/src/pages/Findings.tsx"
+      ]
     },
-    "AGENT_H_CRITIC": {
-      "name": "Critic Validation & Anti-Hallucination Gate",
+    "AGENT_H_REPORTS_UI": {
+      "name": "Interactive Multi-Format Report Viewer & Export",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/agents/specialized/critic_agent.py", "backend/app/agents/prompts/critic_agent.md"]
+      "deliverables": [
+        "frontend/src/pages/Reports.tsx"
+      ]
     },
-    "AGENT_I_REPORT": {
-      "name": "Report Synthesis & Severity Metrics",
+    "AGENT_I_QA_TESTS": {
+      "name": "Automated Pytest Suite (62/62 Passed) & Verification",
       "status": "COMPLETED",
       "progress_pct": 100,
-      "deliverables": ["backend/app/agents/specialized/report_agent.py", "backend/app/agents/prompts/report_agent.md"]
-    },
-    "AGENT_J_UI": {
-      "name": "React Analysis Dashboard & Evidence Viewer",
-      "status": "COMPLETED",
-      "progress_pct": 100,
-      "deliverables": ["frontend/src/pages/Analyze.tsx", "frontend/src/pages/Agents.tsx", "frontend/src/pages/Findings.tsx"]
-    },
-    "AGENT_QA_TESTS": {
-      "name": "Pytest Suite (50/50 Pass) & Demo Repo",
-      "status": "COMPLETED",
-      "progress_pct": 100,
-      "deliverables": ["demo-repos/deploysafe-analysis-demo/", "backend/tests/test_phase3_*.py", "docs/agents.md", "PHASE3DONE.md"]
+      "deliverables": [
+        "backend/tests/test_phase4_*.py",
+        "docs/phase4-demo.md",
+        "PHASE4DONE.md"
+      ]
     }
   }
 }

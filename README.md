@@ -6,20 +6,18 @@ DeploySafe is a multi-agent AI deployment-readiness intelligence platform. It an
 
 ---
 
-## Current Status: Phase 3 — Core Multi-Agent DeploySafe
+## Current Status: Phase 4 — Risk Engine + Professional Product UI
 
-Phase 3 implements the autonomous multi-agent intelligence layer coordinating 8 specialized agents, dynamic orchestrator planning, typed deterministic tools, RAG repository cross-correlation, and an adversarial Critic validation gatekeeper:
-- **Orchestrator Flow:** Dynamically formulates an `AnalysisPlan` based on discovered technologies and executes independent agents concurrently in a thread pool.
-- **Specialized Domain Agents:**
-  - `CodeAnalysisAgent`: Detects hardcoded localhost/dev endpoints, unhandled exceptions, and deployment hazards.
-  - `DependencyAnalysisAgent`: Parses package manifests (`requirements.txt`, `package.json`, etc.) to flag unpinned versions and missing lockfiles.
-  - `ConfigurationAnalysisAgent`: Inspects Dockerfiles and compose manifests for unpinned base images and configuration drift.
-  - `TestAnalysisAgent`: Safely executes sandboxed pytest runners and strictly distinguishes OBSERVED failures from INFERRED test coverage.
-  - `DocumentationRAGAgent`: Queries Chroma vector store, cross-correlating documented requirements (e.g. `REDIS_URL`) against actual deployment manifests.
-  - `SecurityAnalysisAgent`: Combines static analysis and credential detection with automatic secret masking (`***REDACTED_SECRET***`).
-- **Critic Agent Gatekeeper:** Adversarial verification enforcing physical file existence on disk, checking line numbers, merging duplicates, and guarding against LLM hallucinations.
-- **Report Synthesis Agent:** Aggregates audited findings and compiles real severity counts without fake risk scores.
-- **Full Web UI:** Interactive React analysis console with live agent execution timeline, severity summary cards, filterable findings table, and line-accurate code evidence viewer.
+Phase 4 transforms the working multi-agent analysis system into a production-grade deployment-risk platform featuring mathematical risk scoring, finding lifecycle management, and a polished developer UI:
+- **Deterministic Risk Engine (`RiskEngine`):** Computes bounded 0–100 scores via mathematical weighting (Critical=35, High=25, Medium=15, Low=7) adjusted by confidence and impact multipliers. LLMs never directly generate the final score.
+- **Finding Deduplication (`FindingDeduplicationService`):** Multi-attribute clustering across files, line ranges, categories, and scanner rules, merging duplicate agent discoveries while preserving attribution.
+- **Auditable Status Lifecycle:** Findings progress through strictly governed states (`VALIDATED`, `NEEDS_REVIEW`, `DUPLICATE`, `REJECTED`, `INSUFFICIENT_EVIDENCE`, `DISMISSED`) with manual triage overrides that dynamically trigger score recalculations.
+- **Production Developer Dashboard:**
+  - **Overview Dashboard:** Risk Score Hero Gauge, mathematical breakdown modal ("How is this calculated?"), severity breakdown cards, top findings, and recent runs.
+  - **Runs Console:** Chronological historical runs table, agent execution telemetry (duration, tools called, finding counts), and score contributor audits.
+  - **Findings Directory:** Global searchable catalog with multi-attribute filters (Severity, Status, Agent) and inspect drawer with code evidence and actionable remediation.
+  - **Reports & Exports:** Interactive multi-format preview with instant downloads (standalone styled HTML, documentation Markdown, and structured JSON).
+- **Multi-Format Report Service:** Generates self-contained styled HTML documents, clean Markdown reports, and JSON API payloads for CI/CD gates.
 
 ---
 
@@ -72,6 +70,8 @@ python -m pytest backend/tests -v
 
 ## Documentation Links
 - [Product Requirements Document (PRD)](file:///d:/NAVEEN-SIR_PROJECT/prd.md)
+- [Phase 4 Deterministic Risk Model & Formula](file:///d:/NAVEEN-SIR_PROJECT/docs/risk-model.md)
+- [Phase 4 Live Demonstration & Viva Guide](file:///d:/NAVEEN-SIR_PROJECT/docs/phase4-demo.md)
 - [Phase 3 Multi-Agent Architecture & Roster](file:///d:/NAVEEN-SIR_PROJECT/docs/agents.md)
 - [Phase 3 Typed Tool Layer & Security Sandbox](file:///d:/NAVEEN-SIR_PROJECT/docs/tools.md)
 - [Phase 3 Midterm Demonstration Guide](file:///d:/NAVEEN-SIR_PROJECT/docs/phase3-demo.md)
@@ -81,3 +81,4 @@ python -m pytest backend/tests -v
 - [Phase 1 Completion Report](file:///d:/NAVEEN-SIR_PROJECT/PHASE1DONE.md)
 - [Phase 2 Completion Report](file:///d:/NAVEEN-SIR_PROJECT/PHASE2DONE.md)
 - [Phase 3 Completion Report](file:///d:/NAVEEN-SIR_PROJECT/PHASE3DONE.md)
+- [Phase 4 Completion Report](file:///d:/NAVEEN-SIR_PROJECT/PHASE4DONE.md)

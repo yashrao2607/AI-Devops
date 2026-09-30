@@ -144,3 +144,35 @@ def get_repository_stats(repository_id: str):
         total_size_bytes=snapshot.total_size_bytes if snapshot else 0,
         status=index_status.status if index_status else ("INDEXED" if vec_count > 0 else "NOT_INDEXED")
     )
+
+@router.get("/{repository_id}/summary")
+def get_repository_summary(repository_id: str):
+    """
+    Returns latest analysis risk score, risk level, and health overview
+    for a specific ingested repository.
+    """
+    from backend.app.agents.analysis_flow import DeploySafeAnalysisFlow
+
+    # Check for matching reports
+    reports = DeploySafeAnalysisFlow.list_reports()
+    matching_reports = [r for r in reports if r.repository_id == repository_id or repository_id in r.repository_name]
+    latest_report = None
+    if matching_reports:
+        matching_reports.sort(key=lambda r: r.analyzed_at, reverse=True)
+        latest_report = matching_reports[0]
+
+    snapshot = _ACTIVE_SNAPSHOTS.get(repository_id)
+
+    return {
+        "repository_id": repository_id,
+        "repository_name": snapshot.repository_name if snapshot else (latest_report.repository_name if latest_report else repository_id),
+        "has_analysis": latest_report is not None,
+        "latest_run_id": latest_report.run_id if latest_report else None,
+        "risk_score": latest_report.risk_score if latest_report else None,
+        "risk_level": latest_report.risk_level if latest_report else "UNKNOWN",
+        "findings_count": len(latest_report.findings) if latest_report else 0,
+        "validated_count": len(latest_report.validated_findings) if latest_report else 0,
+        "analyzed_at": latest_report.analyzed_at.isoformat() if latest_report else None,
+        "summary": latest_report.summary if latest_report else "No deployment risk analyses have been recorded for this repository."
+    }
+

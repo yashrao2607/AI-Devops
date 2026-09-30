@@ -81,6 +81,10 @@ interface AnalysisReport {
   status: 'COMPLETED' | 'PARTIAL' | 'FAILED';
   agents_executed: string[];
   tools_used: string[];
+  risk_score?: number;
+  risk_level?: 'LOW' | 'MODERATE' | 'HIGH' | 'CRITICAL';
+  score_breakdown?: any;
+  dedup_summary?: any;
   findings: Finding[];
   validated_findings: Finding[];
   needs_review_findings: Finding[];
@@ -453,6 +457,63 @@ export const Analyze: React.FC = () => {
           })}
         </div>
       </Card>
+
+      {/* Phase 4 Deterministic Risk Score Banner */}
+      {report && report.risk_score !== undefined && (
+        <Card className="border-emerald-500/30 bg-slate-950/80">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center font-mono">
+                <span className="text-xl font-bold text-white">{report.risk_score}</span>
+                <span className="text-[9px] text-slate-400">/ 100</span>
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-bold text-white font-mono">
+                    Deterministic Risk Score
+                  </h3>
+                  <Badge
+                    variant={
+                      report.risk_level === 'CRITICAL'
+                        ? 'critical'
+                        : report.risk_level === 'HIGH'
+                        ? 'high'
+                        : report.risk_level === 'MODERATE'
+                        ? 'moderate'
+                        : 'low'
+                    }
+                    size="sm"
+                  >
+                    {report.risk_level} RISK
+                  </Badge>
+                </div>
+                <p className="text-xs text-slate-400 font-mono mt-0.5">
+                  Audited by Critic Agent & computed deterministically via Phase 4 RiskEngine.
+                </p>
+              </div>
+            </div>
+
+            {/* Deduplication & Export Shortcuts */}
+            <div className="flex items-center gap-3 font-mono text-xs">
+              {report.dedup_summary && (
+                <div className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
+                  <span className="text-emerald-400 font-semibold">
+                    {report.dedup_summary.canonical_count}
+                  </span>{' '}
+                  canonical findings ({report.dedup_summary.duplicate_count} merged duplicates)
+                </div>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.open(`/api/v1/runs/${report.run_id}/report?format=html`, '_blank')}
+              >
+                Export Report
+              </Button>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Analysis Severity Summary Cards (Step 21 & Step 27) */}
       {report && (

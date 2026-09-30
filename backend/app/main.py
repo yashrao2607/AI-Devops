@@ -9,8 +9,11 @@ from backend.app.api.v1.health import router as health_router
 from backend.app.api.v1.flow import router as flow_router
 from backend.app.api.v1.repositories import router as repositories_router
 from backend.app.api.v1.analysis import router as analysis_router
+from backend.app.api.v1.dashboard import router as dashboard_router
+from backend.app.api.v1.runs import router as runs_router
+from backend.app.api.v1.findings import router as findings_router
 
-@asynccontextmanager
+# Startup actions
 async def lifespan(app: FastAPI):
     # Startup actions
     logger.info("Starting %s v%s in %s environment...", settings.PROJECT_NAME, settings.VERSION, settings.APP_ENV)
@@ -57,6 +60,9 @@ app.include_router(health_router, prefix="/api/v1", tags=["System & Health"])
 app.include_router(flow_router, prefix="/api/v1/flow", tags=["CrewAI Flows"])
 app.include_router(repositories_router, prefix="/api/v1/repositories", tags=["Repositories & RAG"])
 app.include_router(analysis_router, prefix="/api/v1/analysis", tags=["Multi-Agent Analysis"])
+app.include_router(dashboard_router, prefix="/api/v1/dashboard", tags=["Dashboard & Executive Metrics"])
+app.include_router(runs_router, prefix="/api/v1/runs", tags=["Runs & Findings Management"])
+app.include_router(findings_router, prefix="/api/v1/findings", tags=["Findings Directory"])
 
 # Root fallback
 @app.get("/")

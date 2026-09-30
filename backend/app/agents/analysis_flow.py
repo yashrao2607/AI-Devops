@@ -25,6 +25,8 @@ from backend.app.agents.specialized.rag_agent import DocumentationRAGAgent
 from backend.app.agents.specialized.security_agent import SecurityAnalysisAgent
 from backend.app.agents.specialized.critic_agent import CriticAgent
 from backend.app.agents.specialized.report_agent import ReportGenerationAgent
+from backend.app.services.deduplication import FindingDeduplicationService
+from backend.app.services.risk_engine import RiskEngine
 from backend.app.core.logging import logger
 
 # Global in-memory registry of active and completed analysis runs for live telemetry
@@ -33,9 +35,10 @@ _ACTIVE_REPORTS: Dict[str, AnalysisReport] = {}
 
 class DeploySafeAnalysisFlow:
     """
-    CrewAI-compatible Multi-Agent Analysis Flow (Step 5 of Phase 3).
+    CrewAI-compatible Multi-Agent Analysis Flow with Phase 4 Deterministic Risk Engine.
     Coordinates specialized agents, enforces planning, executes parallel analysis,
-    triggers Critic review, and compiles the final structured report.
+    triggers Critic review, performs multi-attribute deduplication, and computes
+    explainable 0-100 risk scoring.
     """
 
     def __init__(self, run_id: Optional[str] = None):
@@ -48,6 +51,14 @@ class DeploySafeAnalysisFlow:
     @classmethod
     def get_report(cls, run_id: str) -> Optional[AnalysisReport]:
         return _ACTIVE_REPORTS.get(run_id)
+
+    @classmethod
+    def list_runs(cls) -> List[AnalysisRun]:
+        return list(_ACTIVE_ANALYSIS_RUNS.values())
+
+    @classmethod
+    def list_reports(cls) -> List[AnalysisReport]:
+        return list(_ACTIVE_REPORTS.values())
 
     def execute_flow(
         self,
@@ -197,17 +208,30 @@ class DeploySafeAnalysisFlow:
             critic_state.duration_seconds = round(time.time() - c_start, 2)
             critic_state.completed_at = datetime.utcnow()
 
+            # ------------------------------------------------------------------
+            # Phase E.2: Finding Deduplication (Phase 4 Part 4)
+            # ------------------------------------------------------------------
+            deduped_findings, dedup_summary = FindingDeduplicationService.deduplicate(reviewed_findings)
+
+            # ------------------------------------------------------------------
+            # Phase E.3: Deterministic Risk Engine Evaluation (Phase 4 Parts 6-10)
+            # ------------------------------------------------------------------
+            risk_eval = RiskEngine.evaluate(deduped_findings)
+
             # Record stats
-            validated_count = sum(1 for d in decisions if d.decision == "VALIDATED")
-            needs_review_count = sum(1 for d in decisions if d.decision == "NEEDS_REVIEW")
-            rejected_count = sum(1 for d in decisions if d.decision in ("REJECTED", "INSUFFICIENT_EVIDENCE", "DUPLICATE"))
+            validated_count = sum(1 for f in deduped_findings if f.status == "VALIDATED")
+            needs_review_count = sum(1 for f in deduped_findings if f.status == "NEEDS_REVIEW")
+            rejected_count = sum(1 for f in deduped_findings if f.status in ("REJECTED", "INSUFFICIENT_EVIDENCE", "DUPLICATE"))
 
             run.validated_findings_count = validated_count
             run.needs_review_count = needs_review_count
             run.rejected_count = rejected_count
+            run.risk_score = risk_eval.risk_score
+            run.risk_level = risk_eval.risk_level
+            run.score_breakdown = risk_eval.model_dump()
 
             # ------------------------------------------------------------------
-            # Phase F: Generate Structured Report (Step 21)
+            # Phase F: Generate Structured Report (Step 21 & Phase 4 Part 6)
             # ------------------------------------------------------------------
             run.status = "FINALIZING"
             report_state = run.agent_states["report"]
@@ -222,11 +246,17 @@ class DeploySafeAnalysisFlow:
             report = ReportGenerationAgent.generate_report(
                 context=context,
                 run_id=self.run_id,
-                findings=reviewed_findings,
+                findings=deduped_findings,
                 agents_executed=executed_names,
                 tools_used=tools_used,
                 duration_seconds=total_duration
             )
+
+            # Enrich report with Phase 4 deterministic scoring & deduplication
+            report.risk_score = risk_eval.risk_score
+            report.risk_level = risk_eval.risk_level
+            report.score_breakdown = risk_eval.model_dump()
+            report.dedup_summary = dedup_summary
 
             report_state.status = "COMPLETED"
             report_state.duration_seconds = round(time.time() - r_start, 2)
