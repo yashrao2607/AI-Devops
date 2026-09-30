@@ -1,0 +1,1620 @@
+You are continuing the DeploySafe project.
+
+THIS IS PHASE 2 ONLY.
+
+Your job is to inspect the current project, read the original `prd.md`, read `PHASE1DONE.md`, verify the actual state of Phase 1, and then implement ONLY PHASE 2.
+
+Do not start Phase 3.
+Do not build the full multi-agent analysis system yet.
+Do not add fake agent behavior.
+Do not claim success without real testing.
+
+========================================================
+PHASE 2 NAME
+========================================================
+
+Repository Analysis + RAG Foundation
+
+PRIMARY OBJECTIVE
+
+Build a reliable repository ingestion, analysis-context, embedding, vector-storage, and retrieval layer that allows DeploySafe to understand a software repository and retrieve relevant repository evidence later for its agents.
+
+At the end of Phase 2:
+
+Repository
+    ↓
+Ingestion
+    ↓
+File discovery
+    ↓
+Safe filtering
+    ↓
+Parsing / chunking
+    ↓
+Metadata
+    ↓
+Embeddings
+    ↓
+Chroma
+    ↓
+Semantic retrieval
+    ↓
+Evidence with file + line information
+
+The system must be real and testable.
+
+========================================================
+RULE 0 — SOURCE OF TRUTH
+========================================================
+
+Before doing anything:
+
+1. Find `prd.md`.
+2. Read the complete file.
+3. Find and read `PHASE1DONE.md`.
+4. Inspect all existing Phase-1 source code.
+5. Inspect current dependencies.
+6. Inspect current environment configuration.
+7. Inspect existing tests.
+8. Inspect current git state.
+9. Determine what Phase 1 actually implemented.
+10. Compare actual implementation with the Phase-1 documentation.
+
+Do NOT assume Phase 1 is correct simply because `PHASE1DONE.md` says so.
+
+If anything documented as completed is actually broken:
+- identify it
+- fix the minimum required issue
+- document it
+- then continue Phase 2
+
+Do not rewrite the whole project.
+
+========================================================
+RULE 1 — PHASE BOUNDARY
+========================================================
+
+Implement ONLY Phase 2 from `prd.md`.
+
+Phase 2 scope:
+
+1. Repository loader
+2. File discovery
+3. Safe ingestion
+4. Intelligent chunking
+5. Embeddings
+6. Chroma vector database
+7. Repository knowledge retrieval tool
+8. RAG testing and verification
+
+Do NOT implement these unless they are required for Phase 2 infrastructure:
+
+- full Code Agent
+- Dependency Agent
+- Config Agent
+- Test Agent
+- Security Agent
+- Critic Agent
+- Report Agent
+- full risk engine
+- GitHub Actions
+- final CI/CD integration
+- final observability system
+
+Those belong to later phases.
+
+========================================================
+RULE 2 — USE PARALLEL AGENTS
+========================================================
+
+Use as many safe parallel Antigravity agents as practical.
+
+Do not allow agents to blindly edit the same files.
+
+Divide work into isolated workstreams.
+
+Recommended parallel allocation:
+
+AGENT A — REPOSITORY INGESTION
+
+Responsibilities:
+- repository loader
+- local path ingestion
+- GitHub URL ingestion
+- ZIP ingestion
+- repository metadata extraction
+- safe temporary workspace handling
+- cleanup
+
+Do not implement RAG here.
+
+--------------------------------------------------------
+
+AGENT B — FILE DISCOVERY + FILTERING
+
+Responsibilities:
+- recursive file discovery
+- supported-language detection
+- file categorization
+- ignore rules
+- binary detection
+- generated-file detection
+- size limits
+- file count limits
+- symlink handling
+- path safety
+
+Do not implement embeddings here.
+
+--------------------------------------------------------
+
+AGENT C — CHUNKING + METADATA
+
+Responsibilities:
+- repository-aware chunking
+- code chunking
+- documentation chunking
+- configuration chunking
+- metadata model
+- line-number tracking
+- chunk IDs
+- deterministic chunk generation
+
+Do not modify the vector database implementation unnecessarily.
+
+--------------------------------------------------------
+
+AGENT D — EMBEDDING LAYER
+
+Responsibilities:
+- embedding abstraction
+- primary embedding provider
+- local embedding fallback
+- batch embedding
+- retry handling
+- rate-limit handling
+- validation of dimensions
+- provider errors
+
+IMPORTANT:
+Before using an external embedding model name/API:
+- verify current official provider documentation
+- use currently supported model names
+- do not invent model identifiers
+
+Do not hardcode credentials.
+
+--------------------------------------------------------
+
+AGENT E — CHROMA VECTOR STORE
+
+Responsibilities:
+- Chroma initialization
+- collection management
+- document upsert
+- metadata storage
+- similarity search
+- metadata filtering
+- deletion/reindex
+- persistence
+
+Keep vector-storage code isolated behind an interface.
+
+--------------------------------------------------------
+
+AGENT F — RAG RETRIEVAL SERVICE
+
+Responsibilities:
+- query processing
+- embedding query
+- vector retrieval
+- top-k
+- metadata filtering
+- result formatting
+- evidence formatting
+- confidence/relevance metadata if supported
+
+The retrieval layer must return actual repository evidence.
+
+--------------------------------------------------------
+
+AGENT G — QA + INTEGRATION
+
+Responsibilities:
+- unit tests
+- integration tests
+- test repository creation
+- retrieval test cases
+- malformed input tests
+- large file tests
+- empty repository tests
+- unsupported file tests
+- ingestion security tests
+- full end-to-end test
+
+--------------------------------------------------------
+
+AGENT H — UI INTEGRATION
+
+Responsibilities:
+Only Phase-2 UI work.
+
+Add a polished repository-ingestion/RAG interface:
+- repository input
+- ingestion state
+- file summary
+- indexing state
+- chunk count
+- embedding/index state
+- search interface
+- retrieved evidence viewer
+
+Do not build the final risk dashboard yet.
+
+========================================================
+RULE 3 — AGENT COORDINATION
+========================================================
+
+Every parallel agent must:
+
+1. Inspect before modifying.
+2. Understand existing architecture.
+3. Reuse existing abstractions.
+4. Avoid duplicate code.
+5. Avoid modifying unrelated modules.
+6. Write tests for non-trivial functionality.
+7. Document important implementation choices.
+8. Report exactly what changed.
+9. Report failures instead of hiding them.
+10. Never mark unfinished work as complete.
+
+If two agents need the same interface:
+- agree on the interface first
+- keep implementation modules separate
+- integrate carefully
+
+Prefer contracts/interfaces over tightly coupled code.
+
+========================================================
+PART 1 — REPOSITORY LOADER
+========================================================
+
+Implement a real repository ingestion service.
+
+Supported inputs:
+
+A. Local repository path
+
+B. GitHub repository URL
+
+C. ZIP archive
+
+The loader should normalize all three into a common internal representation.
+
+Recommended conceptual model:
+
+RepositorySource
+    ↓
+RepositorySnapshot
+    ↓
+RepositoryFiles
+
+RepositorySnapshot should contain useful metadata such as:
+
+- source type
+- repository name
+- branch if available
+- commit SHA if available
+- ingestion timestamp
+- root path
+- file count
+- total size
+
+Do not fabricate branch or commit information.
+
+If unavailable:
+return null / unknown.
+
+--------------------------------------------------------
+LOCAL REPOSITORY
+--------------------------------------------------------
+
+Validate:
+- path exists
+- path is a directory
+- path is readable
+
+--------------------------------------------------------
+GITHUB URL
+--------------------------------------------------------
+
+Support public repository URLs.
+
+Validate URL safely.
+
+Do not accept arbitrary dangerous protocols.
+
+For private repositories:
+use GitHub token only if configured and only when required.
+
+Never send GitHub credentials to the frontend.
+
+--------------------------------------------------------
+ZIP
+--------------------------------------------------------
+
+Safely extract ZIP files.
+
+Protect against:
+- path traversal
+- absolute paths
+- zip-slip
+- oversized extraction
+- excessive file counts
+
+Never extract outside the designated workspace.
+
+========================================================
+PART 2 — FILE DISCOVERY
+========================================================
+
+Create a file discovery service.
+
+For every discovered file determine:
+
+- path
+- extension
+- filename
+- language
+- category
+- size
+- binary/text
+- generated/not generated
+- indexable/not indexable
+- reason if excluded
+
+Possible categories:
+
+SOURCE_CODE
+TEST
+CONFIG
+DOCUMENTATION
+DOCKER
+CI_CD
+SCRIPT
+OTHER
+
+Supported languages should include common project languages where practical:
+
+- Python
+- JavaScript
+- TypeScript
+- Java
+- Go
+- C/C++
+- Rust
+- PHP
+- Ruby
+
+Also support:
+
+- YAML
+- JSON
+- TOML
+- XML
+- Markdown
+- Dockerfile
+- shell files
+
+Do not claim a language is supported unless the system actually handles it.
+
+========================================================
+PART 3 — IGNORE RULES
+========================================================
+
+Do not index:
+
+- `.git`
+- `node_modules`
+- `.venv`
+- `venv`
+- `dist`
+- `build`
+- cache directories
+- common generated output
+- compiled binaries
+- images
+- videos
+- archives
+- massive lock/cache artifacts where inappropriate
+
+BUT:
+
+Do NOT blindly ignore important deployment files.
+
+For example, inspect whether these should be included:
+
+- Dockerfile
+- docker-compose.yml
+- GitHub Actions YAML
+- requirements.txt
+- package.json
+- pyproject.toml
+- README.md
+- deployment docs
+
+Create a configurable ignore policy.
+
+========================================================
+PART 4 — SAFE INGESTION
+========================================================
+
+Security matters.
+
+Implement:
+
+- maximum file size
+- maximum repository size
+- maximum file count
+- extraction limits
+- timeout
+- safe temp directories
+- path normalization
+- symlink safety
+- binary detection
+- encoding fallback
+- malformed file handling
+
+Never allow repository input to execute arbitrary commands.
+
+Repository ingestion must NOT execute:
+
+- shell scripts
+- package installers
+- arbitrary Python
+- npm scripts
+- Makefiles
+- Docker builds
+
+Phase 2 is repository analysis, not code execution.
+
+========================================================
+PART 5 — SECRET-AWARE INGESTION
+========================================================
+
+Do not intentionally index secrets into the vector database.
+
+Before creating embeddings, detect probable secrets where possible.
+
+Examples:
+
+- API keys
+- tokens
+- private keys
+- `.env` secrets
+- password-like values
+
+For detected secrets:
+
+Either:
+A. exclude the sensitive region/file, or
+B. redact the secret before embedding.
+
+Preserve enough surrounding context for analysis.
+
+Never expose raw secrets in:
+- logs
+- UI
+- embeddings
+- API responses
+
+Document the exact behavior.
+
+Do not claim perfect secret detection.
+
+========================================================
+PART 6 — INTELLIGENT CHUNKING
+========================================================
+
+This is one of the most important parts of Phase 2.
+
+Do NOT use only:
+
+"every N characters"
+
+Implement repository-aware chunking.
+
+For source code, prefer boundaries such as:
+
+- class
+- function
+- method
+- module
+- logical blocks
+
+For Markdown:
+
+- headings
+- paragraphs
+- sections
+
+For configuration:
+
+- logical YAML/JSON/TOML sections
+- related key groups
+
+For Docker files:
+
+- instruction blocks
+
+For CI/CD YAML:
+
+- job
+- step
+- workflow sections
+
+When semantic parsing is unavailable:
+use safe fallback chunking.
+
+Every chunk MUST retain source information.
+
+Required metadata:
+
+- chunk_id
+- repository_id
+- commit_sha if available
+- file_path
+- language
+- category
+- chunk_type
+- line_start
+- line_end
+- file_size
+- content_hash
+
+The chunk content must correspond to the recorded lines.
+
+Do not invent line numbers.
+
+========================================================
+PART 7 — CHUNK QUALITY
+========================================================
+
+Prevent:
+
+- extremely tiny chunks
+- huge chunks
+- meaningless chunks
+- duplicate chunks
+- overlapping chunks that explode vector count
+
+Use practical chunk limits.
+
+Make chunking deterministic.
+
+The same repository snapshot should produce the same chunk IDs/content unless configuration changes.
+
+Add tests for this.
+
+========================================================
+PART 8 — EMBEDDING ABSTRACTION
+========================================================
+
+Create an interface:
+
+EmbeddingProvider
+
+At minimum support:
+
+Primary:
+configured external embedding provider from `.env`
+
+Fallback:
+local open-source embedding model
+
+Do NOT hardcode a provider into the rest of the application.
+
+Possible conceptual architecture:
+
+EmbeddingProvider
+    |
+    +-- GeminiEmbeddingProvider
+    |
+    +-- LocalEmbeddingProvider
+
+Before using a current Gemini embedding model:
+verify its official current API/documentation.
+
+If a model name from the old PRD is no longer supported:
+use the currently documented equivalent and update documentation.
+
+Never guess.
+
+========================================================
+EMBEDDING REQUIREMENTS
+========================================================
+
+Implement:
+
+- single embedding
+- batch embedding
+- retry with limits
+- timeout
+- error handling
+- API failure handling
+- provider fallback
+- embedding dimension validation
+
+Do not embed:
+- empty strings
+- excluded files
+- raw secrets
+- unsupported binary content
+
+Use batching where appropriate.
+
+Track embedding failures clearly.
+
+========================================================
+PART 9 — CHROMA
+========================================================
+
+Create a vector-store abstraction.
+
+Concept:
+
+VectorStore
+    |
+    +-- ChromaVectorStore
+
+Required operations:
+
+create_collection()
+get_collection()
+upsert()
+query()
+delete()
+reset()
+count()
+health_check()
+
+Store:
+
+- chunk content
+- embedding
+- metadata
+- stable chunk ID
+
+The vector database must persist locally during development.
+
+Configuration should come from environment variables.
+
+For example:
+
+CHROMA_PATH=
+COLLECTION_NAME=
+
+Do not hardcode a user's machine-specific path.
+
+========================================================
+PART 10 — REPOSITORY INDEX
+========================================================
+
+Build:
+
+index_repository(repository)
+
+Pipeline:
+
+Repository source
+    ↓
+Snapshot
+    ↓
+File discovery
+    ↓
+Filtering
+    ↓
+Secret-aware processing
+    ↓
+Chunking
+    ↓
+Embeddings
+    ↓
+Chroma
+    ↓
+Index summary
+
+Return a structured result such as:
+
+{
+  repository_id,
+  files_discovered,
+  files_indexed,
+  files_skipped,
+  chunks_created,
+  embeddings_created,
+  embedding_failures,
+  total_size,
+  duration,
+  status
+}
+
+Use actual values.
+
+Never create fake indexing statistics.
+
+========================================================
+PART 11 — INCREMENTAL INDEXING
+========================================================
+
+Where practical, avoid recomputing unchanged files.
+
+Use content hashes.
+
+Concept:
+
+file unchanged
+    ↓
+reuse existing chunks/embeddings
+
+file changed
+    ↓
+remove old chunks
+    ↓
+re-chunk
+    ↓
+re-embed
+
+file deleted
+    ↓
+remove its vectors
+
+This should be implemented only if reliable within Phase 2.
+A simpler full reindex fallback is acceptable.
+
+Document which behavior is implemented.
+
+========================================================
+PART 12 — RETRIEVAL SERVICE
+========================================================
+
+Create:
+
+RepositoryRetriever
+
+Primary API:
+
+search_repository_knowledge(query, repository_id, top_k, filters)
+
+Input:
+
+- natural-language query
+- repository ID
+- top-k
+- optional metadata filters
+
+Output for every result:
+
+- chunk ID
+- relevance/distance
+- file path
+- line start
+- line end
+- category
+- language
+- content
+- commit SHA if available
+
+Do not return only raw text.
+
+The purpose is to provide traceable repository evidence.
+
+========================================================
+PART 13 — RAG SEARCH BEHAVIOR
+========================================================
+
+Support queries such as:
+
+"What does this application use for database configuration?"
+
+"Where is deployment configuration defined?"
+
+"Which files describe how the application is deployed?"
+
+"What testing instructions are documented?"
+
+"Where is authentication implemented?"
+
+"Which files define environment variables?"
+
+The retrieval system should return actual relevant repository sections.
+
+Do not invent answers.
+
+========================================================
+PART 14 — RETRIEVAL QUALITY
+========================================================
+
+Create a small evaluation dataset.
+
+Example:
+
+Question:
+"Where is Docker configuration defined?"
+
+Expected:
+Dockerfile
+docker-compose.yml
+
+Question:
+"How are tests run?"
+
+Expected:
+README/test config files
+
+Question:
+"Where are environment variables documented?"
+
+Expected:
+README/config documentation/.env.example
+
+Measure basic retrieval quality.
+
+At minimum test:
+
+- expected result appears in top-k
+- metadata is correct
+- line numbers are correct
+- repository filtering works
+
+Do not claim high accuracy from a few tests.
+Report actual measurements only.
+
+========================================================
+PART 15 — REPOSITORY ISOLATION
+========================================================
+
+Different repositories must not leak into one another.
+
+Very important.
+
+Query:
+
+repository A
+
+must never return chunks from:
+
+repository B
+
+Implement:
+- repository_id metadata
+- collection strategy or filtering
+- tests for isolation
+
+Create a test proving this.
+
+========================================================
+PART 16 — API ENDPOINTS
+========================================================
+
+Where consistent with existing Phase-1 architecture, expose APIs such as:
+
+POST /api/v1/repositories/ingest
+
+POST /api/v1/repositories/{id}/index
+
+GET /api/v1/repositories/{id}/index-status
+
+POST /api/v1/repositories/{id}/search
+
+GET /api/v1/repositories/{id}/files
+
+GET /api/v1/repositories/{id}/stats
+
+Names may be adjusted to match the existing API conventions.
+
+Do not break Phase-1 APIs.
+
+========================================================
+PART 17 — UI FOR PHASE 2
+========================================================
+
+Extend the existing frontend.
+
+Do NOT redesign the entire application.
+
+Add:
+
+A. Repository input page
+
+Fields:
+
+Repository URL
+or
+Local repository
+or
+ZIP upload
+
+B. Repository summary
+
+Show actual data:
+
+- repository name
+- source
+- branch/commit if available
+- file count
+- supported file count
+- skipped file count
+- total size
+
+C. Indexing state
+
+Real states:
+
+QUEUED
+INGESTING
+DISCOVERING
+CHUNKING
+EMBEDDING
+INDEXING
+COMPLETED
+FAILED
+
+DO NOT fake these states.
+
+They must come from backend progress/events/state.
+
+D. Index summary
+
+Show:
+
+Files discovered
+Files indexed
+Chunks created
+Embeddings created
+Skipped files
+Duration
+
+E. Repository Search
+
+Input:
+
+"Ask about this repository..."
+
+Then show:
+
+Answer/context results
+
+with:
+
+File
+Lines
+Relevance
+Category
+Content
+
+Important:
+At Phase 2 this is a retrieval/evidence interface.
+
+Do NOT make it a full chatbot that invents explanations.
+
+========================================================
+PART 18 — CODE/EVIDENCE VIEWER
+========================================================
+
+Create a professional evidence viewer.
+
+When a result is clicked:
+
+Show:
+
+File:
+src/config/database.py
+
+Lines:
+34–49
+
+Category:
+SOURCE_CODE
+
+Then display the actual retrieved content.
+
+Provide:
+
+- copy button
+- file path
+- line numbers
+- clear highlighting
+- repository context
+
+Do not fabricate a code snippet.
+
+========================================================
+PART 19 — UI DESIGN QUALITY
+========================================================
+
+Keep the visual quality consistent with the Phase-1 design.
+
+Target:
+professional developer/security product.
+
+Avoid:
+
+- generic chatbot appearance
+- excessive rounded cards
+- fake terminal animations
+- fake AI typing
+- huge gradients
+- decorative graphics with no meaning
+- fake progress
+
+Use:
+
+- clean typography
+- strong information hierarchy
+- compact technical tables
+- code viewer
+- clear state badges
+- subtle borders
+- precise spacing
+- responsive layouts
+- accessible controls
+
+The UI should make repository analysis easy to understand.
+
+========================================================
+PART 20 — ERROR HANDLING
+========================================================
+
+Handle:
+
+- invalid repository URL
+- unavailable GitHub repository
+- private repository without token
+- invalid ZIP
+- corrupted ZIP
+- path traversal attempt
+- unsupported file type
+- encoding error
+- oversized file
+- oversized repository
+- embedding API failure
+- rate limit
+- Chroma failure
+- empty repository
+- zero indexable files
+- retrieval with unknown repository
+- retrieval before indexing
+
+Every error must be understandable.
+
+Example:
+
+"Repository indexing failed because the configured embedding provider rejected the request."
+
+Do not expose:
+- API keys
+- internal stack traces
+- sensitive paths unnecessarily
+
+Keep detailed diagnostics in server logs.
+
+========================================================
+PART 21 — TESTING STRATEGY
+========================================================
+
+Create real automated tests.
+
+A. Repository loader tests
+
+- local repository
+- valid GitHub URL
+- invalid URL
+- ZIP input
+- invalid ZIP
+
+B. Security tests
+
+- zip-slip
+- absolute path extraction
+- symlink behavior
+- oversized files
+- oversized archive
+
+C. File discovery tests
+
+- source file
+- test file
+- config file
+- markdown
+- binary file
+- ignored directory
+
+D. Chunking tests
+
+- deterministic chunks
+- correct line numbers
+- metadata
+- code chunking
+- markdown chunking
+- config chunking
+
+E. Embedding tests
+
+Use mocks for external APIs in unit tests.
+
+Test:
+- success
+- timeout
+- missing key
+- rate limit
+- malformed response
+- fallback
+
+Do NOT call paid/external APIs on every unit-test run.
+
+F. Chroma tests
+
+- create
+- insert
+- query
+- metadata filtering
+- delete
+- isolation
+
+G. Retrieval tests
+
+- top-k
+- relevant result
+- metadata
+- repository isolation
+- missing repository
+- empty index
+
+H. End-to-end test
+
+Repository
+→ ingestion
+→ discovery
+→ chunking
+→ embedding
+→ Chroma
+→ retrieval
+
+Use a small local deterministic test repository.
+
+========================================================
+PART 22 — CREATE A DEMO REPOSITORY
+========================================================
+
+Create:
+
+demo-repos/deploysafe-rag-demo/
+
+Include realistic files such as:
+
+README.md
+src/
+tests/
+config/
+Dockerfile
+docker-compose.yml
+.github/workflows/
+requirements.txt or package.json
+docs/
+
+The repository should contain enough information to demonstrate useful semantic retrieval.
+
+Examples:
+
+- deployment instructions
+- environment variable documentation
+- test instructions
+- Docker information
+- architecture notes
+- source code
+
+Do NOT seed dangerous vulnerabilities yet unless needed for later phases.
+
+Phase 2 is about repository understanding/RAG.
+
+========================================================
+PART 23 — PHASE 2 LIVE DEMO
+========================================================
+
+The application must support this live flow:
+
+1. Open DeploySafe.
+2. Enter demo repository.
+3. Start ingestion.
+4. Show real indexing stages.
+5. Show repository statistics.
+6. Show chunk/index completion.
+7. Ask:
+
+"What does this project use for deployment?"
+
+8. Show retrieved evidence.
+
+Then ask:
+
+"How should I run the tests?"
+
+Show actual README/test configuration evidence.
+
+Then ask:
+
+"Where are environment variables documented?"
+
+Show actual files and lines.
+
+Then click an evidence result.
+
+Show:
+- exact file
+- exact lines
+- actual content
+
+This must be a real retrieval result.
+
+========================================================
+PART 24 — NO HALLUCINATION IN RAG
+========================================================
+
+The retrieval layer must distinguish between:
+
+FOUND
+NOT_FOUND
+LOW_RELEVANCE
+
+If no useful result exists:
+
+return:
+"No sufficiently relevant repository evidence was found."
+
+Do not create an answer from general LLM knowledge.
+
+For Phase 2, retrieval is the primary goal.
+
+========================================================
+PART 25 — DOCUMENTATION
+========================================================
+
+Update/create:
+
+docs/rag.md
+
+Include:
+
+- what RAG means in DeploySafe
+- ingestion pipeline
+- file filtering
+- chunking
+- embeddings
+- Chroma
+- metadata
+- retrieval
+- repository isolation
+- limitations
+- testing approach
+
+Also update:
+
+docs/architecture.md
+
+with Phase-2 components.
+
+Also update:
+
+README.md
+
+with:
+
+- how to start the project
+- how to configure embeddings
+- how to ingest repository
+- how to run retrieval
+- how to run tests
+
+========================================================
+PART 26 — ENVIRONMENT VARIABLES
+========================================================
+
+Inspect existing `.env`.
+
+Do NOT delete existing Phase-1 values.
+
+Add only required Phase-2 variables.
+
+Examples where actually needed:
+
+EMBEDDING_PROVIDER=
+GEMINI_API_KEY=
+CHROMA_PATH=
+CHROMA_COLLECTION_PREFIX=
+MAX_FILE_SIZE_MB=
+MAX_REPOSITORY_SIZE_MB=
+MAX_FILE_COUNT=
+TOP_K=
+
+If a variable is not actually needed:
+do not add it.
+
+Update:
+
+ENV_SETUP.md
+
+For each new variable explain:
+
+- purpose
+- required/optional
+- where to get it
+- what value to provide
+- security considerations
+- default behavior
+
+Never put real keys in `.env`.
+
+========================================================
+PART 27 — MODEL/API VERIFICATION
+========================================================
+
+Because external AI provider model names and limits can change:
+
+Before implementing the provider:
+
+1. Verify current official API documentation.
+2. Verify the currently supported embedding model.
+3. Verify current SDK/API invocation format.
+4. Verify whether the configured model supports the required embedding operation.
+5. Do not assume old documentation is still valid.
+6. If the PRD contains an outdated model identifier:
+   - use the currently supported equivalent
+   - document the change in `docs/decisions.md`
+
+Do not bluff about API capabilities.
+
+========================================================
+PART 28 — PERFORMANCE
+========================================================
+
+Phase 2 should be practical for student-scale repositories.
+
+Optimize:
+
+- file reading
+- chunking
+- embedding batching
+- duplicate detection
+- vector insertion
+- retrieval
+
+Do not optimize prematurely.
+
+Prioritize:
+correctness > performance.
+
+Avoid sending unnecessary content to external APIs.
+
+========================================================
+PART 29 — LOGGING
+========================================================
+
+Add structured logs for:
+
+- repository ingestion
+- file discovery
+- skipped files
+- chunk creation
+- embedding batches
+- embedding failures
+- Chroma operations
+- retrieval queries
+- retrieval result counts
+- errors
+
+Never log:
+
+- API keys
+- GitHub tokens
+- raw secrets
+- sensitive repository contents unnecessarily
+
+========================================================
+PART 30 — PHASE 2 DEFINITION OF DONE
+========================================================
+
+Phase 2 is complete ONLY when:
+
+[ ] prd.md was fully read
+[ ] PHASE1DONE.md was read
+[ ] Phase 1 current state was verified
+[ ] repository loader works
+[ ] local repository ingestion works
+[ ] GitHub URL ingestion works or documented limitation exists
+[ ] ZIP ingestion works safely
+[ ] file discovery works
+[ ] ignore rules work
+[ ] binary detection works
+[ ] size limits work
+[ ] safe extraction works
+[ ] chunking works
+[ ] line metadata is correct
+[ ] content hashes exist
+[ ] embedding abstraction works
+[ ] external provider is configured correctly
+[ ] local embedding fallback works if implemented
+[ ] Chroma works
+[ ] repository isolation works
+[ ] retrieval works
+[ ] search returns real evidence
+[ ] UI supports ingestion/indexing/search
+[ ] no fake progress is displayed
+[ ] tests run successfully
+[ ] end-to-end RAG flow works
+[ ] demo repository exists
+[ ] documentation is updated
+[ ] ENV_SETUP.md is updated
+[ ] no secrets are committed
+[ ] no known blocking error remains
+[ ] Phase 3 has NOT been implemented
+
+========================================================
+FINAL FILE — PHASE2DONE.MD
+========================================================
+
+Create:
+
+PHASE2DONE.md
+
+It must be concise, factual, and easy to understand.
+
+Use exactly this general structure:
+
+# DeploySafe — Phase 2 Completed
+
+## Phase objective
+- ...
+
+## What was implemented
+- Repository ingestion: ...
+- File discovery: ...
+- Safe filtering: ...
+- Chunking: ...
+- Embeddings: ...
+- Chroma: ...
+- Retrieval: ...
+- UI: ...
+
+## Repository inputs supported
+- Local path: PASS/FAIL
+- GitHub URL: PASS/FAIL
+- ZIP: PASS/FAIL
+
+## RAG pipeline
+- Files discovered: ...
+- Files indexed: ...
+- Files skipped: ...
+- Chunks created: ...
+- Embeddings created: ...
+- Vector store: ...
+- Retrieval: ...
+
+Use REAL tested values from the demo/evaluation run where appropriate.
+
+## Security protections
+- ...
+- ...
+- ...
+
+## Tests completed
+- Repository loader: PASS/FAIL
+- File discovery: PASS/FAIL
+- Chunking: PASS/FAIL
+- Embeddings: PASS/FAIL
+- Chroma: PASS/FAIL
+- Retrieval: PASS/FAIL
+- Repository isolation: PASS/FAIL
+- End-to-end RAG: PASS/FAIL
+- Browser/UI: PASS/FAIL
+
+## Files created/updated
+- ...
+- ...
+- ...
+
+## Known limitations
+- ...
+- ...
+
+## Not implemented yet
+- Multi-agent analysis
+- Risk engine
+- GitHub Actions
+- Critic/report workflow
+etc.
+
+Only mention things that really remain.
+
+## Next phase
+Phase 3 — Core Multi-Agent DeploySafe
+
+DO NOT claim Phase 3 work was completed.
+
+========================================================
+FINAL VALIDATION
+========================================================
+
+Before finalizing:
+
+1. Run backend tests.
+2. Run frontend checks/build.
+3. Run RAG unit tests.
+4. Run integration tests.
+5. Run the demo repository through the entire pipeline.
+6. Perform real semantic retrieval queries.
+7. Verify returned file paths.
+8. Verify line numbers.
+9. Verify repository isolation.
+10. Verify no secrets appear in logs/UI/vector store.
+11. Use Antigravity browser tools to inspect the UI.
+12. Fix issues found.
+13. Re-run affected tests.
+14. Review git diff.
+15. Ensure no unrelated modifications.
+16. Ensure Phase 3 has not accidentally been started.
+
+========================================================
+FINAL RESPONSE FORMAT
+========================================================
+
+When finished, report briefly:
+
+PHASE 2 STATUS:
+PASS / PARTIAL / FAILED
+
+IMPLEMENTED:
+- ...
+
+PARALLEL AGENTS USED:
+- ...
+
+TESTS RUN:
+- ...
+
+REAL DEMO VERIFIED:
+- ...
+
+FILES CREATED:
+- ...
+
+FILES MODIFIED:
+- ...
+
+KNOWN ISSUES:
+- ...
+
+MANUAL SETUP REQUIRED:
+- ...
+
+ENVIRONMENT VARIABLES:
+- ...
+
+HOW TO RUN:
+- ...
+
+NEXT:
+Phase 3 only.
+
+Do not say "everything is perfect" or "error free".
+Only report what was actually verified.
+
+START NOW.
+
+First inspect:
+1. prd.md
+2. PHASE1DONE.md
+3. existing code
+4. existing tests
+
+Then produce the Phase-2 execution plan and begin safe parallel implementation.

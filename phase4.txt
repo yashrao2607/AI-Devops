@@ -1,0 +1,2005 @@
+You are continuing the DeploySafe project.
+
+THIS IS PHASE 4 ONLY.
+
+PHASE 4 NAME:
+Risk Engine + Professional Product UI
+
+Your mission is to take the real Phase-3 multi-agent analysis system and build the deterministic risk-scoring layer, finding-management layer, run-management layer, and polished production-style UI required by Phase 4 of `prd.md`.
+
+This phase must make DeploySafe feel like a real developer/deployment-risk product rather than a basic college prototype.
+
+========================================================
+IMPORTANT — FIRST READ EVERYTHING
+========================================================
+
+Before modifying anything:
+
+1. Find `prd.md`.
+2. Read the ENTIRE `prd.md`.
+3. Read `PHASE1DONE.md`.
+4. Read `PHASE2DONE.md`.
+5. Read `PHASE3DONE.md`.
+6. Inspect the actual implementation.
+7. Inspect current backend APIs.
+8. Inspect current database models.
+9. Inspect existing analysis/run models.
+10. Inspect Finding and Evidence schemas.
+11. Inspect CrewAI workflow.
+12. Inspect current RAG layer.
+13. Inspect current UI.
+14. Inspect existing tests.
+15. Inspect `.env` and `.env.example`.
+16. Inspect `ENV_SETUP.md`.
+17. Inspect git status and git diff.
+
+Do NOT assume previous phase documentation is correct.
+
+Verify actual implementation.
+
+If anything marked completed in `PHASE3DONE.md` is broken:
+- identify it
+- fix the minimum necessary issue
+- test it
+- document it
+
+Do not rewrite working Phase-3 components without a real reason.
+
+========================================================
+PHASE BOUNDARY
+========================================================
+
+Implement ONLY PHASE 4.
+
+The Phase-4 scope from the project PRD is:
+
+1. Finding schema hardening
+2. Finding deduplication
+3. Finding management
+4. Deterministic risk scoring
+5. Risk normalization
+6. Report preparation
+7. Dashboard
+8. Run details
+9. Finding details
+10. Agent activity visualization
+11. UI polish
+12. UX/error/loading states
+13. Phase-4 testing
+
+Do NOT implement:
+
+- GitHub Actions automation
+- full CI/CD integration
+- production PR comments
+- final security-evaluation dataset
+- final observability platform
+- advanced GitHub workflows
+
+unless `prd.md` explicitly places those in Phase 4.
+
+Those belong to later phases.
+
+Do not start Phase 5.
+
+========================================================
+PHASE 4 PRIMARY OBJECTIVE
+========================================================
+
+Transform:
+
+Phase 3:
+
+Repository
+→ Agents
+→ RAG
+→ Tools
+→ Findings
+
+into:
+
+Repository
+→ Agents
+→ RAG
+→ Tools
+→ Findings
+→ Validation
+→ Deduplication
+→ Deterministic Risk Engine
+→ Explainable Risk Summary
+→ Professional Dashboard
+
+========================================================
+CORE PRODUCT RULE
+========================================================
+
+Use this architecture:
+
+Deterministic tools
+        ↓
+Evidence
+        ↓
+Specialized agents
+        ↓
+Candidate findings
+        ↓
+Critic / validation
+        ↓
+Deduplication
+        ↓
+Validated findings
+        ↓
+Risk Engine
+        ↓
+Final risk score
+        ↓
+UI / Report
+
+The LLM does NOT directly produce the final risk score.
+
+The Risk Engine is deterministic.
+
+========================================================
+STEP 0 — PHASE-4 CHECKPOINT
+========================================================
+
+Before implementation:
+
+Extract the exact Phase-4 requirements from `prd.md`.
+
+Create an internal mapping:
+
+Requirement
+→ module
+→ API
+→ UI
+→ test
+→ demo evidence
+
+Also identify:
+- what is already present
+- what needs modification
+- what needs new implementation
+- what must remain deferred to Phase 5
+
+Do not begin coding until this analysis is complete.
+
+========================================================
+STEP 1 — USE PARALLEL ANTIGRAVITY AGENTS
+========================================================
+
+Use the maximum SAFE amount of parallel agents.
+
+Avoid multiple agents editing the same files.
+
+Recommended parallel allocation:
+
+--------------------------------------------------------
+AGENT A — RISK ENGINE ARCHITECT
+--------------------------------------------------------
+
+Responsibilities:
+- risk calculation
+- severity weights
+- confidence adjustment
+- impact/scope handling
+- normalization
+- score explainability
+- unit tests
+- documentation
+
+Do not modify UI.
+
+--------------------------------------------------------
+AGENT B — FINDING DOMAIN / DATA
+--------------------------------------------------------
+
+Responsibilities:
+- Finding model
+- Evidence model
+- Finding status
+- Finding lifecycle
+- deduplication
+- merging logic
+- persistence
+- database migrations if required
+- tests
+
+--------------------------------------------------------
+AGENT C — REPORT/ANALYSIS SERVICE
+--------------------------------------------------------
+
+Responsibilities:
+- aggregate validated findings
+- create analysis summary
+- category counts
+- severity counts
+- score integration
+- report data contract
+
+Do not create the visual UI.
+
+--------------------------------------------------------
+AGENT D — DASHBOARD UI
+--------------------------------------------------------
+
+Responsibilities:
+- main dashboard
+- score visualization
+- severity distribution
+- repository summary
+- latest run
+- recent findings
+- trends if backed by real data
+
+--------------------------------------------------------
+AGENT E — RUN/FINDING UI
+--------------------------------------------------------
+
+Responsibilities:
+- run details
+- finding list
+- finding details
+- evidence viewer
+- agent attribution
+- validation status
+- recommendation display
+
+--------------------------------------------------------
+AGENT F — DESIGN SYSTEM / UX
+--------------------------------------------------------
+
+Responsibilities:
+- typography
+- spacing
+- component consistency
+- badges
+- tables
+- cards
+- empty states
+- error states
+- loading states
+- responsive behavior
+- accessibility
+- visual polish
+
+Do NOT redesign product logic.
+
+--------------------------------------------------------
+AGENT G — BACKEND/API
+--------------------------------------------------------
+
+Responsibilities:
+- APIs needed for Phase 4
+- dashboard data
+- run data
+- findings data
+- risk summary
+- finding filters
+- finding details
+- report payloads
+
+Maintain API consistency.
+
+--------------------------------------------------------
+AGENT H — QA / INTEGRATION
+--------------------------------------------------------
+
+Responsibilities:
+- unit tests
+- integration tests
+- scoring tests
+- finding tests
+- API tests
+- UI tests
+- browser verification
+- end-to-end tests
+
+========================================================
+PARALLEL AGENT RULES
+========================================================
+
+Every agent must:
+
+1. Inspect existing files first.
+2. Reuse Phase-3 abstractions.
+3. Avoid unnecessary rewrites.
+4. Make only its assigned changes.
+5. Add tests.
+6. Report exact changes.
+7. Report failures.
+8. Never create fake functionality.
+9. Never use fake metrics.
+10. Never fabricate "completed" agent status.
+
+If shared files are required:
+- define interfaces first
+- merge carefully
+- preserve existing behavior
+
+========================================================
+PART 1 — FINDING DOMAIN HARDENING
+========================================================
+
+Review the existing Finding model.
+
+It must support at least:
+
+id
+category
+severity
+confidence
+title
+summary
+impact
+recommendation
+repository_id
+commit_sha
+file_path
+line_start
+line_end
+evidence
+source
+agent
+status
+
+Recommended additional fields:
+
+related_files
+tool_name
+rule_id
+retrieval_context
+created_at
+updated_at
+dedup_group_id
+validation_reason
+score_contribution
+
+Only add fields that are actually useful.
+
+Use typed schemas.
+
+========================================================
+PART 2 — EVIDENCE HARDENING
+========================================================
+
+Review Evidence.
+
+It should support:
+
+- evidence_type
+- repository_id
+- commit_sha
+- file_path
+- line_start
+- line_end
+- snippet
+- source
+- source_tool
+
+Evidence must remain traceable.
+
+Never allow:
+
+finding without evidence
+→ automatically treated as validated
+
+Instead:
+
+INSUFFICIENT_EVIDENCE
+
+========================================================
+PART 3 — FINDING STATUS LIFECYCLE
+========================================================
+
+Implement:
+
+NEW
+VALIDATED
+NEEDS_REVIEW
+DUPLICATE
+REJECTED
+DISMISSED
+
+Where appropriate.
+
+Define valid state transitions.
+
+Example:
+
+NEW
+ ↓
+VALIDATED
+
+or
+
+NEW
+ ↓
+NEEDS_REVIEW
+
+or
+
+NEW
+ ↓
+DUPLICATE
+
+Do not allow arbitrary invalid status transitions.
+
+========================================================
+PART 4 — FINDING DEDUPLICATION
+========================================================
+
+Build real deduplication.
+
+Potential duplicate indicators:
+
+- same repository
+- same file
+- overlapping line range
+- same category
+- similar issue identity
+- same scanner rule
+- semantically equivalent findings
+
+Do not use title equality alone.
+
+When duplicates are detected:
+
+Keep one canonical finding.
+
+Preserve:
+- agents that reported it
+- evidence sources
+- scanner references
+- original finding IDs where practical
+
+Do not silently destroy information.
+
+========================================================
+PART 5 — FINDING PRIORITIZATION
+========================================================
+
+Every validated finding must have:
+
+severity
+confidence
+evidence
+impact
+recommendation
+
+Use only controlled values.
+
+Severity:
+
+CRITICAL
+HIGH
+MEDIUM
+LOW
+
+Confidence:
+
+HIGH
+MEDIUM
+LOW
+
+Do not allow arbitrary LLM-generated severity strings.
+
+Normalize them through schema validation.
+
+========================================================
+PART 6 — RISK ENGINE
+========================================================
+
+Create a dedicated service:
+
+RiskEngine
+
+The LLM must NOT calculate the final score directly.
+
+The engine receives validated findings.
+
+Default project-defined severity weights:
+
+CRITICAL = 35
+HIGH = 25
+MEDIUM = 15
+LOW = 7
+
+These values are DeploySafe's own scoring design.
+
+They are NOT an industry safety standard.
+
+Document this clearly.
+
+========================================================
+PART 7 — RISK CALCULATION
+========================================================
+
+Implement deterministic scoring.
+
+Conceptually:
+
+finding contribution
+=
+severity weight
+× confidence factor
+× impact/scope factor
+
+Choose simple, explainable factors.
+
+Example confidence:
+
+HIGH = 1.0
+MEDIUM = 0.8
+LOW = 0.6
+
+Example impact:
+
+HIGH = 1.0
+MEDIUM = 0.8
+LOW = 0.6
+
+Do not introduce excessive mathematical complexity.
+
+Normalize final score to:
+
+0–100
+
+The exact formula must be:
+- deterministic
+- documented
+- unit tested
+- reproducible
+
+Same findings must always produce the same score.
+
+========================================================
+PART 8 — RISK LEVEL
+========================================================
+
+Use the project-defined levels:
+
+0–24:
+LOW
+
+25–49:
+MODERATE
+
+50–74:
+HIGH
+
+75–100:
+CRITICAL
+
+Do not claim these thresholds are industry standards.
+
+UI should display:
+
+Risk Score
+Risk Level
+
+Example:
+
+72
+HIGH
+
+========================================================
+PART 9 — RISK EXPLANATION
+========================================================
+
+The UI should explain where the score comes from.
+
+Example:
+
+Risk Score
+72 / 100
+
+Contributors:
+
+CRITICAL
+1 finding
++32
+
+HIGH
+2 findings
++25
+
+MEDIUM
+3 findings
++10
+
+Do not hardcode these numbers.
+
+They must come from the actual RiskEngine calculation.
+
+Provide an "How is this calculated?" explanation.
+
+========================================================
+PART 10 — RISK ENGINE EDGE CASES
+========================================================
+
+Handle:
+
+No findings:
+score should be deterministic according to defined policy.
+
+Only low findings.
+
+Many findings.
+
+All critical findings.
+
+Duplicate findings.
+
+Rejected findings.
+
+Needs-review findings.
+
+Missing confidence.
+
+Missing evidence.
+
+Invalid severity.
+
+Partial agent results.
+
+Agent failure.
+
+Do not silently treat invalid findings as validated.
+
+Document policy for uncertain cases.
+
+========================================================
+PART 11 — REPORT DATA MODEL
+========================================================
+
+Create a structured AnalysisSummary:
+
+repository
+branch
+commit
+run_id
+
+risk_score
+risk_level
+
+finding_counts
+severity_counts
+category_counts
+
+validated_count
+review_count
+rejected_count
+
+agent_summary
+tool_summary
+
+top_findings
+
+recommendations
+
+Only actual values.
+
+========================================================
+PART 12 — DASHBOARD API
+========================================================
+
+Expose backend APIs needed for the dashboard.
+
+Potential APIs:
+
+GET /api/v1/dashboard/summary
+
+GET /api/v1/repositories/{repository_id}/summary
+
+GET /api/v1/runs
+
+GET /api/v1/runs/{run_id}
+
+GET /api/v1/runs/{run_id}/summary
+
+GET /api/v1/runs/{run_id}/findings
+
+GET /api/v1/findings/{finding_id}
+
+Exact names may be adapted to existing architecture.
+
+Do not break Phase-3 APIs.
+
+========================================================
+PART 13 — FINDING FILTER API
+========================================================
+
+Support filters where useful:
+
+severity
+category
+status
+agent
+file
+repository
+
+Example:
+
+GET /findings?severity=HIGH&status=VALIDATED
+
+Validate all query parameters.
+
+========================================================
+PART 14 — DASHBOARD UI
+========================================================
+
+Build the main DeploySafe dashboard.
+
+Visual hierarchy:
+
+TOP:
+Repository selector / context
+
+SECOND:
+Primary risk summary
+
+THIRD:
+Finding breakdown
+
+FOURTH:
+Latest analysis
+
+FIFTH:
+Recent findings
+
+SIXTH:
+Agent execution summary
+
+Do not overload the screen.
+
+========================================================
+PART 15 — DASHBOARD HERO
+========================================================
+
+Primary section:
+
+DEPLOSAFE
+
+Repository:
+demo-project
+
+Latest Analysis:
+Run #123
+
+Risk Score:
+72 / 100
+
+Risk Level:
+HIGH
+
+Then:
+
+Last analyzed:
+actual timestamp
+
+Commit:
+actual SHA
+
+Do not show made-up timestamps.
+
+========================================================
+PART 16 — RISK VISUALIZATION
+========================================================
+
+Use a clear visual risk indicator.
+
+Possible:
+
+large score
+progress/ring/bar
+severity distribution
+
+Use restrained visuals.
+
+Do not create a huge decorative chart.
+
+The number and its interpretation are more important than visual effects.
+
+========================================================
+PART 17 — FINDING DISTRIBUTION
+========================================================
+
+Show actual counts:
+
+Critical
+High
+Medium
+Low
+
+Also show:
+
+Validated
+Needs Review
+Rejected
+
+Use actual backend values.
+
+========================================================
+PART 18 — TOP FINDINGS
+========================================================
+
+Show the most important validated findings.
+
+Each row:
+
+Severity
+Title
+File
+Agent
+Confidence
+Status
+
+Clicking opens finding detail.
+
+========================================================
+PART 19 — RUN HISTORY
+========================================================
+
+Show real previous analysis runs.
+
+Each:
+
+Run ID
+Repository
+Commit
+Time
+Score
+Level
+Findings
+Status
+
+Support:
+
+click → run detail
+
+Do not show sample runs unless explicitly labeled DEMO DATA.
+
+========================================================
+PART 20 — RUN DETAIL PAGE
+========================================================
+
+Create a highly polished Run Details page.
+
+Header:
+
+Analysis #123
+
+Repository
+Commit
+Risk Score
+Risk Level
+Run Status
+
+Then sections:
+
+1. Summary
+2. Findings
+3. Agent Activity
+4. Evidence
+5. Statistics
+
+========================================================
+PART 21 — AGENT ACTIVITY UI
+========================================================
+
+Use actual Phase-3 execution data.
+
+Example:
+
+Orchestrator
+COMPLETED
+
+Code Agent
+COMPLETED
+
+Dependency Agent
+COMPLETED
+
+Config Agent
+COMPLETED
+
+Test Agent
+COMPLETED
+
+RAG Agent
+COMPLETED
+
+Security Agent
+COMPLETED
+
+Critic
+COMPLETED
+
+Report
+COMPLETED
+
+Display:
+
+- duration
+- status
+- finding count
+- tool count
+- retrieval count
+
+Do not fabricate metrics.
+
+========================================================
+PART 22 — AGENT EXECUTION DETAIL
+========================================================
+
+When selecting an agent, show:
+
+Agent name
+Status
+Start
+End
+Duration
+
+Purpose:
+actual agent role
+
+Findings:
+actual count
+
+Tools:
+actual tools used
+
+RAG:
+actual retrieval count
+
+Error:
+actual error if any
+
+Do NOT expose hidden chain-of-thought.
+
+Show concise execution summaries and observable outputs instead.
+
+========================================================
+PART 23 — FINDINGS PAGE
+========================================================
+
+Create a professional findings management page.
+
+Features:
+
+- search
+- filter
+- sort
+- severity filter
+- category filter
+- status filter
+- agent filter
+
+Columns:
+
+Severity
+Finding
+File
+Agent
+Confidence
+Status
+
+Make the table responsive.
+
+========================================================
+PART 24 — FINDING DETAIL
+========================================================
+
+Finding detail must contain:
+
+Title
+Severity
+Confidence
+Status
+
+Summary
+
+Why this matters
+
+Impact
+
+Evidence
+
+File path
+
+Line numbers
+
+Code/content
+
+Recommendation
+
+Detected by
+
+Validated by
+
+Related findings if implemented
+
+Score contribution if useful
+
+========================================================
+PART 25 — EVIDENCE VIEWER
+========================================================
+
+Reuse Phase-3 evidence viewer.
+
+Improve it.
+
+Must show:
+
+file
+line range
+actual content
+syntax highlighting
+highlighted relevant lines
+source type
+
+Example:
+
+config/production.yaml
+Lines 12–17
+
+[REAL CONTENT]
+
+Do not inject fake snippets.
+
+========================================================
+PART 26 — RECOMMENDATION PRESENTATION
+========================================================
+
+Recommendations should be actionable.
+
+Display:
+
+Recommended fix
+
+rather than vague:
+
+"Improve security."
+
+Example style:
+
+Move the database URL from static configuration into an environment variable and validate it during startup.
+
+Only display recommendations actually produced by the analysis system.
+
+========================================================
+PART 27 — EXPLAINABILITY
+========================================================
+
+Every finding should answer:
+
+WHAT?
+WHY?
+WHERE?
+EVIDENCE?
+IMPACT?
+WHAT SHOULD I DO?
+
+Example:
+
+WHAT:
+Production configuration mismatch.
+
+WHERE:
+config/production.yaml:14–18
+
+EVIDENCE:
+[actual source]
+
+WHY:
+Repository documentation requires...
+
+IMPACT:
+Deployment may use incorrect production configuration.
+
+FIX:
+...
+
+========================================================
+PART 28 — UI DESIGN SYSTEM
+========================================================
+
+The design should feel like a mature developer/security product created by an experienced product designer.
+
+Design goals:
+
+- premium
+- restrained
+- technical
+- trustworthy
+- information-dense
+- easy to scan
+
+Use:
+
+- strong typography
+- consistent spacing
+- consistent component sizes
+- subtle borders
+- clear hierarchy
+- carefully chosen status colors
+- excellent code presentation
+- professional tables
+- compact badges
+- clear navigation
+
+Avoid:
+
+- excessive gradients
+- oversized cards
+- childish illustrations
+- excessive rounded corners
+- random bright colors
+- fake AI animations
+- generic chatbot design
+- unnecessary glassmorphism
+- decorative charts with no information
+
+========================================================
+PART 29 — RESPONSIVE DESIGN
+========================================================
+
+Verify:
+
+Desktop
+Tablet
+Mobile
+
+At minimum ensure:
+
+- sidebar adapts
+- tables remain usable
+- finding detail remains readable
+- code viewer scrolls properly
+- risk score remains visible
+- controls do not overlap
+
+========================================================
+PART 30 — ACCESSIBILITY
+========================================================
+
+Implement where practical:
+
+- keyboard navigation
+- semantic HTML
+- visible focus states
+- proper button labels
+- accessible form labels
+- sufficient contrast
+- non-color-only status indicators
+
+Do not rely solely on red/green to convey status.
+
+========================================================
+PART 31 — LOADING STATES
+========================================================
+
+Use real loading states.
+
+Examples:
+
+Dashboard loading
+Findings loading
+Run loading
+Finding loading
+
+Do not show fake percentages.
+
+Prefer:
+
+Loading findings...
+
+Retrieving run details...
+
+========================================================
+PART 32 — EMPTY STATES
+========================================================
+
+Create meaningful empty states.
+
+Example:
+
+No analysis runs yet.
+
+Start an analysis to see deployment-readiness results here.
+
+No findings:
+
+No deployment-related findings were detected in this run.
+
+IMPORTANT:
+Do not claim "safe".
+
+"0 findings detected" is different from "guaranteed safe".
+
+========================================================
+PART 33 — ERROR STATES
+========================================================
+
+Create useful errors.
+
+Examples:
+
+Analysis unavailable
+Repository not found
+Run not found
+Finding not found
+Risk calculation failed
+Backend unavailable
+
+Never show raw stack traces to normal users.
+
+========================================================
+PART 34 — DEMO DATA RULE
+========================================================
+
+Do NOT create permanent fake dashboard metrics.
+
+For development only, use real seeded demo repositories and actual runs.
+
+If static UI mocks are needed during design:
+clearly label them as:
+DEMO PREVIEW
+
+Remove or separate those from production data paths.
+
+========================================================
+PART 35 — REPORT GENERATION
+========================================================
+
+Phase 4 may prepare structured data for the report system.
+
+If `prd.md` requires report generation at this phase, implement:
+
+Markdown
+HTML
+
+where practical.
+
+Report should contain:
+
+Repository
+Commit
+Risk score
+Risk level
+Finding summary
+Detailed findings
+Evidence
+Recommendations
+
+Do not generate PDF unless explicitly required.
+
+========================================================
+PART 36 — DATA CONSISTENCY
+========================================================
+
+Ensure:
+
+Dashboard score
+Run score
+Finding score contribution
+Finding counts
+
+all originate from the same backend data.
+
+Never calculate one number in frontend and another in backend.
+
+Risk Engine should be authoritative.
+
+========================================================
+PART 37 — RISK SCORE REPRODUCIBILITY
+========================================================
+
+Create a deterministic test:
+
+Input:
+same validated findings
+
+Output:
+same risk score
+
+Always.
+
+Also test:
+
+same repository analysis
+same findings
+same score
+
+No randomness should affect the final score.
+
+========================================================
+PART 38 — DATABASE CONSISTENCY
+========================================================
+
+Check:
+
+AnalysisRun
+Finding
+Evidence
+AgentExecution
+
+relationships.
+
+Ensure deleting or reprocessing a run does not orphan data unexpectedly.
+
+Use migrations or safe schema updates.
+
+Do not destroy existing database data during normal startup.
+
+========================================================
+PART 39 — API VALIDATION
+========================================================
+
+All Phase-4 API endpoints must validate:
+
+- UUIDs/IDs
+- repository IDs
+- run IDs
+- query parameters
+- enum values
+
+Return appropriate HTTP errors.
+
+Do not leak stack traces.
+
+========================================================
+PART 40 — FRONTEND/BACKEND CONTRACT
+========================================================
+
+Define stable response types.
+
+Frontend should not guess backend field names.
+
+Use typed API clients/interfaces.
+
+Avoid:
+
+data?.foo?.bar?.something
+
+everywhere.
+
+Create clean domain types.
+
+========================================================
+PART 41 — RISK SCORE TEST MATRIX
+========================================================
+
+Create deterministic tests for:
+
+Test 1:
+No findings.
+
+Test 2:
+One LOW finding.
+
+Test 3:
+One MEDIUM finding.
+
+Test 4:
+One HIGH finding.
+
+Test 5:
+One CRITICAL finding.
+
+Test 6:
+Mixed severities.
+
+Test 7:
+Different confidence values.
+
+Test 8:
+Duplicate findings.
+
+Test 9:
+Rejected findings.
+
+Test 10:
+Needs-review findings.
+
+Test 11:
+Large number of findings.
+
+Test 12:
+Invalid finding.
+
+Expected behavior must be documented.
+
+========================================================
+PART 42 — DEDUP TEST MATRIX
+========================================================
+
+Test:
+
+same title + same file
+
+same issue + different agents
+
+same issue + overlapping lines
+
+same issue + different evidence sources
+
+different issues in same file
+
+semantically unrelated findings
+
+Ensure actual behavior is deterministic.
+
+========================================================
+PART 43 — UI TESTING
+========================================================
+
+Test:
+
+Dashboard loads.
+
+Run list loads.
+
+Run details load.
+
+Findings load.
+
+Finding details load.
+
+Filters work.
+
+Search works.
+
+Navigation works.
+
+Evidence viewer works.
+
+No console errors.
+
+No broken links.
+
+No overlapping components.
+
+========================================================
+PART 44 — BROWSER VERIFICATION
+========================================================
+
+Use Antigravity browser capabilities.
+
+Actually open the application.
+
+Verify:
+
+1. Dashboard
+2. Run details
+3. Findings
+4. Finding detail
+5. Agent activity
+6. Evidence viewer
+7. Filters
+8. Responsive layout
+9. Empty state
+10. Error state
+
+Fix all issues discovered.
+
+Do not report browser verification unless you actually performed it.
+
+========================================================
+PART 45 — PERFORMANCE
+========================================================
+
+Do not make dashboard queries unnecessarily expensive.
+
+Avoid:
+
+- retrieving entire repository
+- loading all evidence at once
+- recalculating score repeatedly
+- excessive API requests
+
+Use:
+
+- pagination
+- summary APIs
+- filtered queries
+- reasonable payloads
+
+Only optimize where needed.
+
+========================================================
+PART 46 — SECURITY
+========================================================
+
+Do not expose:
+
+- LLM API keys
+- GitHub tokens
+- raw secrets
+- internal stack traces
+
+Do not allow users to manipulate:
+
+- repository ID
+- run ID
+- finding ID
+
+without authorization/validation appropriate for the current application.
+
+Preserve Phase-2/3 secret-redaction behavior.
+
+========================================================
+PART 47 — DOCUMENTATION
+========================================================
+
+Update:
+
+docs/risk-model.md
+
+Include:
+
+- severity weights
+- confidence factors
+- impact factors
+- normalization
+- thresholds
+- examples
+- limitations
+- deterministic behavior
+
+Update:
+
+docs/agents.md
+
+with how agent findings feed the Risk Engine.
+
+Update:
+
+docs/architecture.md
+
+with:
+
+Agent analysis
+→ validation
+→ deduplication
+→ Risk Engine
+→ UI
+
+Update:
+
+README.md
+
+with Phase-4 capabilities.
+
+Update:
+
+docs/phase4-demo.md
+
+with a step-by-step demo.
+
+========================================================
+PART 48 — ENVIRONMENT
+========================================================
+
+Inspect `.env`.
+
+Do not add unnecessary environment variables.
+
+If Phase 4 requires new configuration:
+- add placeholder to `.env`
+- update `.env.example`
+- update `ENV_SETUP.md`
+
+Never add real credentials.
+
+Do not break Phase-1/2/3 variables.
+
+========================================================
+PART 49 — NO FAKE VALUES
+========================================================
+
+NEVER display fake:
+
+- risk score
+- finding counts
+- agent counts
+- execution times
+- timestamps
+- repository statistics
+- confidence values
+- tool results
+
+All product metrics must come from real backend data.
+
+Static labels are allowed.
+
+========================================================
+PART 50 — PHASE 4 INTEGRATION TEST
+========================================================
+
+Use the existing demo repository from previous phases.
+
+Run:
+
+Repository
+↓
+Phase-3 multi-agent analysis
+↓
+Candidate findings
+↓
+Critic
+↓
+Validated findings
+↓
+Deduplication
+↓
+Risk Engine
+↓
+Score
+↓
+Dashboard
+↓
+Run details
+↓
+Finding detail
+↓
+Evidence
+
+Verify that the SAME findings and SAME score appear throughout the product.
+
+========================================================
+PART 51 — LIVE DEMO REQUIREMENT
+========================================================
+
+Prepare the following real demo:
+
+STEP 1:
+Open DeploySafe dashboard.
+
+STEP 2:
+Select the demo repository.
+
+STEP 3:
+Start analysis.
+
+STEP 4:
+Wait for the real Phase-3 workflow.
+
+STEP 5:
+Once complete, show:
+
+Risk Score:
+actual score
+
+Risk Level:
+actual level
+
+Findings:
+actual count
+
+STEP 6:
+Open a HIGH finding.
+
+Show:
+- title
+- evidence
+- exact file
+- exact lines
+- impact
+- recommendation
+- detected by
+- validated by
+
+STEP 7:
+Show the Risk Score explanation.
+
+Example:
+
+1 Critical
+2 High
+3 Medium
+1 Low
+
+and explain that the score is calculated by the deterministic Risk Engine.
+
+STEP 8:
+Open agent activity.
+
+Show actual agents that executed.
+
+STEP 9:
+Open another finding.
+
+STEP 10:
+Return to dashboard.
+
+Everything should be linked together.
+
+========================================================
+PART 52 — PRODUCT QUALITY BAR
+========================================================
+
+The final Phase-4 interface should look like a real product.
+
+It should NOT feel like:
+
+"Python project + a few cards."
+
+It should feel like:
+
+"Developer deployment intelligence platform."
+
+Prioritize:
+
+- visual hierarchy
+- speed
+- evidence
+- clarity
+- consistency
+- professional information architecture
+
+========================================================
+PART 53 — TESTING PRINCIPLES
+========================================================
+
+Use mocks for external APIs in unit tests.
+
+Do not call Gemini/Groq unnecessarily during every test.
+
+External APIs should be tested through:
+- a small integration test
+- optional manual verification
+
+Unit tests should be deterministic.
+
+========================================================
+PART 54 — FAILURE HANDLING
+========================================================
+
+If Risk Engine fails:
+
+Run status:
+PARTIAL or FAILED
+depending on actual state.
+
+Do not show a previous score as current.
+
+If findings fail to load:
+
+show:
+"Findings could not be loaded."
+
+Do not show zero findings.
+
+If dashboard summary fails:
+
+show error state.
+
+Do not show fake metrics.
+
+========================================================
+PART 55 — AUDITABILITY
+========================================================
+
+The Risk Engine should be able to explain:
+
+- which findings contributed
+- which were excluded
+- why duplicates were excluded
+- why rejected findings were excluded
+- how final score was normalized
+
+Implement enough metadata for this.
+
+========================================================
+PART 56 — FINAL PHASE-4 DEFINITION OF DONE
+========================================================
+
+Phase 4 is complete ONLY when:
+
+[ ] prd.md read completely
+[ ] PHASE1DONE.md read
+[ ] PHASE2DONE.md read
+[ ] PHASE3DONE.md read
+[ ] existing Phase-3 implementation verified
+[ ] Finding model hardened
+[ ] Evidence model hardened
+[ ] Finding lifecycle works
+[ ] Deduplication works
+[ ] Risk Engine exists
+[ ] Risk Engine is deterministic
+[ ] Severity weights are documented
+[ ] Confidence handling is documented
+[ ] Score normalized to 0–100
+[ ] Risk levels work
+[ ] Invalid findings handled safely
+[ ] Dashboard works
+[ ] Run history works
+[ ] Run detail works
+[ ] Findings page works
+[ ] Finding detail works
+[ ] Evidence viewer works
+[ ] Agent activity works
+[ ] Real metrics shown
+[ ] No fake metrics
+[ ] UI is polished
+[ ] Loading states work
+[ ] Error states work
+[ ] Empty states work
+[ ] Responsive UI checked
+[ ] Backend APIs tested
+[ ] Risk Engine tests pass
+[ ] Dedup tests pass
+[ ] Integration tests pass
+[ ] Browser verification completed
+[ ] Demo repository works
+[ ] Full end-to-end flow works
+[ ] Documentation updated
+[ ] `.env` preserved safely
+[ ] Phase 5 NOT started
+
+========================================================
+CREATE PHASE4DONE.MD
+========================================================
+
+Create:
+
+PHASE4DONE.md
+
+Keep it SHORT, EASY TO UNDERSTAND, POINT-TO-POINT, AND FACTUAL.
+
+Use this structure:
+
+# DeploySafe — Phase 4 Completed
+
+## Phase objective
+- ...
+
+## What was implemented
+- Risk Engine: ...
+- Deterministic scoring: ...
+- Finding management: ...
+- Deduplication: ...
+- Dashboard: ...
+- Run details: ...
+- Findings: ...
+- Evidence viewer: ...
+- Agent activity: ...
+- UI improvements: ...
+
+## Risk model
+- Severity weights: ...
+- Confidence handling: ...
+- Score range: 0–100
+- Risk levels: ...
+- Formula location: ...
+
+## Actual demo result
+- Repository: ...
+- Run ID: ...
+- Risk score: ...
+- Risk level: ...
+- Total findings: ...
+- Validated findings: ...
+- Needs review: ...
+- Rejected: ...
+
+Use REAL values from an actual run.
+
+## Testing
+- Risk Engine: PASS/FAIL
+- Deduplication: PASS/FAIL
+- Backend API: PASS/FAIL
+- Frontend: PASS/FAIL
+- Integration: PASS/FAIL
+- Browser verification: PASS/FAIL
+- End-to-end: PASS/FAIL
+
+## Files created/updated
+- ...
+- ...
+- ...
+
+## Known limitations
+- ...
+- ...
+
+## Not implemented yet
+- GitHub Actions
+- final evaluation framework
+- advanced observability
+etc.
+
+Only list genuinely incomplete Phase-5/6 work.
+
+## Next phase
+Phase 5 — GitHub Automation + Safety + Evaluation
+
+Do NOT claim Phase 5 has started.
+
+========================================================
+FINAL REVIEW
+========================================================
+
+Before completing:
+
+1. Inspect git status.
+2. Inspect git diff.
+3. Check for accidental file deletion.
+4. Check for secrets.
+5. Check dependency changes.
+6. Check migrations.
+7. Run tests.
+8. Run frontend build.
+9. Run integration flow.
+10. Browser-test the UI.
+11. Run actual demo repository.
+12. Verify score.
+13. Verify score appears consistently everywhere.
+14. Verify findings are traceable.
+15. Confirm no Phase-5 implementation.
+16. Review PHASE4DONE.md for factual correctness.
+
+========================================================
+FINAL RESPONSE TO ME
+========================================================
+
+Report exactly:
+
+PHASE 4 STATUS:
+PASS / PARTIAL / FAILED
+
+IMPLEMENTED:
+- ...
+
+RISK ENGINE:
+- ...
+
+UI:
+- ...
+
+DEDUPE:
+- ...
+
+TESTS:
+- ...
+
+BROWSER VERIFICATION:
+- ...
+
+REAL END-TO-END DEMO:
+- ...
+
+FILES CREATED:
+- ...
+
+FILES MODIFIED:
+- ...
+
+KNOWN ISSUES:
+- ...
+
+MANUAL SETUP:
+- ...
+
+PHASE 5:
+NOT STARTED
+
+Never say:
+"Everything is perfect."
+
+Only report what was actually verified.
+
+START NOW.
+
+FIRST:
+1. Read `prd.md`.
+2. Read `PHASE1DONE.md`.
+3. Read `PHASE2DONE.md`.
+4. Read `PHASE3DONE.md`.
+5. Inspect current code.
+6. Produce the Phase-4 requirements map.
+7. Produce the safe parallel-agent allocation.
+8. Identify Phase-4 vs Phase-5 boundaries.
+9. THEN begin implementation.
