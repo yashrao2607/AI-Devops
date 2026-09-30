@@ -1,0 +1,946 @@
+You are continuing the DeploySafe project AFTER completion of the original six planned development phases.
+
+IMPORTANT:
+
+PHASE 7 IS NOT PART OF THE ORIGINAL COURSE SUBMISSION PLAN.
+
+This is an OPTIONAL POST-ENDTERM / V2 enhancement phase.
+
+Do NOT modify the final-submission state unnecessarily.
+
+Before starting:
+- verify Phase 6 is complete
+- verify final demo works
+- verify final GitHub repository is clean
+- verify final report/PPT/demo materials are preserved
+
+The goal of Phase 7 is to improve DeploySafe using evidence from real usage, evaluation results, and technical limitations.
+
+========================================================
+PHASE 7 NAME
+========================================================
+
+DeploySafe V2 — Intelligence, Reliability & Product Enhancement
+
+========================================================
+MAIN OBJECTIVE
+========================================================
+
+Improve DeploySafe based on:
+
+- actual evaluation results
+- actual false positives
+- actual false negatives
+- actual usability problems
+- actual performance bottlenecks
+- actual agent failures
+- actual GitHub workflow issues
+- actual user feedback
+
+Do NOT add features merely because they sound impressive.
+
+Every feature must solve a demonstrated problem.
+
+========================================================
+RULE 0 — PROTECT FINAL SUBMISSION
+========================================================
+
+Before modifying anything:
+
+1. Read `prd.md`.
+2. Read all phase completion files.
+3. Verify Phase 6.
+4. Create a Git tag/backup of the final submission state if appropriate.
+5. Record current git commit.
+6. Preserve final demo configuration.
+7. Preserve final evaluation results.
+8. Do not overwrite final reports.
+
+Create:
+
+docs/v2-baseline.md
+
+Record:
+
+- current version
+- git commit
+- current evaluation metrics
+- known limitations
+- current architecture
+- current demo status
+
+========================================================
+STEP 1 — POST-RELEASE AUDIT
+========================================================
+
+Inspect:
+
+- actual evaluation results
+- actual failed cases
+- false positives
+- false negatives
+- slow agents
+- expensive retrieval
+- provider failures
+- GitHub failures
+- UI usability issues
+- deployment failures
+- feedback from users/team
+
+Create:
+
+docs/v2-audit.md
+
+Categorize issues:
+
+CRITICAL
+HIGH
+MEDIUM
+LOW
+
+Do not prioritize based only on intuition.
+
+========================================================
+STEP 2 — USE PARALLEL ANTIGRAVITY AGENTS
+========================================================
+
+Use safe parallel agents.
+
+Recommended workstreams:
+
+AGENT A — EVALUATION ANALYST
+
+Study:
+- evaluation results
+- false positives
+- false negatives
+- severity disagreements
+- evidence problems
+
+Recommend improvements.
+
+--------------------------------------------------------
+
+AGENT B — AI QUALITY
+
+Improve:
+- agent prompts
+- finding quality
+- evidence grounding
+- critic behavior
+- cross-agent correlation
+
+Do not reduce reliability simply to increase finding count.
+
+--------------------------------------------------------
+
+AGENT C — RAG QUALITY
+
+Study:
+- retrieval misses
+- irrelevant retrievals
+- chunking problems
+- metadata issues
+- duplicate context
+
+Improve only where measurable.
+
+--------------------------------------------------------
+
+AGENT D — PERFORMANCE
+
+Measure:
+
+- ingestion
+- retrieval
+- agent execution
+- total analysis
+
+Optimize real bottlenecks.
+
+--------------------------------------------------------
+
+AGENT E — PRODUCT / UX
+
+Study:
+- confusing workflows
+- usability
+- information hierarchy
+- finding readability
+- dashboard usefulness
+- GitHub experience
+
+--------------------------------------------------------
+
+AGENT F — SECURITY
+
+Perform another security review.
+
+Focus on:
+- newly introduced functionality
+- provider integrations
+- repository handling
+- GitHub workflows
+- tool permissions
+
+--------------------------------------------------------
+
+AGENT G — PLATFORM / ARCHITECTURE
+
+Investigate:
+
+- scalability limitations
+- maintainability
+- modularity
+- storage
+- concurrency
+
+Do not prematurely introduce distributed infrastructure.
+
+--------------------------------------------------------
+
+AGENT H — QA
+
+Create regression tests for every V2 change.
+
+========================================================
+STEP 3 — IMPROVE FINDING QUALITY
+========================================================
+
+Use actual evaluation results.
+
+For each poor finding determine whether the cause is:
+
+- bad retrieval
+- poor prompt
+- insufficient evidence
+- poor severity classification
+- duplicate detection
+- tool limitation
+- incomplete repository context
+
+Fix the actual cause.
+
+Do not simply add more LLM calls.
+
+========================================================
+STEP 4 — IMPROVE CRITIC
+========================================================
+
+Enhance critic validation if evaluation shows weaknesses.
+
+Critic should assess:
+
+- evidence quality
+- relevance
+- severity
+- duplication
+- deployment relevance
+- recommendation quality
+
+Do not let Critic remove evidence.
+
+========================================================
+STEP 5 — IMPROVE RAG
+========================================================
+
+Only make changes supported by evaluation.
+
+Potential improvements:
+
+- better chunk boundaries
+- metadata filtering
+- hybrid retrieval
+- reranking
+- query expansion
+- repository-aware retrieval
+
+Do not implement everything.
+
+Measure before vs after.
+
+========================================================
+STEP 6 — HYBRID ANALYSIS
+========================================================
+
+Where useful:
+
+Deterministic tools
++
+RAG
++
+LLM reasoning
++
+Critic
+
+should work together.
+
+Do not replace deterministic checks with LLM guesses.
+
+========================================================
+STEP 7 — ADVANCED CHANGE IMPACT
+========================================================
+
+Potential V2 feature:
+
+Change Impact Analysis
+
+Input:
+git diff
+
+Output:
+
+Changed component:
+payment service
+
+Potentially affected:
+database configuration
+API endpoint
+tests
+deployment configuration
+
+Only implement if evidence can support the dependency.
+
+Do not invent architectural relationships.
+
+========================================================
+STEP 8 — HISTORICAL ANALYTICS
+========================================================
+
+Use real stored runs.
+
+Provide:
+
+- risk trend
+- recurring issues
+- unresolved findings
+- resolved findings
+- category trends
+- repository trends
+
+No fake historical data.
+
+========================================================
+STEP 9 — RISK TREND
+========================================================
+
+Show:
+
+Run 1
+42
+
+Run 2
+58
+
+Run 3
+71
+
+Run 4
+39
+
+Only if those runs actually exist.
+
+Do not create sample history in production.
+
+========================================================
+STEP 10 — POLICY IMPROVEMENT
+========================================================
+
+Allow configurable policies.
+
+Examples:
+
+maximum risk
+critical finding policy
+required test policy
+security finding policy
+
+Keep:
+
+analysis
+separate from
+policy
+
+========================================================
+STEP 11 — TEAM / ORGANIZATION RULES
+========================================================
+
+Optional V2 feature:
+
+Repository-specific policy configuration.
+
+Example:
+
+deploysafe.yml
+
+Could define:
+
+risk threshold
+required checks
+ignored paths
+analysis scope
+
+Treat configuration as untrusted data.
+
+Validate it.
+
+Do not allow repository configuration to override system security controls.
+
+========================================================
+STEP 12 — CONFIGURATION VALIDATION
+========================================================
+
+If `deploysafe.yml` is introduced:
+
+Validate schema.
+
+Reject:
+
+unknown dangerous properties
+invalid thresholds
+unsafe commands
+unapproved tools
+
+Never allow repository configuration to grant itself elevated permissions.
+
+========================================================
+STEP 13 — EXPLAINABLE POLICY RESULT
+========================================================
+
+Show:
+
+Risk:
+72
+
+Policy threshold:
+50
+
+Result:
+REVIEW REQUIRED
+
+Reason:
+Risk score exceeds configured threshold.
+
+Keep this deterministic.
+
+========================================================
+STEP 14 — IMPROVED REMEDIATION
+========================================================
+
+Optional feature:
+
+Generate a proposed fix.
+
+IMPORTANT:
+
+The proposal must NOT automatically modify production code.
+
+Show:
+
+Suggested change
+
+Affected file
+
+Why
+
+Potential impact
+
+Require human review.
+
+========================================================
+STEP 15 — PATCH PREVIEW
+========================================================
+
+If implemented:
+
+Show:
+
+BEFORE
+
+[actual code]
+
+PROPOSED
+
+[generated patch]
+
+Do not apply automatically.
+
+Clearly label:
+
+AI-GENERATED PROPOSAL
+
+========================================================
+STEP 16 — HUMAN APPROVAL
+========================================================
+
+If remediation is added:
+
+Require explicit user approval before applying anything.
+
+Never:
+
+agent
+→ production repository
+→ automatic commit
+
+without explicit authorization.
+
+========================================================
+STEP 17 — MCP / TOOL INTEROPERABILITY
+========================================================
+
+OPTIONAL.
+
+Only consider MCP if it provides a real architectural benefit.
+
+Potential:
+
+DeploySafe
+→ MCP server
+→ approved tools
+
+Do not add MCP purely for presentation.
+
+Document:
+- why it is needed
+- what it replaces/improves
+- security model
+
+========================================================
+STEP 18 — MULTI-REPOSITORY SUPPORT
+========================================================
+
+Optional V2 feature.
+
+Support:
+
+Organization
+    ↓
+Repository A
+Repository B
+Repository C
+
+Keep data isolated.
+
+A query for repository A must never retrieve repository B content.
+
+========================================================
+STEP 19 — CROSS-REPOSITORY CONTEXT
+========================================================
+
+Only implement if there is a real use case.
+
+If repositories are related:
+
+frontend
+backend
+infrastructure
+
+support controlled cross-repository context.
+
+Explicitly define:
+
+which repositories can see which data.
+
+Never default to unrestricted cross-repository retrieval.
+
+========================================================
+STEP 20 — LOCAL LLM MODE
+========================================================
+
+Optional privacy-focused enhancement.
+
+Add a local/open-source provider only if the environment can actually support it.
+
+Potential architecture:
+
+LLMProvider
+   |
+   +-- Gemini
+   +-- Groq
+   +-- Local
+
+Do not claim local inference works unless actually tested.
+
+========================================================
+STEP 21 — COST / USAGE VISIBILITY
+========================================================
+
+If provider APIs expose usable usage data:
+
+show:
+
+- provider
+- request count
+- estimated tokens where available
+- failures
+- fallback count
+
+Do not invent costs.
+
+If exact cost cannot be measured:
+say:
+NOT AVAILABLE
+
+========================================================
+STEP 22 — CACHE
+========================================================
+
+Potential V2 optimization:
+
+Cache:
+
+- repository metadata
+- unchanged file embeddings
+- repeated retrievals
+- deterministic scanner results
+
+Do not cache sensitive content carelessly.
+
+Define invalidation.
+
+========================================================
+STEP 23 — PERFORMANCE BENCHMARK
+========================================================
+
+Create a benchmark dataset:
+
+Small repository
+Medium repository
+Large repository
+
+Measure:
+
+ingestion
+indexing
+retrieval
+agent execution
+total analysis
+
+Compare:
+
+Before optimization
+After optimization
+
+Use actual measurements.
+
+========================================================
+STEP 24 — REGRESSION GUARANTEE
+========================================================
+
+Every V2 optimization must pass the original evaluation suite.
+
+Compare:
+
+Baseline
+vs
+V2
+
+Track:
+
+detection
+false positives
+evidence correctness
+runtime
+
+If V2 improves runtime but damages finding quality:
+do NOT automatically keep the change.
+
+Document tradeoff.
+
+========================================================
+STEP 25 — UI V2
+========================================================
+
+Do not redesign the entire UI.
+
+Add only useful improvements.
+
+Potential:
+
+historical trends
+advanced filters
+policy configuration
+repository insights
+finding recurrence
+change impact
+proposed remediation
+
+Keep the same visual language.
+
+========================================================
+STEP 26 — UX PRINCIPLE
+========================================================
+
+The interface must remain:
+
+- technical
+- clear
+- trustworthy
+- restrained
+- evidence-first
+
+Do not turn DeploySafe into a generic AI chat application.
+
+========================================================
+STEP 27 — FINAL SECURITY TESTS
+========================================================
+
+Test V2 features for:
+
+- prompt injection
+- repository poisoning
+- secret leakage
+- privilege escalation
+- arbitrary commands
+- unsafe patches
+- cross-repository leakage
+- malformed configuration
+- malicious GitHub input
+
+========================================================
+STEP 28 — FINAL EVALUATION
+========================================================
+
+Run:
+
+Original evaluation suite
++
+V2 evaluation suite
+
+Save:
+
+evaluation/v2-results.json
+
+Create:
+
+docs/v2-evaluation.md
+
+Include:
+
+Baseline
+V2
+
+Actual differences.
+
+========================================================
+STEP 29 — A/B COMPARISON
+========================================================
+
+For major agent/prompt changes:
+
+Baseline:
+Version A
+
+V2:
+Version B
+
+Run same cases.
+
+Compare:
+
+- finding recall
+- false positives
+- evidence
+- severity
+- recommendation quality
+- runtime
+
+Never compare different datasets as if equivalent.
+
+========================================================
+STEP 30 — RELEASE VERSIONING
+========================================================
+
+Use semantic versioning if appropriate.
+
+Example:
+
+1.0.0
+→ final academic release
+
+1.1.0
+→ V2 enhancement
+
+Record changes in:
+
+CHANGELOG.md
+
+========================================================
+STEP 31 — DOCUMENTATION
+========================================================
+
+Create/update:
+
+docs/v2-architecture.md
+
+docs/v2-evaluation.md
+
+docs/v2-decisions.md
+
+docs/v2-security.md
+
+docs/v2-performance.md
+
+docs/v2-demo.md
+
+========================================================
+STEP 32 — FINAL V2 DEMO
+========================================================
+
+Demonstrate:
+
+1. Existing repository
+2. New analysis
+3. Risk result
+4. Historical trend
+5. Recurring issue
+6. Change impact
+7. Evidence
+8. Policy
+9. Optional remediation proposal
+10. Human approval
+11. Re-analysis
+
+Only demonstrate features actually implemented.
+
+========================================================
+STEP 33 — V2 DEFINITION OF DONE
+========================================================
+
+[ ] Phase 6 baseline preserved
+[ ] V2 audit completed
+[ ] Evaluation baseline stored
+[ ] V2 changes justified
+[ ] Finding quality tested
+[ ] RAG improvements tested
+[ ] Performance measured
+[ ] Security tested
+[ ] UI verified
+[ ] Regression suite passes
+[ ] V2 evaluation completed
+[ ] Documentation updated
+[ ] No secrets
+[ ] No fake metrics
+[ ] No uncontrolled automation
+[ ] Final submission version preserved
+
+========================================================
+CREATE PHASE7DONE.MD
+========================================================
+
+Create:
+
+PHASE7DONE.md
+
+Use:
+
+# DeploySafe — Phase 7 / V2 Completed
+
+## Important note
+- This is an optional post-endterm enhancement phase.
+- Original final submission remains preserved.
+
+## Objective
+- ...
+
+## Improvements
+- ...
+- ...
+- ...
+
+## Evaluation
+- Baseline: ...
+- V2: ...
+- Actual improvement/regression: ...
+
+If not measured:
+NOT MEASURED
+
+## Performance
+- Before: ...
+- After: ...
+
+## Security
+- ...
+
+## UI
+- ...
+
+## V2 demo
+- ...
+
+## Known limitations
+- ...
+
+## Original submission preserved
+- YES/NO
+
+## Final V2 status
+READY / PARTIAL / FAILED
+
+========================================================
+FINAL RULE
+========================================================
+
+Do not add features just because they are technically impressive.
+
+Every V2 change must answer:
+
+"What real problem does this solve?"
+
+If there is no clear answer:
+DO NOT IMPLEMENT IT.
+
+Do not sacrifice:
+- correctness
+- evidence
+- safety
+- reproducibility
+
+for feature count.
+
+========================================================
+FINAL RESPONSE
+========================================================
+
+Report:
+
+PHASE 7 / V2 STATUS:
+PASS / PARTIAL / FAILED
+
+BASELINE PRESERVED:
+YES / NO
+
+MAIN IMPROVEMENTS:
+- ...
+
+EVALUATION:
+- ...
+
+PERFORMANCE:
+- ...
+
+SECURITY:
+- ...
+
+UI:
+- ...
+
+KNOWN ISSUES:
+- ...
+
+FILES CREATED:
+- ...
+
+FILES MODIFIED:
+- ...
+
+ORIGINAL FINAL SUBMISSION:
+PRESERVED / NOT PRESERVED
+
+START:
+
+First audit the six-phase final system.
+
+Do not modify files until the baseline audit is complete.
