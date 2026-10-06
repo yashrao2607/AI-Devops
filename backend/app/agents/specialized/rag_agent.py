@@ -8,10 +8,17 @@ from backend.app.core.logging import logger
 
 class DocumentationRAGAgent(BaseSpecializedAgent):
     """
-    Documentation / RAG Agent (Step 13 of Phase 3).
-    Queries the Phase-2 Chroma vector store to extract repository documentation policies
-    and correlates them with actual configuration manifests.
+    Documentation / RAG Agent (Step 13 of Phase 3 / Phase 4 Intelligence Layer).
+    Queries the Chroma vector store to extract repository documentation policies,
+    prerequisites, and mandatory environment variables, correlating them with actual
+    CI/CD workflows, Docker configs, and deployment manifests.
     """
+
+    COMMON_NOISE_TOKENS = {
+        "HTTP", "HTTPS", "PORT", "TRUE", "FALSE", "NONE", "FROM", "COPY",
+        "WORKDIR", "RUN", "CMD", "ENTRYPOINT", "ENV", "EXPOSE", "ADD", "USER",
+        "JSON", "HTML", "POST", "GET", "PUT", "DELETE", "HEAD", "OPTIONS"
+    }
 
     def __init__(self):
         super().__init__(
@@ -22,59 +29,74 @@ class DocumentationRAGAgent(BaseSpecializedAgent):
     def analyze(self, context: AnalysisContext) -> List[Finding]:
         findings: List[Finding] = []
 
-        # 1. Semantic query to find documented environment and deployment requirements
-        rag_res = RAGTools.search_repository_context(
-            repository_id=context.repository_id,
-            query="What required environment variables and services are documented for deployment?",
-            top_k=5
-        )
+        # 1. Semantic RAG queries across indexed documentation and configs
+        rag_queries = [
+            "What required environment variables and services are documented for deployment?",
+            "What database, queue, or external service dependencies are documented?",
+        ]
 
-        if not rag_res.evidence_available or not rag_res.items:
-            logger.info("RAGAgent: No indexed documentation evidence available for repository '%s'.", context.repository_id)
-            return findings
-
-        # 2. Extract documented mandatory variables (e.g. REDIS_URL, DATABASE_URL, API_KEY)
         documented_vars = []
         seen_keys = set()
-        for item in rag_res.items:
-            found_vars = re.findall(r"\b([A-Z][A-Z0-9_]{3,})\b", item.content)
-            for v in found_vars:
-                if v not in {"HTTP", "PORT", "TRUE", "FALSE", "NONE", "FROM", "COPY", "WORKDIR"}:
-                    if (v, item.file_path) not in seen_keys:
-                        seen_keys.add((v, item.file_path))
-                        documented_vars.append((v, item))
 
-        # 3. Check if any documented variable is missing from compose/config manifests
-        compose_files = [f for f in context.all_files if "docker-compose" in f.lower() or "compose.yml" in f.lower()]
-        for compose_file in compose_files:
-            compose_content = RepositoryTools.get_file_content(context, compose_file)
-            if not compose_content.exists or not compose_content.content:
+        for q in rag_queries:
+            rag_res = RAGTools.search_repository_context(
+                repository_id=context.repository_id,
+                query=q,
+                top_k=5
+            )
+            if not rag_res.evidence_available or not rag_res.items:
                 continue
 
+            # Extract variable names from RAG hits
+            for item in rag_res.items:
+                found_vars = re.findall(r"\b([A-Z][A-Z0-9_]{3,})\b", item.content)
+                for v in found_vars:
+                    if v not in self.COMMON_NOISE_TOKENS and not v.startswith("GITHUB_"):
+                        if (v, item.file_path) not in seen_keys:
+                            seen_keys.add((v, item.file_path))
+                            documented_vars.append((v, item))
+
+        if not documented_vars:
+            logger.info("RAGAgent: No mandatory environment variables extracted from documentation for '%s'.", context.repository_id)
+            return findings
+
+        # 2. Check deployment manifests (compose, github workflows, vercel.json)
+        deploy_manifests = [
+            f for f in context.all_files
+            if any(term in f.lower() for term in ["compose", "workflow", "vercel.json", "netlify.toml", "fly.toml"])
+        ]
+
+        for dep_file in deploy_manifests:
+            dep_res = RepositoryTools.get_file_content(context, dep_file)
+            if not dep_res.exists or not dep_res.content:
+                continue
+
+            content_text = dep_res.content
             for var_name, evidence_item in documented_vars:
-                # If documented as mandatory (e.g. REDIS_URL or CACHE_URL) but absent in compose
-                if var_name in {"REDIS_URL", "CACHE_URL", "JWT_SECRET", "API_SECRET"} and var_name not in compose_content.content:
+                # Check critical infrastructure variables
+                is_critical_var = any(term in var_name for term in ["DATABASE", "POSTGRES", "REDIS", "SECRET", "TOKEN", "MONGO", "API_KEY", "PASSWORD", "AUTH"])
+                if is_critical_var and var_name not in content_text:
                     findings.append(Finding(
                         id=f"F-RAG-{len(findings)+1:03d}",
                         category="DOCUMENTATION",
                         severity="HIGH",
                         confidence="HIGH",
-                        title=f"Documentation/Config Mismatch: Documented '{var_name}' missing from compose",
+                        title=f"Documentation/Config Mismatch: Documented '{var_name}' missing from {dep_file}",
                         summary=(
-                            f"Repository documentation in {evidence_item.file_path} specifies that '{var_name}' is "
-                            f"required for deployment, but {compose_file} does not configure or pass this variable."
+                            f"Repository documentation in '{evidence_item.file_path}' specifies that '{var_name}' is "
+                            f"required for operation, but deployment configuration '{dep_file}' does not configure or pass this variable."
                         ),
-                        impact="Application container will encounter missing environment variable exceptions upon production startup.",
-                        recommendation=f"Define '{var_name}' under the environment section in {compose_file} as documented in {evidence_item.file_path}.",
+                        impact="Application containers or serverless functions will encounter missing configuration exceptions upon production initialization.",
+                        recommendation=f"Define '{var_name}' under the environment or secrets block in '{dep_file}' as specified in '{evidence_item.file_path}'.",
                         repository_id=context.repository_id,
                         commit_sha=context.commit_sha,
-                        file_path=compose_file,
-                        line_start=compose_content.line_start,
-                        line_end=min(compose_content.total_lines, 25),
+                        file_path=dep_file,
+                        line_start=1,
+                        line_end=min(dep_res.total_lines, 25),
                         evidence=(
                             f"Documented in {evidence_item.file_path} (L{evidence_item.line_start}-{evidence_item.line_end}):\n"
                             f"\"{evidence_item.content[:200].strip()}\"\n\n"
-                            f"Missing from {compose_file} environment block."
+                            f"Missing from '{dep_file}' deployment configuration."
                         ),
                         evidence_items=[
                             Evidence(
@@ -88,10 +110,10 @@ class DocumentationRAGAgent(BaseSpecializedAgent):
                             ),
                             Evidence(
                                 evidence_type="CONFIGURATION",
-                                file_path=compose_file,
+                                file_path=dep_file,
                                 line_start=1,
-                                line_end=compose_content.total_lines,
-                                snippet=compose_content.content[:200],
+                                line_end=dep_res.total_lines,
+                                snippet=content_text[:200],
                                 source="file_read",
                                 repository_id=context.repository_id
                             )

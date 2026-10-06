@@ -161,10 +161,17 @@ class EmbeddingFactory:
 
     @staticmethod
     def get_provider(preferred_provider: Optional[str] = None) -> EmbeddingProvider:
-        target = preferred_provider or getattr(settings, "EMBEDDING_PROVIDER", "gemini")
+        target = preferred_provider or getattr(settings, "EMBEDDING_PROVIDER", None)
+        if not target:
+            if getattr(settings, "PRIMARY_LLM_PROVIDER", "").lower() == "groq":
+                target = "local"
+            elif settings.has_gemini:
+                target = "gemini"
+            else:
+                target = "local"
 
         if target == "gemini" and settings.has_gemini:
             return GeminiEmbeddingProvider(api_key=settings.GEMINI_API_KEY)
-        
+
         logger.info("Using LocalEmbeddingProvider (offline deterministic mode)")
         return LocalEmbeddingProvider(dim=384)

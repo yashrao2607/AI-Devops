@@ -55,6 +55,7 @@ pnpm-debug.log*
 *.sqlite3
 chroma_db/
 chroma_data/
+cloned_repos/
 
 # OS / Editor files
 .DS_Store

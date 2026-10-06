@@ -33,10 +33,12 @@ class SecurityTools:
 
     SECRET_PATTERNS = [
         ("AWS_ACCESS_KEY", r"AKIA[0-9A-Z]{16}", "High-entropy AWS Access Key pattern"),
-        ("HARDCODED_PASSWORD", r"(?:password|passwd|pwd|secret)\s*[:=]\s*['\"]([^'\"]{8,})['\"]", "Hardcoded credential assignment"),
+        ("HARDCODED_PASSWORD", r"(?:password|passwd|pwd|db_pass)\s*[:=]\s*['\"]([^'\"]{8,})['\"]", "Hardcoded credential assignment"),
         ("PRIVATE_KEY", r"-----BEGIN (?:RSA|OPENSSH|EC|DSA)? PRIVATE KEY-----", "Hardcoded cryptographic private key"),
         ("GENERIC_API_TOKEN", r"(?:api[_-]?key|auth[_-]?token|bearer)\s*[:=]\s*['\"]([a-zA-Z0-9_\-\.]{20,})['\"]", "Hardcoded API authorization token"),
-        ("DATABASE_URI_WITH_CREDS", r"(?:postgres|mysql|mongodb|redis):\/\/[a-zA-Z0-9_-]+:[^@\s]+@[a-zA-Z0-9.-]+", "Database connection string containing raw credentials")
+        ("DATABASE_URI_WITH_CREDS", r"(?:postgres|mysql|mongodb|redis):\/\/[a-zA-Z0-9_-]+:[^@\s]+@[a-zA-Z0-9.-]+", "Database connection string containing raw credentials"),
+        ("GITHUB_TOKEN", r"(?:ghp_[a-zA-Z0-9]{36}|github_pat_[a-zA-Z0-9_]{82})", "Hardcoded GitHub Personal Access Token"),
+        ("SLACK_WEBHOOK", r"https:\/\/hooks\.slack\.com\/services\/T[a-zA-Z0-9_]+\/B[a-zA-Z0-9_]+\/[a-zA-Z0-9_]+", "Exposed Slack Incoming Webhook URI")
     ]
 
     @classmethod
@@ -45,8 +47,8 @@ class SecurityTools:
         executed_external = False
         tool_used = "deploy_safe_security_engine"
 
-        # 1. Attempt Bandit if Python files exist
-        has_python = bool(context.files_by_category.get("SOURCE_CODE", []))
+        # 1. Attempt Bandit ONLY if Python source files exist
+        has_python = any(f.endswith(".py") for f in context.all_files)
         if has_python:
             bandit_res = SafeCommandExecutor.execute(
                 command=["bandit", "-r", ".", "-f", "json", "-q"],

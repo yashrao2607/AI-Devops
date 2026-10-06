@@ -14,7 +14,8 @@ import {
   Layers,
   FileText,
   Folder,
-  ShieldCheck
+  ShieldCheck,
+  Play
 } from 'lucide-react';
 import { Card } from '../components/common/Card.tsx';
 import { Badge, BadgeVariant } from '../components/common/Badge.tsx';
@@ -396,12 +397,31 @@ export const Repositories: React.FC = () => {
               {sourceType === 'github' && (
                 <div className="space-y-3">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-slate-300">GitHub Repository URL</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-medium text-slate-300">GitHub Repository URL or Slug</label>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-slate-500 font-mono">Presets:</span>
+                        <button
+                          type="button"
+                          onClick={() => setTargetPath('https://github.com/yashrao2607/web-scrape')}
+                          className="text-[10px] text-emerald-400 hover:text-emerald-300 font-mono underline"
+                        >
+                          web-scrape
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setTargetPath('https://github.com/bottlepy/bottle')}
+                          className="text-[10px] text-cyan-400 hover:text-cyan-300 font-mono underline"
+                        >
+                          bottle
+                        </button>
+                      </div>
+                    </div>
                     <input
                       type="text"
                       value={targetPath}
                       onChange={(e) => setTargetPath(e.target.value)}
-                      placeholder="https://github.com/owner/repository"
+                      placeholder="https://github.com/owner/repository or owner/repo"
                       className="w-full bg-slate-950 border border-slate-800 rounded-md px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500"
                     />
                   </div>
@@ -513,7 +533,18 @@ export const Repositories: React.FC = () => {
                     }}
                     icon={<FileText className="w-3.5 h-3.5" />}
                   >
-                    View Discovered Files
+                    Files
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      window.location.hash = `#analyze?repo=${encodeURIComponent(snapshot.repository_id)}`;
+                      window.dispatchEvent(new CustomEvent('deploysafe-navigate'));
+                    }}
+                    icon={<Play className="w-3.5 h-3.5 text-emerald-400" />}
+                  >
+                    Analyze
                   </Button>
                 </div>
               </div>

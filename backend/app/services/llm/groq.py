@@ -13,7 +13,7 @@ T = TypeVar("T", bound=BaseModel)
 class GroqProvider(LLMProvider):
     """Groq Cloud LLM Provider with OpenAI-compatible endpoint."""
 
-    def __init__(self, api_key: Optional[str], model_name: str = "llama-3.3-70b-versatile", timeout: int = 30):
+    def __init__(self, api_key: Optional[str], model_name: str = "openai/gpt-oss-120b", timeout: int = 30):
         super().__init__(model_name=model_name, timeout=timeout)
         self.api_key = api_key
         self.base_url = "https://api.groq.com/openai/v1/chat/completions"
@@ -39,10 +39,23 @@ class GroqProvider(LLMProvider):
                 
                 if response.status_code == 200:
                     return response.json()
+                elif (response.status_code == 404 and "model_not_found" in response.text) or response.status_code == 429:
+                    # Model not available or rate limited on this account/tier, fallback to working models
+                    fallback_models = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"]
+                    for alt_model in fallback_models:
+                        if alt_model != payload.get("model"):
+                            logger.info("[groq] Model '%s' status %d. Trying alternative '%s'...", payload.get("model"), response.status_code, alt_model)
+                            alt_payload = dict(payload)
+                            alt_payload["model"] = alt_model
+                            alt_res = client.post(self.base_url, json=alt_payload, headers=headers)
+                            if alt_res.status_code == 200:
+                                self.model_name = alt_model
+                                return alt_res.json()
+                    if response.status_code == 429:
+                        raise LLMRateLimitError(f"Groq rate limit exceeded across models: {response.text}")
+                    raise LLMProviderError(f"Groq API returned status 404: {response.text}")
                 elif response.status_code in (401, 403):
                     raise LLMAuthenticationError(f"Groq authentication failed (HTTP {response.status_code}): {response.text}")
-                elif response.status_code == 429:
-                    raise LLMRateLimitError(f"Groq rate limit exceeded: {response.text}")
                 else:
                     raise LLMProviderError(f"Groq API returned status {response.status_code}: {response.text}")
         except httpx.TimeoutException:

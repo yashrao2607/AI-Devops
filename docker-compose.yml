@@ -1,0 +1,68 @@
+# ==============================================================================
+# DeploySafe Production Docker Compose
+# ==============================================================================
+services:
+  # ----------------------------------------------------------------------------
+  # Backend API Service (FastAPI + Multi-Agent Intelligence Engine)
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: deploysafe-backend:latest
+    container_name: deploysafe-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - APP_ENV=production
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - DATABASE_URL=sqlite:////app/data/deploysafe.db
+      - CHROMA_PATH=/app/data/chroma_db
+    volumes:
+      - deploysafe_data:/app/data
+      - deploysafe_cloned_repos:/app/cloned_repos
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - deploysafe-net
+
+  # ----------------------------------------------------------------------------
+  # Frontend UI Service (React + Vite SPA served via Nginx Reverse Proxy)
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    image: deploysafe-frontend:latest
+    container_name: deploysafe-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - deploysafe-net
+
+# ------------------------------------------------------------------------------
+# Persistent Volumes & Networks
+# ------------------------------------------------------------------------------
+volumes:
+  deploysafe_data:
+    name: deploysafe_data
+  deploysafe_cloned_repos:
+    name: deploysafe_cloned_repos
+
+networks:
+  deploysafe-net:
+    name: deploysafe-net
+    driver: bridge

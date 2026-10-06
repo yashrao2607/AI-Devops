@@ -189,7 +189,10 @@ export const Dashboard: React.FC = () => {
             variant="primary"
             size="sm"
             icon={<Play className="w-3.5 h-3.5 fill-current" />}
-            onClick={() => window.location.hash = '#analyze'}
+            onClick={() => {
+              window.location.hash = '#analyze';
+              window.dispatchEvent(new CustomEvent('deploysafe-navigate'));
+            }}
           >
             Run New Analysis
           </Button>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Shell, NavItem } from './components/layout/Shell.tsx';
 import { Dashboard } from './pages/Dashboard.tsx';
 import { Analyze } from './pages/Analyze.tsx';
@@ -10,20 +10,42 @@ import { Reports } from './pages/Reports.tsx';
 import { SettingsPage } from './pages/Settings.tsx';
 
 export default function App() {
-  const getInitialTab = (): NavItem => {
-    const path = window.location.pathname.replace(/^\//, '').toLowerCase();
+  const parseTabFromLocation = (): NavItem => {
     const validTabs: NavItem[] = ['overview', 'analyze', 'repositories', 'runs', 'findings', 'agents', 'reports', 'settings'];
-    if (validTabs.includes(path as NavItem)) return path as NavItem;
-    const hash = window.location.hash.replace(/^#/, '').toLowerCase();
+    
+    // Check hash first (e.g. #analyze or #analyze?repo=...)
+    const hash = window.location.hash.replace(/^#/, '').split('?')[0].toLowerCase();
     if (validTabs.includes(hash as NavItem)) return hash as NavItem;
+    
+    // Check pathname (e.g. /analyze or /analyze?repo=...)
+    const path = window.location.pathname.replace(/^\//, '').split('?')[0].toLowerCase();
+    if (validTabs.includes(path as NavItem)) return path as NavItem;
+    
     return 'overview';
   };
 
-  const [currentTab, setCurrentTab] = useState<NavItem>(getInitialTab());
+  const [currentTab, setCurrentTab] = useState<NavItem>(parseTabFromLocation());
+
+  useEffect(() => {
+    const syncTab = () => {
+      const tab = parseTabFromLocation();
+      setCurrentTab(tab);
+    };
+
+    window.addEventListener('hashchange', syncTab);
+    window.addEventListener('popstate', syncTab);
+    window.addEventListener('deploysafe-navigate', syncTab);
+
+    return () => {
+      window.removeEventListener('hashchange', syncTab);
+      window.removeEventListener('popstate', syncTab);
+      window.removeEventListener('deploysafe-navigate', syncTab);
+    };
+  }, []);
 
   const handleTabChange = (tab: NavItem) => {
     setCurrentTab(tab);
-    window.history.pushState(null, '', `/${tab === 'overview' ? '' : tab}`);
+    window.location.hash = tab === 'overview' ? '' : `#${tab}`;
   };
 
   const renderContent = () => {

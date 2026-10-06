@@ -27,8 +27,8 @@ class Settings(BaseSettings):
     PRIMARY_LLM_PROVIDER: Literal["gemini", "groq"] = Field(default="gemini")
     FALLBACK_LLM_PROVIDER: Literal["gemini", "groq"] = Field(default="groq")
 
-    GEMINI_MODEL: str = Field(default="gemini-2.0-flash")
-    GROQ_MODEL: str = Field(default="llama-3.3-70b-versatile")
+    GEMINI_MODEL: str = Field(default="gemini-2.5-flash")
+    GROQ_MODEL: str = Field(default="openai/gpt-oss-120b")
 
     # Storage Settings
     DATABASE_URL: str = Field(default="sqlite:///./deploysafe.db")

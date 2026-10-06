@@ -16,6 +16,78 @@ router = APIRouter()
 # Active snapshots in memory
 _ACTIVE_SNAPSHOTS: dict[str, RepositorySnapshot] = {}
 
+def register_snapshot(snapshot: RepositorySnapshot, target_alias: Optional[str] = None):
+    """Registers a snapshot under all its identifiers, names, slugs, and URL aliases."""
+    if not snapshot:
+        return
+    _ACTIVE_SNAPSHOTS[snapshot.repository_id] = snapshot
+    if snapshot.repository_name:
+        _ACTIVE_SNAPSHOTS[snapshot.repository_name] = snapshot
+
+    # Normalized slug variants (e.g. owner_repo vs owner/repo)
+    s_id = snapshot.repository_id.strip()
+    _ACTIVE_SNAPSHOTS[s_id] = snapshot
+    _ACTIVE_SNAPSHOTS[s_id.replace("/", "_")] = snapshot
+    _ACTIVE_SNAPSHOTS[s_id.replace("_", "/")] = snapshot
+
+    if snapshot.repository_name:
+        s_name = snapshot.repository_name.strip()
+        _ACTIVE_SNAPSHOTS[s_name] = snapshot
+        _ACTIVE_SNAPSHOTS[s_name.replace("/", "_")] = snapshot
+        _ACTIVE_SNAPSHOTS[s_name.replace("_", "/")] = snapshot
+
+    if target_alias:
+        t = target_alias.strip()
+        _ACTIVE_SNAPSHOTS[t] = snapshot
+        t_clean = t.rstrip("/").removesuffix(".git")
+        _ACTIVE_SNAPSHOTS[t_clean] = snapshot
+        if "github.com/" in t_clean:
+            slug = t_clean.split("github.com/")[-1]
+            _ACTIVE_SNAPSHOTS[slug] = snapshot
+            _ACTIVE_SNAPSHOTS[slug.replace("/", "_")] = snapshot
+            _ACTIVE_SNAPSHOTS[slug.replace("_", "/")] = snapshot
+
+def lookup_snapshot(repo_identifier: str) -> Optional[RepositorySnapshot]:
+    """Finds a snapshot by ID, slug, URL, or local path across in-memory cache and disk."""
+    raw = repo_identifier.strip()
+    if not raw:
+        return None
+
+    # 1. Direct memory lookup
+    if raw in _ACTIVE_SNAPSHOTS:
+        return _ACTIVE_SNAPSHOTS[raw]
+
+    clean = raw.rstrip("/").removesuffix(".git")
+    if clean in _ACTIVE_SNAPSHOTS:
+        return _ACTIVE_SNAPSHOTS[clean]
+
+    slug = clean.split("github.com/")[-1] if "github.com/" in clean else clean
+    for candidate in [slug, slug.replace("/", "_"), slug.replace("_", "/")]:
+        if candidate in _ACTIVE_SNAPSHOTS:
+            return _ACTIVE_SNAPSHOTS[candidate]
+
+    # 2. Check disk in cloned_repos, demo-repos, or direct path
+    candidates_to_check = [
+        raw,
+        os.path.join("cloned_repos", slug.replace("/", "_")),
+        os.path.join("cloned_repos", slug),
+        os.path.join("demo-repos", raw),
+        os.path.join("demo-repos", raw.replace("demo-repos/", "")),
+    ]
+    for c_path in candidates_to_check:
+        if os.path.isdir(c_path):
+            try:
+                repo_id = slug.replace("/", "_") if "cloned_repos" in c_path else os.path.basename(c_path)
+                s = RepositoryLoader.load_local(c_path, repository_id=repo_id)
+                if "cloned_repos" in c_path:
+                    s.source_type = "github"
+                register_snapshot(s, target_alias=raw)
+                return s
+            except Exception as e:
+                logger.debug("Lookup disk load failed for %s: %s", c_path, str(e))
+
+    return None
+
 class IngestRequest(BaseModel):
     source_type: Literal["local", "github"]
     target: str = Field(description="Local directory path or GitHub URL")
@@ -36,18 +108,78 @@ class RepositoryStatsResponse(BaseModel):
     total_size_bytes: int
     status: str
 
+@router.get("", response_model=List[RepositorySnapshot])
+def list_repositories():
+    """Lists all available ingested, cloned, and demo repositories."""
+    seen_ids = set()
+    repos: List[RepositorySnapshot] = []
+
+    # 1. From in-memory snapshots
+    for snapshot in list(_ACTIVE_SNAPSHOTS.values()):
+        if snapshot.repository_id not in seen_ids:
+            seen_ids.add(snapshot.repository_id)
+            repos.append(snapshot)
+
+    # 2. From cloned_repos directory
+    cloned_base = os.path.abspath("cloned_repos")
+    if os.path.isdir(cloned_base):
+        for entry in os.listdir(cloned_base):
+            repo_path = os.path.join(cloned_base, entry)
+            git_path = os.path.join(repo_path, ".git")
+            if os.path.isdir(repo_path) and os.path.exists(git_path) and entry not in seen_ids:
+                try:
+                    s = RepositoryLoader.load_local(repo_path, repository_id=entry)
+                    if s.file_count > 0:
+                        s.source_type = "github"
+                        register_snapshot(s)
+                        seen_ids.add(entry)
+                        repos.append(s)
+                except Exception as e:
+                    logger.debug("Could not inspect cloned repo %s: %s", entry, str(e))
+
+    # 3. From demo-repos directory
+    demo_base = os.path.abspath("demo-repos")
+    if os.path.isdir(demo_base):
+        for entry in os.listdir(demo_base):
+            repo_path = os.path.join(demo_base, entry)
+            if os.path.isdir(repo_path) and entry not in seen_ids:
+                try:
+                    s = RepositoryLoader.load_local(repo_path, repository_id=entry)
+                    register_snapshot(s)
+                    seen_ids.add(entry)
+                    repos.append(s)
+                except Exception as e:
+                    logger.debug("Could not inspect demo repo %s: %s", entry, str(e))
+
+    return repos
+
 @router.post("/ingest", response_model=RepositorySnapshot)
 def ingest_repository(payload: IngestRequest):
     """Ingests a repository from a local filesystem path or public/private GitHub URL."""
     try:
-        if payload.source_type == "local":
-            snapshot = RepositoryLoader.load_local(path=payload.target, repository_id=payload.repository_id)
-        elif payload.source_type == "github":
-            snapshot = RepositoryLoader.load_github(url=payload.target, branch=payload.branch, repository_id=payload.repository_id)
+        target = payload.target.strip()
+        source_type = payload.source_type
+
+        # Smart source_type auto-detection
+        is_url_or_slug = (
+            target.startswith("http://")
+            or target.startswith("https://")
+            or "github.com/" in target
+            or ("/" in target and not os.path.isdir(target) and not os.path.exists(target))
+        )
+        if is_url_or_slug and not os.path.isdir(target):
+            source_type = "github"
+        elif os.path.isdir(target):
+            source_type = "local"
+
+        if source_type == "local":
+            snapshot = RepositoryLoader.load_local(path=target, repository_id=payload.repository_id)
+        elif source_type == "github":
+            snapshot = RepositoryLoader.load_github(url=target, branch=payload.branch, repository_id=payload.repository_id)
         else:
             raise HTTPException(status_code=400, detail="Invalid source type. Use 'local' or 'github'.")
 
-        _ACTIVE_SNAPSHOTS[snapshot.repository_id] = snapshot
+        register_snapshot(snapshot, target_alias=payload.target)
         return snapshot
     except RepositoryLoaderError as e:
         logger.error("Ingestion failed: %s", str(e))
@@ -68,7 +200,7 @@ def ingest_zip_archive(file: UploadFile = File(...), repository_id: Optional[str
         temp_zip.close()
 
         snapshot = RepositoryLoader.load_zip(zip_path=temp_zip.name, repository_id=repository_id)
-        _ACTIVE_SNAPSHOTS[snapshot.repository_id] = snapshot
+        register_snapshot(snapshot)
         return snapshot
     except RepositoryLoaderError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -82,14 +214,9 @@ def ingest_zip_archive(file: UploadFile = File(...), repository_id: Optional[str
 @router.post("/{repository_id}/index", response_model=IndexSummary)
 def index_repository_endpoint(repository_id: str):
     """Triggers the full RAG indexing pipeline on an ingested repository."""
-    snapshot = _ACTIVE_SNAPSHOTS.get(repository_id)
+    snapshot = lookup_snapshot(repository_id)
     if not snapshot:
-        # Check if repository exists as local directory fallback
-        if os.path.isdir(repository_id):
-            snapshot = RepositoryLoader.load_local(repository_id)
-            _ACTIVE_SNAPSHOTS[snapshot.repository_id] = snapshot
-        else:
-            raise HTTPException(status_code=404, detail=f"Repository '{repository_id}' has not been ingested yet.")
+        raise HTTPException(status_code=404, detail=f"Repository '{repository_id}' has not been ingested yet.")
 
     try:
         indexer = RepositoryIndexer()
@@ -109,11 +236,13 @@ def get_index_status(repository_id: str):
 @router.post("/{repository_id}/search", response_model=SearchResponse)
 def search_repository_endpoint(repository_id: str, payload: SearchRequest):
     """Performs semantic RAG search across indexed repository chunks, returning evidence."""
+    snapshot = lookup_snapshot(repository_id)
     retriever = RepositoryRetriever()
     filters = {"category": payload.category} if payload.category else None
+    actual_id = snapshot.repository_id if snapshot else repository_id
     response = retriever.search_repository_knowledge(
         query=payload.query,
-        repository_id=repository_id,
+        repository_id=actual_id,
         top_k=payload.top_k,
         filters=filters
     )
@@ -122,7 +251,7 @@ def search_repository_endpoint(repository_id: str, payload: SearchRequest):
 @router.get("/{repository_id}/files", response_model=List[DiscoveredFile])
 def get_discovered_files(repository_id: str):
     """Lists discovered files and categorization for an ingested repository."""
-    snapshot = _ACTIVE_SNAPSHOTS.get(repository_id)
+    snapshot = lookup_snapshot(repository_id)
     if not snapshot:
         raise HTTPException(status_code=404, detail=f"Repository '{repository_id}' not found.")
     return FileDiscoveryService.discover_files(snapshot.root_path)
@@ -130,13 +259,14 @@ def get_discovered_files(repository_id: str):
 @router.get("/{repository_id}/stats", response_model=RepositoryStatsResponse)
 def get_repository_stats(repository_id: str):
     """Returns storage and vector counts for a repository."""
+    snapshot = lookup_snapshot(repository_id)
+    actual_id = snapshot.repository_id if snapshot else repository_id
     vector_store = ChromaVectorStore()
-    vec_count = vector_store.count(repository_id)
-    snapshot = _ACTIVE_SNAPSHOTS.get(repository_id)
-    index_status = RepositoryIndexer.get_status(repository_id)
+    vec_count = vector_store.count(actual_id)
+    index_status = RepositoryIndexer.get_status(actual_id)
 
     return RepositoryStatsResponse(
-        repository_id=repository_id,
+        repository_id=actual_id,
         repository_name=snapshot.repository_name if snapshot else repository_id,
         vector_count=vec_count,
         source_type=snapshot.source_type if snapshot else "unknown",
@@ -153,18 +283,19 @@ def get_repository_summary(repository_id: str):
     """
     from backend.app.agents.analysis_flow import DeploySafeAnalysisFlow
 
+    snapshot = lookup_snapshot(repository_id)
+    actual_id = snapshot.repository_id if snapshot else repository_id
+
     # Check for matching reports
     reports = DeploySafeAnalysisFlow.list_reports()
-    matching_reports = [r for r in reports if r.repository_id == repository_id or repository_id in r.repository_name]
+    matching_reports = [r for r in reports if r.repository_id in (repository_id, actual_id) or repository_id in r.repository_name]
     latest_report = None
     if matching_reports:
         matching_reports.sort(key=lambda r: r.analyzed_at, reverse=True)
         latest_report = matching_reports[0]
 
-    snapshot = _ACTIVE_SNAPSHOTS.get(repository_id)
-
     return {
-        "repository_id": repository_id,
+        "repository_id": actual_id,
         "repository_name": snapshot.repository_name if snapshot else (latest_report.repository_name if latest_report else repository_id),
         "has_analysis": latest_report is not None,
         "latest_run_id": latest_report.run_id if latest_report else None,

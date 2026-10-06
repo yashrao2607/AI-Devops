@@ -1,0 +1,48 @@
+# ==============================================================================
+# DeploySafe Development Docker Compose (Hot-Reloading Enabled)
+# ==============================================================================
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: deploysafe-backend-dev
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - APP_ENV=development
+      - LOG_LEVEL=DEBUG
+    volumes:
+      - ./backend:/app/backend
+      - ./chroma_db:/app/chroma_db
+      - ./cloned_repos:/app/cloned_repos
+      - ./deploysafe.db:/app/deploysafe.db
+    command: ["python", "-m", "uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    networks:
+      - deploysafe-dev-net
+
+  frontend:
+    image: node:20-alpine
+    container_name: deploysafe-frontend-dev
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_BACKEND_URL=http://backend:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: ["sh", "-c", "npm install && npm run dev -- --host 0.0.0.0"]
+    depends_on:
+      - backend
+    networks:
+      - deploysafe-dev-net
+
+networks:
+  deploysafe-dev-net:
+    name: deploysafe-dev-net
+    driver: bridge

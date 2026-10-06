@@ -90,61 +90,105 @@ class RepositoryLoader:
     @classmethod
     def load_github(cls, url: str, branch: Optional[str] = None, repository_id: Optional[str] = None) -> RepositorySnapshot:
         """Safely clones a public or authenticated GitHub repository."""
+        # Normalize shorthand format (e.g., owner/repo -> https://github.com/owner/repo)
+        clean_url = url.strip()
+        if not clean_url.startswith("http://") and not clean_url.startswith("https://"):
+            if re.match(r"^[a-zA-Z0-9_\-\.]+/[a-zA-Z0-9_\-\.]+$", clean_url):
+                clean_url = f"https://github.com/{clean_url}"
+
         # Validate URL format
         pattern = r"^https://github\.com/([a-zA-Z0-9_\-\.]+)/([a-zA-Z0-9_\-\.]+?)(?:\.git)?/?$"
-        match = re.match(pattern, url.strip())
+        match = re.match(pattern, clean_url)
         if not match:
-            raise RepositoryLoaderError(f"Invalid GitHub repository URL: {url}. Must be in format https://github.com/owner/repo")
+            raise RepositoryLoaderError(f"Invalid GitHub repository URL: {url}. Must be in format https://github.com/owner/repo or owner/repo")
 
         owner, repo_name = match.group(1), match.group(2)
         repo_id = repository_id or f"{cls._sanitize_slug(owner)}_{cls._sanitize_slug(repo_name)}"
 
-        temp_dir = tempfile.mkdtemp(prefix=f"deploysafe_gh_{repo_id}_")
-        clone_url = url
+        # Store in persistent cloned_repos directory so clones survive across runs and server restarts
+        cloned_base = os.path.abspath("cloned_repos")
+        os.makedirs(cloned_base, exist_ok=True)
+        dest_dir = os.path.join(cloned_base, repo_id)
+
+        clone_url = clean_url
         if settings.GITHUB_TOKEN and settings.GITHUB_TOKEN.strip() and not settings.GITHUB_TOKEN.startswith("YOUR_"):
             clone_url = f"https://x-access-token:{settings.GITHUB_TOKEN}@github.com/{owner}/{repo_name}.git"
 
-        cmd = ["git", "clone", "--depth", "1"]
-        if branch:
-            cmd.extend(["--branch", branch])
-        cmd.extend([clone_url, temp_dir])
+        # Check if already cloned with files
+        has_existing_clone = (
+            os.path.isdir(dest_dir)
+            and os.path.exists(os.path.join(dest_dir, ".git"))
+            and cls._calculate_stats(dest_dir)[0] > 0
+        )
 
+        if has_existing_clone:
+            logger.info("Repository '%s' already cloned at %s, updating...", repo_id, dest_dir)
+            try:
+                subprocess.run(["git", "-C", dest_dir, "fetch", "--depth", "1"], capture_output=True, timeout=20)
+                if branch and branch.lower() not in ("main", "head", "default"):
+                    subprocess.run(["git", "-C", dest_dir, "checkout", branch], capture_output=True, timeout=10)
+                subprocess.run(["git", "-C", dest_dir, "reset", "--hard", f"origin/{branch or 'HEAD'}"], capture_output=True, timeout=10)
+            except Exception as e:
+                logger.warning("Could not refresh existing git clone (%s), continuing with current files.", str(e))
+        else:
+            # Clone into an isolated temporary folder first to avoid locks and partial reads
+            temp_clone = tempfile.mkdtemp(prefix=f"deploysafe_git_{repo_id}_")
+            cmd = ["git", "clone", "--depth", "1"]
+            if branch and branch.lower() not in ("main", "head", "default"):
+                cmd.extend(["--branch", branch])
+            cmd.extend([clone_url, temp_clone])
+
+            try:
+                logger.info("Cloning GitHub repository: %s/%s into %s", owner, repo_name, temp_clone)
+                res = subprocess.run(cmd, capture_output=True, text=True, timeout=90)
+                if res.returncode != 0:
+                    err_msg = res.stderr.replace(settings.GITHUB_TOKEN or "", "***TOKEN***")
+                    shutil.rmtree(temp_clone, ignore_errors=True)
+                    raise RepositoryLoaderError(f"Git clone failed: {err_msg}")
+
+                # Copy cloned content to persistent dest_dir safely
+                os.makedirs(dest_dir, exist_ok=True)
+                shutil.copytree(temp_clone, dest_dir, dirs_exist_ok=True)
+                shutil.rmtree(temp_clone, ignore_errors=True)
+            except subprocess.TimeoutExpired:
+                shutil.rmtree(temp_clone, ignore_errors=True)
+                raise RepositoryLoaderError("Git clone timed out after 90 seconds.")
+            except RepositoryLoaderError:
+                raise
+            except Exception as e:
+                shutil.rmtree(temp_clone, ignore_errors=True)
+                raise RepositoryLoaderError(f"Failed to clone GitHub repository: {str(e)}")
+
+        # Fetch actual branch and commit SHA from destination
+        actual_branch = branch or "main"
         try:
-            logger.info("Cloning GitHub repository: %s/%s into temp dir %s", owner, repo_name, temp_dir)
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=45)
-            if res.returncode != 0:
-                # Mask token in error message if present
-                err_msg = res.stderr.replace(settings.GITHUB_TOKEN or "", "***TOKEN***")
-                shutil.rmtree(temp_dir, ignore_errors=True)
-                raise RepositoryLoaderError(f"Git clone failed: {err_msg}")
-        except subprocess.TimeoutExpired:
-            shutil.rmtree(temp_dir, ignore_errors=True)
-            raise RepositoryLoaderError("Git clone timed out after 45 seconds.")
-        except Exception as e:
-            shutil.rmtree(temp_dir, ignore_errors=True)
-            raise RepositoryLoaderError(f"Failed to clone GitHub repository: {str(e)}")
+            res_b = subprocess.run(["git", "-C", dest_dir, "rev-parse", "--abbrev-ref", "HEAD"],
+                                   capture_output=True, text=True, timeout=5)
+            if res_b.returncode == 0 and res_b.stdout.strip():
+                actual_branch = res_b.stdout.strip()
+        except Exception:
+            pass
 
-        # Fetch commit SHA
         commit_sha = None
         try:
-            res_c = subprocess.run(["git", "-C", temp_dir, "rev-parse", "HEAD"],
+            res_c = subprocess.run(["git", "-C", dest_dir, "rev-parse", "HEAD"],
                                    capture_output=True, text=True, timeout=5)
             if res_c.returncode == 0:
                 commit_sha = res_c.stdout.strip()
         except Exception:
             pass
 
-        file_count, total_size = cls._calculate_stats(temp_dir)
+        file_count, total_size = cls._calculate_stats(dest_dir)
         return RepositorySnapshot(
             source_type="github",
             repository_id=repo_id,
             repository_name=f"{owner}/{repo_name}",
-            branch=branch or "main",
+            branch=actual_branch,
             commit_sha=commit_sha,
-            root_path=temp_dir,
+            root_path=dest_dir,
             file_count=file_count,
             total_size_bytes=total_size,
-            is_temporary=True
+            is_temporary=False
         )
 
     @classmethod

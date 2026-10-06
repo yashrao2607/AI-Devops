@@ -27,6 +27,7 @@ CODE_BG = RGBColor(248, 250, 252)         # #F8FAFC Code block background
 
 FONT_FAMILY = "Segoe UI"
 CODE_FONT = "Consolas"
+TOTAL_SLIDES = 10
 
 def create_presentation():
     prs = Presentation()
@@ -64,7 +65,7 @@ def create_presentation():
             card.line.fill.background()
         return card
 
-    def add_header(slide, title, subtitle=None, slide_num=None):
+    def add_header(slide, title, subtitle=None):
         tb = slide.shapes.add_textbox(Inches(0.8), Inches(0.55), Inches(11.733), Inches(1.1))
         tf = tb.text_frame
         tf.word_wrap = True
@@ -85,7 +86,7 @@ def create_presentation():
             run2 = p2.add_run()
             run2.text = subtitle
             run2.font.name = FONT_FAMILY
-            run2.font.size = Pt(14)
+            run2.font.size = Pt(13.5)
             run2.font.bold = False
             run2.font.color.rgb = TEXT_MUTED
 
@@ -97,15 +98,15 @@ def create_presentation():
 
         p = tf.paragraphs[0]
         r1 = p.add_run()
-        r1.text = "DeploySafe  ·  Agentic AI  ·  CSE3101"
+        r1.text = "DeploySafe  |  CSE 4011: Intelligent Developer Tools & AI DevOps Workflows"
         r1.font.name = FONT_FAMILY
         r1.font.size = Pt(10)
         r1.font.color.rgb = TEXT_SUBTLE
 
         r_spacer = p.add_run()
-        r_spacer.text = " " * 85
+        r_spacer.text = " " * 50
         r2 = p.add_run()
-        r2.text = f"{slide_num:02d} / 10"
+        r2.text = f"{slide_num:02d} / {TOTAL_SLIDES:02d}"
         r2.font.name = FONT_FAMILY
         r2.font.size = Pt(10)
         r2.font.bold = True
@@ -121,7 +122,7 @@ def create_presentation():
         p1.font.size = Pt(12)
         for tp in notes_dict.get("talking_points", []):
             p = tf.add_paragraph()
-            p.text = f"• {tp}"
+            p.text = f"- {tp}"
             p.font.size = Pt(11)
 
         p_q = tf.add_paragraph()
@@ -143,38 +144,45 @@ def create_presentation():
         p_at.font.size = Pt(11)
 
     # =========================================================================
-    # SLIDE 1: Title & Product Overview
+    # SLIDE 1: Title & Course Context (Grounded, direct)
     # =========================================================================
     slide1 = prs.slides.add_slide(blank_layout)
     set_slide_background(slide1)
 
-    # Left Column: Clean Title & Context
-    tb1 = slide1.shapes.add_textbox(Inches(0.9), Inches(1.5), Inches(5.6), Inches(4.5))
+    # Left Column: Title & Metadata
+    tb1 = slide1.shapes.add_textbox(Inches(0.8), Inches(1.2), Inches(5.8), Inches(5.2))
     tf1 = tb1.text_frame
     tf1.word_wrap = True
     tf1.margin_left = tf1.margin_top = tf1.margin_right = tf1.margin_bottom = 0
 
-    add_para(tf1, "DEPLOYSAFE", size_pt=12, bold=True, color=ACCENT_BLUE, space_after=12)
-    add_para(tf1, "Deployment Readiness Analysis Before Release", size_pt=34, bold=True, color=TEXT_MAIN, space_after=16)
-    add_para(tf1, "An intelligent analysis layer that identifies cross-domain deployment risks across code, configurations, dependencies, and documentation.", size_pt=15, bold=False, color=TEXT_MUTED, space_after=32)
+    add_para(tf1, "DEPLOYSAFE  |  PROJECT PHASE EVALUATION 2 (A2)", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=10)
+    add_para(tf1, "Automated Pre-Deployment Risk Analysis for DevOps Pipelines", size_pt=28, bold=True, color=TEXT_MAIN, space_after=14)
+    add_para(tf1, "An intelligent analysis tool that inspects repositories before release, detecting configuration drift, unpinned dependencies, and missing environment secrets.", size_pt=13.5, bold=False, color=TEXT_MUTED, space_after=24)
 
-    add_para(tf1, "Agentic AI  ·  CSE3101  ·  Midterm Presentation", size_pt=11, bold=True, color=TEXT_SUBTLE, space_after=4)
-    add_para(tf1, "Team DeploySafe  ·  Evaluation Repository Demo", size_pt=11, bold=False, color=TEXT_MUTED, space_after=0)
+    # Course Metadata Box
+    c_meta = add_card(slide1, 0.8, 4.35, 5.65, 2.35, bg=CARD_BG, border=CARD_BORDER)
+    tb_m = slide1.shapes.add_textbox(Inches(1.0), Inches(4.5), Inches(5.25), Inches(2.05))
+    tf_m = tb_m.text_frame
+    tf_m.word_wrap = True
+    tf_m.margin_left = tf_m.margin_top = tf_m.margin_right = tf_m.margin_bottom = 0
 
-    # Right Column: Clean Product UI Card
-    card_right = add_card(slide1, 6.7, 1.2, 5.8, 5.0, bg=CARD_BG, border=CARD_BORDER)
-    # Add real UI screenshot inside card
+    add_para(tf_m, "Course: CSE 4011 — Intelligent Developer Tools and AI DevOps Workflows", size_pt=11, bold=True, color=TEXT_MAIN, space_after=4)
+    add_para(tf_m, "Faculty Mentors: Dr. Kiran Khatter & Mr. Naveen Singh", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=4)
+    add_para(tf_m, "Evaluation: Mid-Term Examination (A2 · 30% Weightage · 5–9 Oct 2026)", size_pt=10.5, bold=False, color=TEXT_MUTED, space_after=4)
+    add_para(tf_m, "Student: Yash Rao  |  Batch 2023–27 (7th Semester)", size_pt=10.5, bold=False, color=TEXT_MAIN, space_after=0)
+
+    # Right Column: UI Card
+    card_right = add_card(slide1, 6.75, 1.2, 5.78, 5.5, bg=CARD_BG, border=CARD_BORDER)
     if os.path.exists("docs/assets/screenshot_dashboard.png"):
-        slide1.shapes.add_picture("docs/assets/screenshot_dashboard.png", Inches(6.85), Inches(1.35), Inches(5.5), Inches(4.4))
+        slide1.shapes.add_picture("docs/assets/screenshot_dashboard.png", Inches(6.9), Inches(1.35), Inches(5.48), Inches(4.7))
 
-    # Caption under product card
-    tb_cap = slide1.shapes.add_textbox(Inches(6.85), Inches(5.85), Inches(5.5), Inches(0.3))
+    tb_cap = slide1.shapes.add_textbox(Inches(6.9), Inches(6.2), Inches(5.48), Inches(0.35))
     tf_cap = tb_cap.text_frame
     tf_cap.margin_top = tf_cap.margin_left = tf_cap.margin_right = tf_cap.margin_bottom = 0
     p_cap = tf_cap.paragraphs[0]
     p_cap.alignment = PP_ALIGN.RIGHT
     run_cap = p_cap.add_run()
-    run_cap.text = "Actual DeploySafe Console  ·  Deterministic Risk Overview"
+    run_cap.text = "DeploySafe Web Console  |  Deterministic Risk Overview Hero"
     run_cap.font.name = FONT_FAMILY
     run_cap.font.size = Pt(10)
     run_cap.font.color.rgb = TEXT_SUBTLE
@@ -182,336 +190,340 @@ def create_presentation():
     add_footer(slide1, 1)
     add_speaker_notes(slide1, {
         "talking_points": [
-            "Good morning Professor. Today we present DeploySafe, an AI-powered deployment readiness platform.",
-            "DeploySafe analyzes software repositories before release to detect deployment-blocking risks that traditional CI tests miss.",
-            "It evaluates code changes, deployment configurations, dependencies, and documentation in unison.",
-            "All findings are validated by an adversarial Critic agent and scored with a deterministic risk engine."
+            "Good morning Dr. Kiran Khatter and Mr. Naveen Singh. Today I am presenting DeploySafe for our CSE 4011 Mid-Term Evaluation (A2).",
+            "DeploySafe is an automated pre-deployment risk analysis tool that inspects repositories before release to catch critical deployment failures.",
+            "It bridges modern software engineering, AI code intelligence, and DevOps workflows as outlined in our course syllabus.",
+            "All findings are validated against actual disk files by a Critic agent, and scored through a deterministic mathematical formula."
         ],
-        "question": "Why is this problem best solved by Agentic AI rather than standard static analysis?",
-        "answer": "Static analysis checks individual files for syntax and stylistic rules in isolation. DeploySafe uses specialized agents to correlate human intent in documentation with deployment manifests, catching cross-file misconfigurations."
+        "question": "Why is this problem best solved by an AI DevOps tool rather than standard static analysis?",
+        "answer": "Static analysis checks individual files for syntax rules in isolation. DeploySafe uses specialized domain agents to correlate human intent in documentation with deployment manifests, catching cross-domain misconfigurations like a missing database container."
     })
 
     # =========================================================================
-    # SLIDE 2: The Problem
+    # SLIDE 2: The Problem: Why Green Builds Still Fail in Production
     # =========================================================================
     slide2 = prs.slides.add_slide(blank_layout)
     set_slide_background(slide2)
-    add_header(slide2, "A Passing Pipeline Doesn't Tell the Whole Story", "Standard CI/CD checks whether code compiles and passes unit tests—not whether it is safe to deploy.")
+    add_header(slide2, "Why Green Builds Still Fail in Production", "Unit tests pass in isolated environments, but fail when deployed to real production infrastructure.")
 
-    # Top Flow: Traditional Pipeline
-    flow_bg = add_card(slide2, 0.8, 1.8, 11.733, 1.3, bg=CARD_BG, border=CARD_BORDER)
-    tb_flow = slide2.shapes.add_textbox(Inches(1.0), Inches(1.95), Inches(11.333), Inches(1.0))
-    tf_flow = tb_flow.text_frame
-    tf_flow.word_wrap = True
-    tf_flow.margin_left = tf_flow.margin_top = tf_flow.margin_right = tf_flow.margin_bottom = 0
+    col_w2 = 5.67
+    card_h2 = 3.95
 
-    add_para(tf_flow, "TRADITIONAL RELEASE PIPELINE", size_pt=10, bold=True, color=TEXT_SUBTLE, space_after=6)
-    add_para(tf_flow, "Code Change    →    Unit Tests (Passed)    →    Container Build    →    Production Deployment (Outage)", size_pt=14, bold=True, color=TEXT_MAIN, space_after=4)
-    add_para(tf_flow, "Blind spot: Unit tests pass completely while environment configurations and service dependencies are broken.", size_pt=12, bold=False, color=CRITICAL_RED, space_after=0)
+    # Left: The Problem
+    c_prob = add_card(slide2, 0.8, 1.8, col_w2, card_h2, bg=CARD_BG, border=CARD_BORDER)
+    tb_p = slide2.shapes.add_textbox(Inches(1.02), Inches(1.98), Inches(col_w2 - 0.44), Inches(card_h2 - 0.36))
+    tf_p = tb_p.text_frame
+    tf_p.word_wrap = True
+    tf_p.margin_left = tf_p.margin_top = tf_p.margin_right = tf_p.margin_bottom = 0
 
-    # Bottom Gap: 3 Concrete Cards
-    examples = [
-        ("Configuration Mismatch", "Documentation specifies Redis for session storage, but Redis is completely missing from docker-compose.yml.", "Deployment fails on container boot."),
-        ("Dependency Drift", "Unpinned package versions or missing native build dependencies in requirements.txt.", "Build succeeds locally but crashes in production."),
-        ("Missing Environment Variables", "Source code expects runtime secrets or port configurations that were never declared in deployment manifests.", "Application throws unhandled 500 crashes.")
+    add_para(tf_p, "COMMON DEPLOYMENT BLIND SPOTS", size_pt=11, bold=True, color=CRITICAL_RED, space_after=6)
+    add_para(tf_p, "What CI/CD Pipelines Miss Before Release", size_pt=17, bold=True, color=TEXT_MAIN, space_after=10)
+    add_para(tf_p, "Traditional CI runs unit tests in isolation. It does not verify deployment environment parity:", size_pt=12, bold=False, color=TEXT_MUTED, space_after=10)
+
+    prob_items = [
+        ("Missing Services in Compose", "Source code connects to redis://redis:6379, but Redis is completely missing from docker-compose.yml. Tests pass; container crashes on boot."),
+        ("Unpinned Dependency Drift", "requirements.txt or package.json uses unpinned versions. Tests pass on cached CI runners, but newer breaking releases fail in production."),
+        ("Undeclared Environment Variables", "Code calls os.environ['DATABASE_URL'] without fallback. Variable is omitted from .env.example, causing runtime KeyError crashes.")
     ]
+    for p_title, p_desc in prob_items:
+        add_para(tf_p, f"- {p_title}:", size_pt=11, bold=True, color=TEXT_MAIN, space_after=1)
+        add_para(tf_p, f"  {p_desc}", size_pt=10, bold=False, color=TEXT_MUTED, space_after=5)
 
-    card_w = 3.65
-    gap_x = 0.39
-    start_x = 0.8
-    for i, (title, desc, impact) in enumerate(examples):
-        cx = start_x + i * (card_w + gap_x)
-        c = add_card(slide2, cx, 3.4, card_w, 3.2, bg=CARD_BG, border=CARD_BORDER)
-        tb_c = slide2.shapes.add_textbox(Inches(cx + 0.25), Inches(3.6), Inches(card_w - 0.5), Inches(2.8))
-        tf_c = tb_c.text_frame
-        tf_c.word_wrap = True
-        tf_c.margin_left = tf_c.margin_top = tf_c.margin_right = tf_c.margin_bottom = 0
+    # Right: The Solution
+    c_sol = add_card(slide2, 6.863, 1.8, col_w2, card_h2, bg=CARD_BG, border=ACCENT_BLUE)
+    tb_s = slide2.shapes.add_textbox(Inches(7.083), Inches(1.98), Inches(col_w2 - 0.44), Inches(card_h2 - 0.36))
+    tf_s = tb_s.text_frame
+    tf_s.word_wrap = True
+    tf_s.margin_left = tf_s.margin_top = tf_s.margin_right = tf_s.margin_bottom = 0
 
-        add_para(tf_c, f"0{i+1}", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=6)
-        add_para(tf_c, title, size_pt=16, bold=True, color=TEXT_MAIN, space_after=10)
-        add_para(tf_c, desc, size_pt=13, bold=False, color=TEXT_MUTED, space_after=14)
-        add_para(tf_c, f"Impact: {impact}", size_pt=12, bold=True, color=TEXT_MAIN, space_after=0)
+    add_para(tf_s, "HOW DEPLOYSAFE ADDRESSES THIS", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=6)
+    add_para(tf_s, "Pre-Flight Intelligence Layer Before Deployment", size_pt=17, bold=True, color=TEXT_MAIN, space_after=10)
+    add_para(tf_s, "DeploySafe analyzes the entire repository context before code reaches the production cluster:", size_pt=12, bold=False, color=TEXT_MUTED, space_after=10)
+
+    sol_items = [
+        ("Cross-File Correlation", "Inspects whether external services used in source code are declared in Dockerfiles and docker-compose.yml."),
+        ("Documentation Comparison", "Uses ChromaDB to query README.md instructions and check if required ports and secrets are configured."),
+        ("Static AST Parsing", "Uses Python's ast module to inspect unhandled exceptions, database retry logic, and network call safety.")
+    ]
+    for s_title, s_desc in sol_items:
+        add_para(tf_s, f"- {s_title}:", size_pt=11, bold=True, color=TEXT_MAIN, space_after=1)
+        add_para(tf_s, f"  {s_desc}", size_pt=10, bold=False, color=TEXT_MUTED, space_after=5)
+
+    # Bottom Banner
+    c_bot2 = add_card(slide2, 0.8, 5.95, 11.733, 0.85, bg=ACCENT_BG, border=CARD_BORDER)
+    tb_b2 = slide2.shapes.add_textbox(Inches(1.0), Inches(6.08), Inches(11.333), Inches(0.6))
+    tf_b2 = tb_b2.text_frame
+    tf_b2.word_wrap = True
+    tf_b2.margin_left = tf_b2.margin_top = tf_b2.margin_right = tf_b2.margin_bottom = 0
+
+    add_para(tf_b2, "RELEASE WORKFLOW PLACEMENT", size_pt=10, bold=True, color=ACCENT_BLUE, space_after=2)
+    add_para(tf_b2, "Code Commit  ->  Run Unit Tests (CI)  ->  Run DeploySafe (Pre-Flight Analysis)  ->  Deterministic Go/No-Go Release Gate", size_pt=12.5, bold=True, color=TEXT_MAIN, space_after=0)
 
     add_footer(slide2, 2)
     add_speaker_notes(slide2, {
         "talking_points": [
-            "Every engineering team experiences green CI builds that immediately fail when deployed to production.",
-            "Traditional pipelines execute tests and builds, but they do not reason about cross-file configuration mismatches.",
-            "For example, code can pass 100% of unit tests while docker-compose is missing a required database service.",
-            "DeploySafe bridges this gap by analyzing the systemic deployment context across code, config, and docs."
+            "This slide highlights the common blind spots in traditional CI/CD pipelines.",
+            "Unit tests check code logic in isolation, but they miss missing container services, unpinned dependencies, and undeclared secrets.",
+            "DeploySafe analyzes cross-file relationships and documentation context to catch these issues before release.",
+            "It sits right after unit tests pass, acting as an automated pre-flight gatekeeper."
         ],
         "question": "Why don't staging environments catch these problems?",
-        "answer": "Staging catches only scenarios exercised by scripted integration tests. It misses unpinned dependencies, silent config drift, and missing documentation requirements before release."
+        "answer": "Staging catches only scenarios covered by existing integration tests against running infrastructure. It misses unpinned container tags that change overnight and missing documentation requirements before release. DeploySafe catches these statically in under 5 seconds."
     })
 
     # =========================================================================
-    # SLIDE 3: The Idea
+    # SLIDE 3: Course Alignment & Midterm Evaluation Rubrics (A2 · 30%)
     # =========================================================================
     slide3 = prs.slides.add_slide(blank_layout)
     set_slide_background(slide3)
-    add_header(slide3, "DeploySafe Adds an Analysis Layer", "DeploySafe does not replace CI/CD—it analyzes the change before production release.")
+    add_header(slide3, "Course Alignment & Evaluation Rubrics (A2 · 30%)", "Direct mapping of project deliverables to CSE 4011 Mid-Term evaluation components.")
 
-    # Two Column Comparison
-    col_w = 5.6
-    # Left: CI/CD
-    c_left = add_card(slide3, 0.8, 1.8, col_w, 3.6, bg=CARD_BG, border=CARD_BORDER)
-    tb_l = slide3.shapes.add_textbox(Inches(1.1), Inches(2.05), Inches(col_w - 0.6), Inches(3.1))
-    tf_l = tb_l.text_frame
-    tf_l.word_wrap = True
-    tf_l.margin_left = tf_l.margin_top = tf_l.margin_right = tf_l.margin_bottom = 0
+    rubric_cards = [
+        ("01", "RAG & Code Retrieval (10%)", "CO2, CO3  |  ChromaDB & AST", [
+            "ChromaDB persistent vector store with cosine similarity search",
+            "Markdown chunking that preserves section headers and line numbers",
+            "Retrieves deployment prerequisites from README and documentation",
+            "Cross-references documented services against compose manifests"
+        ]),
+        ("02", "CI/CD & Release Automation (10%)", "CO2, CO3  |  Pre-Flight Gates", [
+            "Automated pre-deployment verification gate with non-zero exit codes",
+            "Blocks deployment release when Critical severity findings are detected",
+            "Generates structured audit reports in JSON, Markdown, and HTML",
+            "Outputs copyable CLI commands for immediate developer remediation"
+        ]),
+        ("03", "Test Suite & AST Inspection (5%)", "CO2  |  Python AST & Pytest", [
+            "62 automated unit and integration tests covering all pipeline stages",
+            "Static AST parsing for Python files and package manifests for Node.js",
+            "Audit checks for missing error handling and unhandled exceptions",
+            "Deterministic mock tests allowing zero-cost CI execution"
+        ]),
+        ("04", "Working Prototype & Docs (5%)", "CO3  |  FastAPI & React 19", [
+            "Functional backend using FastAPI with typed Pydantic models",
+            "Interactive web console built with React 19, TypeScript, and Tailwind",
+            "Multi-container deployment using Docker Compose and Nginx proxy",
+            "Complete OpenAPI / Swagger documentation at /docs"
+        ])
+    ]
 
-    add_para(tf_l, "CI / CD PIPELINES", size_pt=12, bold=True, color=TEXT_SUBTLE, space_after=8)
-    add_para(tf_l, "Executes Predefined Checks", size_pt=20, bold=True, color=TEXT_MAIN, space_after=16)
-    add_para(tf_l, "• Runs pre-programmed test suites and builds", size_pt=14, bold=False, color=TEXT_MUTED, space_after=8)
-    add_para(tf_l, "• Checks binary exit codes (0 = Success, 1 = Failure)", size_pt=14, bold=False, color=TEXT_MUTED, space_after=8)
-    add_para(tf_l, "• Operates on single files without architectural context", size_pt=14, bold=False, color=TEXT_MUTED, space_after=8)
-    add_para(tf_l, "• Cannot read documentation or correlate requirements", size_pt=14, bold=False, color=TEXT_MUTED, space_after=0)
+    card_w4 = 5.67
+    card_h4 = 2.05
+    row1_y4 = 1.8
+    row2_y4 = 4.0
 
-    # Right: DeploySafe
-    c_right = add_card(slide3, 6.933, 1.8, col_w, 3.6, bg=CARD_BG, border=ACCENT_BLUE)
-    tb_r = slide3.shapes.add_textbox(Inches(7.233), Inches(2.05), Inches(col_w - 0.6), Inches(3.1))
-    tf_r = tb_r.text_frame
-    tf_r.word_wrap = True
-    tf_r.margin_left = tf_r.margin_top = tf_r.margin_right = tf_r.margin_bottom = 0
+    for i, (num, title, badge, bullets) in enumerate(rubric_cards):
+        cx = 0.8 if (i % 2 == 0) else 6.863
+        cy = row1_y4 if i < 2 else row2_y4
 
-    add_para(tf_r, "DEPLOYSAFE INTELLIGENCE", size_pt=12, bold=True, color=ACCENT_BLUE, space_after=8)
-    add_para(tf_r, "Analyzes Deployment Readiness", size_pt=20, bold=True, color=TEXT_MAIN, space_after=16)
-    add_para(tf_r, "• Correlates code changes against deployment manifests", size_pt=14, bold=False, color=TEXT_MAIN, space_after=8)
-    add_para(tf_r, "• Retrieves architectural intent from docs via vector RAG", size_pt=14, bold=False, color=TEXT_MAIN, space_after=8)
-    add_para(tf_r, "• Critic verifies physical evidence on repository disk", size_pt=14, bold=False, color=TEXT_MAIN, space_after=8)
-    add_para(tf_r, "• Computes a deterministic 0–100 risk score with fixes", size_pt=14, bold=False, color=TEXT_MAIN, space_after=0)
+        c = add_card(slide3, cx, cy, card_w4, card_h4, bg=CARD_BG, border=CARD_BORDER)
+        tb_c = slide3.shapes.add_textbox(Inches(cx + 0.22), Inches(cy + 0.14), Inches(card_w4 - 0.44), Inches(card_h4 - 0.28))
+        tf_c = tb_c.text_frame
+        tf_c.word_wrap = True
+        tf_c.margin_left = tf_c.margin_top = tf_c.margin_right = tf_c.margin_bottom = 0
 
-    # Bottom Banner: How they work together
-    c_bot = add_card(slide3, 0.8, 5.7, 11.733, 1.0, bg=ACCENT_BG, border=CARD_BORDER)
-    tb_bot = slide3.shapes.add_textbox(Inches(1.1), Inches(5.85), Inches(11.133), Inches(0.7))
-    tf_bot = tb_bot.text_frame
-    tf_bot.word_wrap = True
-    tf_bot.margin_left = tf_bot.margin_top = tf_bot.margin_right = tf_bot.margin_bottom = 0
+        add_para(tf_c, f"{num}  ·  {title}", size_pt=13, bold=True, color=TEXT_MAIN, space_after=2)
+        add_para(tf_c, badge, size_pt=9.5, bold=True, color=ACCENT_BLUE, space_after=6)
+        for b in bullets:
+            add_para(tf_c, f"- {b}", size_pt=9.5, bold=False, color=TEXT_MUTED, space_after=2)
 
-    add_para(tf_bot, "THE COMBINED WORKFLOW", size_pt=10, bold=True, color=ACCENT_BLUE, space_after=2)
-    add_para(tf_bot, "Repository Change    →    [ CI / CD Pipeline   +   DeploySafe Analysis ]    →    Deterministic Risk Score + Fixes", size_pt=14, bold=True, color=TEXT_MAIN, space_after=0)
+    c_bot3 = add_card(slide3, 0.8, 6.15, 11.733, 0.7, bg=ACCENT_BG, border=CARD_BORDER)
+    tb_b3 = slide3.shapes.add_textbox(Inches(1.0), Inches(6.22), Inches(11.333), Inches(0.55))
+    tf_b3 = tb_b3.text_frame
+    tf_b3.word_wrap = True
+    tf_b3.margin_left = tf_b3.margin_top = tf_b3.margin_right = tf_b3.margin_bottom = 0
+
+    add_para(tf_b3, "Evaluation Criteria Mapping:", size_pt=10.5, bold=True, color=ACCENT_BLUE, space_after=1)
+    add_para(tf_b3, "C6 (Progress vs Plan)  |  C7 (Technical Understanding)  |  C8 (Problem Solving)  |  C9 (Documentation)  |  C10 (Individual Contribution)", size_pt=11, bold=True, color=TEXT_MAIN, space_after=0)
 
     add_footer(slide3, 3)
     add_speaker_notes(slide3, {
         "talking_points": [
-            "We want to emphasize clearly: DeploySafe does not attempt to replace GitHub Actions, GitLab CI, or Jenkins.",
-            "CI/CD is an execution engine. It asks 'Did the tests pass?'",
-            "DeploySafe is an analytical intelligence layer. It asks 'Is this change safe to deploy?'",
-            "By analyzing context and cross-file relationships, DeploySafe complements standard pipelines."
+            "This slide maps our project deliverables to the 4 components of the A2 Mid-Term Rubric in the CSE 4011 Course Handout.",
+            "Component 1 (10%): RAG-based code and docs retrieval using ChromaDB and AST parsing.",
+            "Component 2 (10%): Pre-deployment verification gate with non-zero exit codes to block broken releases.",
+            "Component 3 (5%): Test suite quality with 62 unit and integration tests running in CI.",
+            "Component 4 (5%): Working prototype with FastAPI, React 19, Docker Compose, and OpenAPI docs."
         ],
-        "question": "Does DeploySafe slow down the development workflow?",
-        "answer": "No. In our tested runs, full multi-agent analysis, Critic validation, and scoring complete in under 2.5 seconds on typical repository sizes."
+        "question": "How does DeploySafe satisfy Course Outcomes CO1, CO2, and CO3?",
+        "answer": "DeploySafe fulfills CO1 through prompt engineering and model selection; CO2 through semantic code search with ChromaDB and automated test analysis; and CO3 through an end-to-end AI-augmented release gate."
     })
 
     # =========================================================================
-    # SLIDE 4: How It Works (Pipeline)
+    # SLIDE 4: System Architecture & Agent Responsibilities
     # =========================================================================
     slide4 = prs.slides.add_slide(blank_layout)
     set_slide_background(slide4)
-    add_header(slide4, "How DeploySafe Works", "An end-to-end pipeline from repository ingestion to deterministic risk scoring.")
+    add_header(slide4, "System Architecture & Agent Responsibilities", "A multi-agent pipeline that divides repository inspection across dedicated domains.")
 
-    steps = [
-        ("01", "Repository", "Code, config, tests,\nand documentation"),
-        ("02", "Context & RAG", "Discovers files and indexes\narchitectural intent"),
-        ("03", "Agents", "Specialized agents analyze\ntechnical domains"),
-        ("04", "Critic", "Checks findings against\nactual disk evidence"),
-        ("05", "Risk Engine", "Calculates deterministic\n0–100 risk score"),
-        ("06", "Result", "Actionable findings with\nline numbers and fixes")
+    # Top Pipeline (5 horizontal steps)
+    pipe_steps = [
+        ("01", "Ingestion & AST", "Parse file trees, ASTs, and dependencies"),
+        ("02", "ChromaDB RAG", "Embed & index doc intent into vector DB"),
+        ("03", "Specialist Agents", "Agents inspect code, config, and dependencies"),
+        ("04", "Critic Validation", "Physical line verification on repository disk"),
+        ("05", "Risk Formula", "Deterministic 0–100 math & release gate")
     ]
+    p_w = 2.15
+    p_gap = 0.245
+    p_top = 1.8
+    p_h = 1.45
 
-    box_w = 1.75
-    gap = 0.246
-    top_y = 2.4
-    height_y = 3.6
+    for i, (num, title, desc) in enumerate(pipe_steps):
+        bx = 0.8 + i * (p_w + p_gap)
+        is_hi = (num in ["04", "05"])
+        b_c = ACCENT_BLUE if is_hi else CARD_BORDER
+        bg_c = ACCENT_BG if is_hi else CARD_BG
 
-    for i, (num, title, desc) in enumerate(steps):
-        bx = 0.8 + i * (box_w + gap)
-        is_highlight = (num in ["04", "05"])
-        b_color = ACCENT_BLUE if is_highlight else CARD_BORDER
-        bg_col = ACCENT_BG if is_highlight else CARD_BG
-
-        card = add_card(slide4, bx, top_y, box_w, height_y, bg=bg_col, border=b_color)
-        tb_box = slide4.shapes.add_textbox(Inches(bx + 0.15), Inches(top_y + 0.25), Inches(box_w - 0.3), Inches(height_y - 0.5))
+        add_card(slide4, bx, p_top, p_w, p_h, bg=bg_c, border=b_c)
+        tb_box = slide4.shapes.add_textbox(Inches(bx + 0.12), Inches(p_top + 0.12), Inches(p_w - 0.24), Inches(p_h - 0.24))
         tf_box = tb_box.text_frame
         tf_box.word_wrap = True
         tf_box.margin_left = tf_box.margin_top = tf_box.margin_right = tf_box.margin_bottom = 0
 
-        add_para(tf_box, num, size_pt=14, bold=True, color=ACCENT_BLUE, space_after=12)
-        add_para(tf_box, title, size_pt=16, bold=True, color=TEXT_MAIN, space_after=14)
-        add_para(tf_box, desc, size_pt=12, bold=False, color=TEXT_MUTED, space_after=0)
+        add_para(tf_box, f"{num}  ·  {title}", size_pt=11.5, bold=True, color=ACCENT_BLUE if is_hi else TEXT_MAIN, space_after=3)
+        add_para(tf_box, desc, size_pt=9.5, bold=False, color=TEXT_MUTED, space_after=0)
 
-        if i < len(steps) - 1:
-            tb_arr = slide4.shapes.add_textbox(Inches(bx + box_w), Inches(top_y + 1.5), Inches(gap), Inches(0.5))
+        if i < len(pipe_steps) - 1:
+            tb_arr = slide4.shapes.add_textbox(Inches(bx + p_w), Inches(p_top + 0.5), Inches(p_gap), Inches(0.4))
             tf_arr = tb_arr.text_frame
             tf_arr.margin_left = tf_arr.margin_top = tf_arr.margin_right = tf_arr.margin_bottom = 0
             p_arr = tf_arr.paragraphs[0]
             p_arr.alignment = PP_ALIGN.CENTER
             r_arr = p_arr.add_run()
-            r_arr.text = "→"
-            r_arr.font.size = Pt(13)
+            r_arr.text = "->"
+            r_arr.font.size = Pt(12)
             r_arr.font.color.rgb = TEXT_SUBTLE
 
-    c_note = add_card(slide4, 0.8, 6.2, 11.733, 0.65, bg=CARD_BG, border=CARD_BORDER)
-    tb_n = slide4.shapes.add_textbox(Inches(1.0), Inches(6.3), Inches(11.333), Inches(0.45))
-    tf_n = tb_n.text_frame
-    tf_n.margin_left = tf_n.margin_top = tf_n.margin_right = tf_n.margin_bottom = 0
-    add_para(tf_n, "Key Architectural Principle: LLMs propose candidate findings; the Critic and Risk Engine enforce strict evidence and deterministic scoring.", size_pt=12, bold=True, color=TEXT_MAIN, space_after=0)
-
-    add_footer(slide4, 4)
-    add_speaker_notes(slide4, {
-        "talking_points": [
-            "Here is the high-level data flow through the DeploySafe pipeline.",
-            "First, the repository is ingested and indexed into ChromaDB for semantic retrieval.",
-            "Specialized domain agents analyze code, configuration, dependencies, tests, and documentation in parallel.",
-            "Candidate findings are submitted to the Critic agent for physical verification before the Risk Engine calculates the score."
-        ],
-        "question": "What happens if an agent suggests a finding that does not exist in the code?",
-        "answer": "The Critic reads the actual target file on disk. If the cited line does not exist or the evidence is invalid, the Critic rejects the finding with a detailed reason, preventing hallucinated alerts."
-    })
-
-    # =========================================================================
-    # SLIDE 5: Multi-Agent Architecture
-    # =========================================================================
-    slide5 = prs.slides.add_slide(blank_layout)
-    set_slide_background(slide5)
-    add_header(slide5, "Why Multiple Agents?", "Each agent focuses on one type of repository evidence, allowing focused analysis.")
-
-    c_orch = add_card(slide5, 4.3, 1.8, 4.733, 0.85, bg=CARD_BG, border=ACCENT_BLUE)
-    tb_orch = slide5.shapes.add_textbox(Inches(4.5), Inches(1.92), Inches(4.333), Inches(0.6))
-    tf_orch = tb_orch.text_frame
-    tf_orch.margin_left = tf_orch.margin_top = tf_orch.margin_right = tf_orch.margin_bottom = 0
-    add_para(tf_orch, "Orchestrator Agent", size_pt=14, bold=True, color=ACCENT_BLUE, space_after=2, align=PP_ALIGN.CENTER)
-    add_para(tf_orch, "Inspects tech stack · Plans domain tasks · Runs agents in parallel", size_pt=11, bold=False, color=TEXT_MUTED, space_after=0, align=PP_ALIGN.CENTER)
-
-    agents = [
-        ("Code Agent", "Analyzes source code changes, error handling, and runtime safety."),
-        ("Config Agent", "Inspects Dockerfiles, compose specs, and environment variables."),
-        ("Dependency Agent", "Audits package manifests, unpinned versions, and supply chain risks."),
-        ("Test Agent", "Reviews test suite coverage, skipped tests, and deployment relevance."),
-        ("Documentation RAG", "Queries architectural requirements and deployment instructions."),
-        ("Security Agent", "Scans for committed secrets, permissive keys, and security flags.")
+    # Bottom Grid: 4 Core Specialist Agents + Critic
+    agents_list = [
+        ("Code Agent", "Uses Python's ast module to detect unhandled exceptions, bare except blocks, and missing timeouts."),
+        ("Config Agent", "Inspects Dockerfiles (base image, non-root user) and docker-compose.yml for missing services."),
+        ("Dependency Agent", "Scans requirements.txt and package.json for unpinned versions and missing native build flags."),
+        ("Documentation RAG", "Queries ChromaDB vector database for documented environment variables, databases, and ports."),
+        ("Critic Agent", "Verifies that reported files and line numbers physically exist on disk before any score is calculated."),
+        ("Orchestrator", "Inspects repository technology stack and dispatches domain agents concurrently in a thread pool.")
     ]
 
     grid_w = 3.65
     grid_gap = 0.39
-    r1_y = 2.95
-    r2_y = 4.25
+    r1_y = 3.45
+    r2_y = 4.65
 
-    for i, (name, role) in enumerate(agents):
+    for i, (name, role) in enumerate(agents_list):
         gx = 0.8 + (i % 3) * (grid_w + grid_gap)
         gy = r1_y if i < 3 else r2_y
-        c_ag = add_card(slide5, gx, gy, grid_w, 1.15, bg=CARD_BG, border=CARD_BORDER)
-        tb_ag = slide5.shapes.add_textbox(Inches(gx + 0.2), Inches(gy + 0.15), Inches(grid_w - 0.4), Inches(0.85))
+        add_card(slide4, gx, gy, grid_w, 1.05, bg=CARD_BG, border=CARD_BORDER)
+        tb_ag = slide4.shapes.add_textbox(Inches(gx + 0.18), Inches(gy + 0.12), Inches(grid_w - 0.36), Inches(0.81))
         tf_ag = tb_ag.text_frame
         tf_ag.word_wrap = True
         tf_ag.margin_left = tf_ag.margin_top = tf_ag.margin_right = tf_ag.margin_bottom = 0
 
-        add_para(tf_ag, name, size_pt=13, bold=True, color=TEXT_MAIN, space_after=4)
-        add_para(tf_ag, role, size_pt=11, bold=False, color=TEXT_MUTED, space_after=0)
+        add_para(tf_ag, name, size_pt=12, bold=True, color=TEXT_MAIN, space_after=2)
+        add_para(tf_ag, role, size_pt=9.5, bold=False, color=TEXT_MUTED, space_after=0)
 
-    c_crit = add_card(slide5, 0.8, 5.65, 11.733, 1.05, bg=ACCENT_BG, border=ACCENT_BLUE)
-    tb_cr = slide5.shapes.add_textbox(Inches(1.1), Inches(5.8), Inches(11.133), Inches(0.75))
+    # Bottom Banner
+    c_crit = add_card(slide4, 0.8, 5.85, 11.733, 0.95, bg=ACCENT_BG, border=ACCENT_BLUE)
+    tb_cr = slide4.shapes.add_textbox(Inches(1.0), Inches(5.95), Inches(11.333), Inches(0.75))
     tf_cr = tb_cr.text_frame
     tf_cr.word_wrap = True
     tf_cr.margin_left = tf_cr.margin_top = tf_cr.margin_right = tf_cr.margin_bottom = 0
 
-    add_para(tf_cr, "Critic Agent & Validation Gate", size_pt=13, bold=True, color=ACCENT_BLUE, space_after=2)
-    add_para(tf_cr, "All 6 domain agents submit findings to the Critic. The Critic verifies line existence, checks false positive heuristics, and deduplicates findings before passing them to the Risk Engine.", size_pt=12, bold=False, color=TEXT_MAIN, space_after=0)
+    add_para(tf_cr, "Why Multiple Agents Over a Single Prompt?", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=2)
+    add_para(tf_cr, "A single prompt loaded with Docker syntax, AST trees, and package manifests suffers from attention loss. Dividing analysis across specialist agents keeps prompts focused, runs concurrently in ~1.8 seconds, and isolates findings for validation.", size_pt=10.5, bold=False, color=TEXT_MAIN, space_after=0)
 
-    add_footer(slide5, 5)
-    add_speaker_notes(slide5, {
+    add_footer(slide4, 4)
+    add_speaker_notes(slide4, {
         "talking_points": [
-            "Why use multiple agents instead of one large prompt? Because deployment readiness spans heterogeneous domains.",
-            "A prompt loaded with Docker syntax, Python ASTs, and package manifests suffers from attention loss.",
-            "DeploySafe divides work into 6 specialized domain agents that execute in parallel.",
-            "All findings must be approved by the Critic agent, ensuring every finding is backed by physical evidence."
+            "This slide explains our multi-agent architecture and division of labor.",
+            "Instead of sending an entire repository to one giant LLM prompt, we divide work across specialist agents.",
+            "The Code Agent checks Python ASTs, Config Agent checks Docker manifests, and Dependency Agent checks version pins.",
+            "The Critic agent performs physical disk verification to ensure every reported line actually exists."
         ],
         "question": "How are the agents orchestrated?",
-        "answer": "The Orchestrator inspects the repository's technology stack (e.g. Python, Docker, Node) and dispatches independent domain agents concurrently using a thread pool before aggregating findings."
+        "answer": "The Orchestrator inspects the repository's technology stack (e.g., Python, Docker, Node) and dispatches independent domain agents concurrently using a thread pool before aggregating findings into a Pydantic blackboard."
     })
 
     # =========================================================================
-    # SLIDE 6: RAG + Evidence
+    # SLIDE 5: Semantic RAG: Correlating Docs with Configs
     # =========================================================================
-    slide6 = prs.slides.add_slide(blank_layout)
-    set_slide_background(slide6)
-    add_header(slide6, "The AI Uses Repository Context", "RAG bridges the gap between written developer documentation and deployment code.")
+    slide5 = prs.slides.add_slide(blank_layout)
+    set_slide_background(slide5)
+    add_header(slide5, "RAG in Practice: Detecting Configuration Drift", "ChromaDB semantic retrieval correlates written documentation with deployment manifests.")
 
-    # Left: 40% Width RAG Pipeline
-    c_rag = add_card(slide6, 0.8, 1.8, 4.5, 4.9, bg=CARD_BG, border=CARD_BORDER)
-    tb_rag = slide6.shapes.add_textbox(Inches(1.05), Inches(2.0), Inches(4.0), Inches(4.5))
+    # Left: RAG Pipeline
+    c_rag = add_card(slide5, 0.8, 1.8, 4.5, 4.9, bg=CARD_BG, border=CARD_BORDER)
+    tb_rag = slide5.shapes.add_textbox(Inches(1.05), Inches(2.0), Inches(4.0), Inches(4.5))
     tf_rag = tb_rag.text_frame
     tf_rag.word_wrap = True
     tf_rag.margin_left = tf_rag.margin_top = tf_rag.margin_right = tf_rag.margin_bottom = 0
 
-    add_para(tf_rag, "SEMANTIC RETRIEVAL PIPELINE", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=12)
+    add_para(tf_rag, "RAG PIPELINE IMPLEMENTATION", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=12)
     rag_steps = [
-        ("1. Ingestion", "Parses README, docs, guides, and configs."),
-        ("2. Chunking", "Splits markdown into header-aware sections."),
-        ("3. Embeddings", "Generates dense semantic vector embeddings."),
-        ("4. ChromaDB", "Stores vectors locally with line metadata."),
-        ("5. Agent Query", "Agents query context via similarity search.")
+        ("1. Documentation Parsing", "Parses README.md, setup guides, and env examples."),
+        ("2. Header-Aware Chunking", "Splits markdown into sections while preserving line numbers."),
+        ("3. Dense Vector Embeddings", "Generates semantic vector embeddings for each chunk."),
+        ("4. ChromaDB Storage", "Stores vectors locally with file path and line metadata."),
+        ("5. Agent Querying", "Agents query context using cosine similarity search.")
     ]
     for step_title, step_desc in rag_steps:
-        add_para(tf_rag, step_title, size_pt=13, bold=True, color=TEXT_MAIN, space_after=2)
-        add_para(tf_rag, step_desc, size_pt=11, bold=False, color=TEXT_MUTED, space_after=8)
+        add_para(tf_rag, step_title, size_pt=12.5, bold=True, color=TEXT_MAIN, space_after=2)
+        add_para(tf_rag, step_desc, size_pt=10.5, bold=False, color=TEXT_MUTED, space_after=8)
 
-    # Right: 60% Width Real Evidence Example (Optimized spacing to avoid touching border)
-    c_ev = add_card(slide6, 5.6, 1.8, 6.933, 4.9, bg=CARD_BG, border=CARD_BORDER)
-    tb_ev = slide6.shapes.add_textbox(Inches(5.85), Inches(1.98), Inches(6.433), Inches(4.5))
+    # Right: Real Repository Case Study
+    c_ev = add_card(slide5, 5.6, 1.8, 6.933, 4.9, bg=CARD_BG, border=CARD_BORDER)
+    tb_ev = slide5.shapes.add_textbox(Inches(5.85), Inches(1.98), Inches(6.433), Inches(4.5))
     tf_ev = tb_ev.text_frame
     tf_ev.word_wrap = True
     tf_ev.margin_left = tf_ev.margin_top = tf_ev.margin_right = tf_ev.margin_bottom = 0
 
-    add_para(tf_ev, "REAL REPOSITORY EXAMPLE", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=4)
-    add_para(tf_ev, "Documentation Context vs. Deployment Manifest", size_pt=17, bold=True, color=TEXT_MAIN, space_after=10)
+    add_para(tf_ev, "REAL CASE STUDY: DEMO MICROSERVICE", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=4)
+    add_para(tf_ev, "Catching a Missing Service Before Production Boot", size_pt=17, bold=True, color=TEXT_MAIN, space_after=10)
 
-    add_para(tf_ev, "1. Retrieved Architectural Intent (README.md, lines 18–22):", size_pt=11, bold=True, color=TEXT_MUTED, space_after=3)
-    add_para(tf_ev, '"DeploySafe demo requires an active Redis cache service for distributed session storage (REDIS_URL=redis://redis:6379/0)."', size_pt=10.5, bold=False, color=TEXT_MAIN, space_after=10, font_name=CODE_FONT)
+    add_para(tf_ev, "1. Retrieved from README.md (lines 18-22 via ChromaDB):", size_pt=11, bold=True, color=TEXT_MUTED, space_after=3)
+    add_para(tf_ev, '"Requires Redis for session caching: REDIS_URL=redis://redis:6379/0"', size_pt=10.5, bold=False, color=TEXT_MAIN, space_after=10, font_name=CODE_FONT)
 
-    add_para(tf_ev, "2. Inspected Deployment Manifest (docker-compose.yml, lines 1–15):", size_pt=11, bold=True, color=TEXT_MUTED, space_after=3)
-    add_para(tf_ev, "services:\n  web:\n    build: .\n    ports: ['8000:8000']\n    # Redis service completely omitted from compose specification", size_pt=10.5, bold=False, color=TEXT_MAIN, space_after=10, font_name=CODE_FONT)
+    add_para(tf_ev, "2. Inspected Deployment Manifest (docker-compose.yml, lines 1-12):", size_pt=11, bold=True, color=TEXT_MUTED, space_after=3)
+    add_para(tf_ev, "services:\n  web:\n    build: .\n    ports: ['8000:8000']\n    # Redis service completely omitted", size_pt=10.5, bold=False, color=TEXT_MAIN, space_after=10, font_name=CODE_FONT)
 
-    add_para(tf_ev, "3. Critic-Validated Finding & Risk Impact:", size_pt=11, bold=True, color=CRITICAL_RED, space_after=3)
-    add_para(tf_ev, "High Severity: Missing Redis container definition. Web service will crash on initial boot when resolving session cache endpoint.", size_pt=11.5, bold=False, color=TEXT_MAIN, space_after=0)
+    add_para(tf_ev, "3. Critic Verification & Risk Output:", size_pt=11, bold=True, color=CRITICAL_RED, space_after=3)
+    add_para(tf_ev, "Validated docker-compose.yml on disk. Emitted High Severity finding: Web service will fail health checks on container startup due to unreachable Redis endpoint.", size_pt=11, bold=False, color=TEXT_MAIN, space_after=0)
 
-    add_footer(slide6, 6)
-    add_speaker_notes(slide6, {
+    add_footer(slide5, 5)
+    add_speaker_notes(slide5, {
         "talking_points": [
-            "This slide demonstrates the real power of RAG in DeploySafe.",
-            "Traditional linters only see syntax. They don't know what external services the developer intended to run.",
-            "Here, our RAG agent retrieved documentation from README.md specifying that Redis is required for sessions.",
-            "The Config Agent cross-referenced docker-compose.yml, discovered Redis was missing, and flagged a High-severity crash risk."
+            "This slide demonstrates how our RAG pipeline catches configuration drift, fulfilling the 10% RAG requirement.",
+            "Traditional linters check syntax inside docker-compose.yml, but they have no idea what services the code actually expects.",
+            "Our RAG agent queries ChromaDB for documentation requirements, discovers Redis is required, and checks docker-compose.yml.",
+            "The Critic verifies the file on disk and confirms the service is missing, flagging a High-severity deployment blocker."
         ],
         "question": "What happens if a repository has no documentation?",
-        "answer": "DeploySafe continues operating cleanly. Agents fall back to static code inspection and configuration manifests, while the Documentation RAG agent gracefully reports no indexed guidelines."
+        "answer": "DeploySafe handles missing documentation gracefully. If no markdown files exist, the RAG agent returns an empty context set, and the other agents continue static code, manifest, and dependency analysis without interruption."
     })
 
     # =========================================================================
-    # SLIDE 7: Finding -> Evidence -> Risk
+    # SLIDE 6: Deterministic Risk Scoring vs. LLM Hallucinations
     # =========================================================================
-    slide7 = prs.slides.add_slide(blank_layout)
-    set_slide_background(slide7)
-    add_header(slide7, "From Finding to Risk", "Findings are backed by exact source lines, and risk is calculated deterministically.")
+    slide6 = prs.slides.add_slide(blank_layout)
+    set_slide_background(slide6)
+    add_header(slide6, "Deterministic Risk Scoring vs. LLM Hallucinations", "LLMs propose findings; a deterministic Python formula calculates the 0–100 score.")
 
     stages = [
-        ("STAGE 1", "Candidate Finding", "LLM Proposal", "The specialized agent identifies a potential problem.", [
+        ("STAGE 1", "Candidate Finding", "LLM Proposal", "Specialist agent identifies a potential problem.", [
             ("Category", "Configuration Drift"),
-            ("Title", "Missing Redis Service"),
-            ("Agent", "Config Analysis Agent"),
+            ("Finding", "Missing Redis Service"),
+            ("Agent", "Config Agent"),
             ("Confidence", "0.90 (High certainty)")
         ]),
-        ("STAGE 2", "Physical Verification", "Critic Verification", "The Critic checks the actual repository disk.", [
+        ("STAGE 2", "Physical Verification", "Critic Verification", "Critic validates the file on actual disk.", [
             ("Target File", "docker-compose.yml"),
-            ("Line Reference", "Lines 1–15 checked"),
-            ("Heuristic Check", "No false-positive flags"),
-            ("Validation Status", "VALIDATED (Approved)")
+            ("Line Reference", "Lines 1–12 checked"),
+            ("Disk Check", "File exists, lines matched"),
+            ("Status", "VALIDATED (Approved)")
         ]),
-        ("STAGE 3", "Risk Calculation", "Deterministic Engine", "The Risk Engine computes the score with zero AI.", [
+        ("STAGE 3", "Risk Calculation", "Deterministic Formula", "Python arithmetic calculates score with zero AI.", [
             ("Severity Base", "HIGH: 25.0 points"),
-            ("Confidence Factor", "0.90 weight applied"),
+            ("Confidence", "0.90 weight applied"),
             ("Impact Factor", "1.0 (Runtime critical)"),
-            ("Final Contribution", "+22.5 Risk Points")
+            ("Contribution", "+22.5 Risk Points")
         ])
     ]
 
@@ -520,8 +532,8 @@ def create_presentation():
     start_x = 0.8
     for i, (stage_num, title, badge, desc, items) in enumerate(stages):
         cx = start_x + i * (card_w + gap_x)
-        c = add_card(slide7, cx, 1.8, card_w, 4.0, bg=CARD_BG, border=CARD_BORDER)
-        tb_c = slide7.shapes.add_textbox(Inches(cx + 0.25), Inches(2.0), Inches(card_w - 0.5), Inches(3.6))
+        c = add_card(slide6, cx, 1.8, card_w, 4.0, bg=CARD_BG, border=CARD_BORDER)
+        tb_c = slide6.shapes.add_textbox(Inches(cx + 0.25), Inches(2.0), Inches(card_w - 0.5), Inches(3.6))
         tf_c = tb_c.text_frame
         tf_c.word_wrap = True
         tf_c.margin_left = tf_c.margin_top = tf_c.margin_right = tf_c.margin_bottom = 0
@@ -529,198 +541,306 @@ def create_presentation():
         add_para(tf_c, stage_num, size_pt=10, bold=True, color=ACCENT_BLUE, space_after=4)
         add_para(tf_c, title, size_pt=18, bold=True, color=TEXT_MAIN, space_after=2)
         add_para(tf_c, badge, size_pt=11, bold=True, color=TEXT_MUTED, space_after=8)
-        add_para(tf_c, desc, size_pt=11, bold=False, color=TEXT_MUTED, space_after=12)
+        add_para(tf_c, desc, size_pt=10.5, bold=False, color=TEXT_MUTED, space_after=12)
 
         for label, val in items:
-            add_para(tf_c, f"• {label}: {val}", size_pt=11, bold=False, color=TEXT_MAIN, space_after=4)
+            add_para(tf_c, f"- {label}: {val}", size_pt=10.5, bold=False, color=TEXT_MAIN, space_after=4)
 
-    c_bot = add_card(slide7, 0.8, 6.0, 11.733, 0.85, bg=ACCENT_BG, border=CARD_BORDER)
-    tb_b = slide7.shapes.add_textbox(Inches(1.0), Inches(6.12), Inches(11.333), Inches(0.6))
+    c_bot = add_card(slide6, 0.8, 6.0, 11.733, 0.85, bg=ACCENT_BG, border=CARD_BORDER)
+    tb_b = slide6.shapes.add_textbox(Inches(1.0), Inches(6.12), Inches(11.333), Inches(0.6))
     tf_b = tb_b.text_frame
     tf_b.word_wrap = True
     tf_b.margin_left = tf_b.margin_top = tf_b.margin_right = tf_b.margin_bottom = 0
 
-    add_para(tf_b, "Mathematical Safety Guarantee:", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=2)
-    add_para(tf_b, "LLMs propose findings. The Critic verifies physical evidence. The Risk Engine calculates the 0–100 score mathematically. An LLM never generates the risk score directly.", size_pt=12, bold=False, color=TEXT_MAIN, space_after=0)
+    add_para(tf_b, "Mathematical Risk Formula & Gate Threshold:", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=2)
+    add_para(tf_b, "Score = min(100, Sum(BaseWeight * Confidence)). Weights: Critical = 40, High = 25, Medium = 12, Low = 5. Threshold: Score >= 70 -> NO-GO (Exit Code 1); Score < 70 -> GO. An LLM never generates numbers directly.", size_pt=11, bold=False, color=TEXT_MAIN, space_after=0)
 
-    add_footer(slide7, 7)
-    add_speaker_notes(slide7, {
+    add_footer(slide6, 6)
+    add_speaker_notes(slide6, {
         "talking_points": [
-            "A critical design choice in DeploySafe is the strict separation between AI reasoning and risk scoring.",
-            "The LLM is responsible for identifying potential issues based on repository evidence.",
-            "The Critic verifies that the cited file and lines physically exist on disk.",
-            "Finally, deterministic Python code calculates the risk score using fixed severity weights and confidence factors."
+            "A core design decision in DeploySafe is strictly separating LLM reasoning from mathematical scoring.",
+            "If an LLM directly outputs a risk score like '85', that number is subjective and cannot be audited.",
+            "In DeploySafe, the LLM only outputs categorical findings.",
+            "The Critic verifies the evidence on disk, and pure Python arithmetic calculates the final 0–100 score."
         ],
-        "question": "Can the LLM hallucinate a risk score of 95?",
-        "answer": "No. The LLM never outputs numbers or risk scores. Risk scores are calculated deterministically by pure Python arithmetic based on verified findings."
+        "question": "Can the LLM hallucinate a high risk score?",
+        "answer": "No. The LLM never outputs numbers or scores. Risk scores are computed deterministically by pure Python math based on verified findings that pass Critic validation."
     })
 
     # =========================================================================
-    # SLIDE 8: The Product
+    # SLIDE 7: Working Product: Web Dashboard
     # =========================================================================
-    slide8 = prs.slides.add_slide(blank_layout)
-    set_slide_background(slide8)
-    add_header(slide8, "The Working Product", "A clean web console for reviewing deployment risks, evidence, and history.")
+    slide7 = prs.slides.add_slide(blank_layout)
+    set_slide_background(slide7)
+    add_header(slide7, "The Working Product: Web Dashboard", "React 19 interface displaying risk scores, line citations, and execution telemetry.")
 
     screen_w = 3.65
     screens = [
-        ("docs/assets/screenshot_dashboard.png", "Risk Overview Dashboard", "100/100 risk score hero, severity cards, and Critic audit health."),
-        ("docs/assets/screenshot_findings.png", "Findings Directory", "Line-accurate evidence, confidence metrics, and score contributions."),
-        ("docs/assets/screenshot_analyze.png", "Real-Time Execution", "Multi-agent parallel execution timeline and runtime telemetry.")
+        ("docs/assets/screenshot_dashboard.png", "Risk Overview Dashboard", "Displays the 0–100 risk score hero, severity count cards, and Critic validation status."),
+        ("docs/assets/screenshot_findings.png", "Findings Directory", "Shows findings with exact file paths, line references, and copyable CLI remediation commands."),
+        ("docs/assets/screenshot_analyze.png", "Execution Telemetry", "Displays per-agent execution times (~1.8s per agent), pipeline logs, and real-time status polling.")
     ]
 
     for i, (path, cap_title, cap_desc) in enumerate(screens):
         sx = 0.8 + i * (screen_w + gap_x)
-        c_frame = add_card(slide8, sx, 1.8, screen_w, 4.9, bg=CARD_BG, border=CARD_BORDER)
+        c_frame = add_card(slide7, sx, 1.8, screen_w, 4.9, bg=CARD_BG, border=CARD_BORDER)
 
         if os.path.exists(path):
-            slide8.shapes.add_picture(path, Inches(sx + 0.12), Inches(1.92), Inches(screen_w - 0.24), Inches(2.75))
+            slide7.shapes.add_picture(path, Inches(sx + 0.12), Inches(1.92), Inches(screen_w - 0.24), Inches(2.75))
 
-        tb_cap = slide8.shapes.add_textbox(Inches(sx + 0.2), Inches(4.8), Inches(screen_w - 0.4), Inches(1.7))
+        tb_cap = slide7.shapes.add_textbox(Inches(sx + 0.2), Inches(4.8), Inches(screen_w - 0.4), Inches(1.7))
         tf_cap = tb_cap.text_frame
         tf_cap.word_wrap = True
         tf_cap.margin_left = tf_cap.margin_top = tf_cap.margin_right = tf_cap.margin_bottom = 0
 
         add_para(tf_cap, cap_title, size_pt=14, bold=True, color=TEXT_MAIN, space_after=4)
-        add_para(tf_cap, cap_desc, size_pt=11, bold=False, color=TEXT_MUTED, space_after=0)
+        add_para(tf_cap, cap_desc, size_pt=10.5, bold=False, color=TEXT_MUTED, space_after=0)
 
-    add_footer(slide8, 8)
-    add_speaker_notes(slide8, {
+    add_footer(slide7, 7)
+    add_speaker_notes(slide7, {
         "talking_points": [
-            "This slide showcases the actual running DeploySafe web console built in React, TypeScript, and Tailwind CSS.",
-            "Engineers can review the overall risk score hero, inspect severity breakdowns, and see real-time pipeline status.",
+            "This slide showcases the running DeploySafe web console built in React 19, TypeScript, and Tailwind CSS.",
+            "The dashboard displays the overall risk score hero, severity cards, and Critic audit health.",
             "Each finding links directly to the source file, line numbers, and actionable remediation instructions.",
-            "Our run telemetry tracks per-agent duration, finding counts, and Critic validation rates."
+            "The execution view displays real-time telemetry and per-agent execution duration."
         ],
         "question": "How does the frontend communicate with the backend?",
         "answer": "The React frontend communicates with our FastAPI REST gateway via typed API endpoints, supporting real-time status polling during analysis runs."
     })
 
     # =========================================================================
-    # SLIDE 9: What We Built
+    # SLIDE 8: Implementation Status & Test Verification (Realistic, no fluff)
     # =========================================================================
-    slide9 = prs.slides.add_slide(blank_layout)
-    set_slide_background(slide9)
-    add_header(slide9, "What Is Working Today", "Core capabilities implemented and verified across Phases 1 through 4.")
+    slide8 = prs.slides.add_slide(blank_layout)
+    set_slide_background(slide8)
+    add_header(slide8, "Implementation Status & Test Verification", "Completed components, work in progress, and automated test suite coverage.")
 
-    capabilities = [
-        ("01", "Core Foundation", [
-            "FastAPI REST service with typed Pydantic models",
-            "React 19 + TypeScript + Tailwind CSS web console",
-            "Multi-provider LLM abstraction (OpenAI, Groq, Mock)",
-            "62 automated unit and integration tests passing"
+    # Left: Status Breakdown (Grounded & honest)
+    c_p8 = add_card(slide8, 0.8, 1.8, 5.67, 4.0, bg=CARD_BG, border=CARD_BORDER)
+    tb_p8 = slide8.shapes.add_textbox(Inches(1.02), Inches(1.95), Inches(5.23), Inches(3.7))
+    tf_p8 = tb_p8.text_frame
+    tf_p8.word_wrap = True
+    tf_p8.margin_left = tf_p8.margin_top = tf_p8.margin_right = tf_p8.margin_bottom = 0
+
+    add_para(tf_p8, "IMPLEMENTATION PROGRESS (MIDTERM)", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=8)
+
+    status_sections = [
+        ("Implemented & Operational", [
+            "Repository ingestion and Python AST code parser",
+            "ChromaDB persistent vector store and markdown chunker",
+            "4 specialist agents (Code, Config, Dependency, Doc RAG)",
+            "Adversarial Critic physical disk line verification",
+            "Deterministic risk scoring formula and Go/No-Go gate",
+            "FastAPI REST backend and React 19 web console"
         ]),
-        ("02", "Repository Understanding", [
-            "Recursive AST and safe repository file-tree parsing",
-            "Markdown chunking with line number preservation",
-            "ChromaDB persistent vector store with cosine search",
-            "Semantic context retrieval for specialized agents"
-        ]),
-        ("03", "Multi-Agent Engine", [
-            "CrewAI orchestration with parallel domain tasks",
-            "6 specialized domain agents + Orchestrator",
-            "Typed inspection tools (file reader, diff, grep)",
-            "Critic validation agent & semantic deduplication"
-        ]),
-        ("04", "Risk & Reporting", [
-            "Deterministic 0–100 mathematical risk scoring",
-            "Findings catalog with line-accurate citations",
-            "Multi-format deployment reports (HTML, MD, JSON)",
-            "Verified on realistic evaluation repositories"
+        ("Currently In Progress / Next Phase", [
+            "GitHub Actions PR bot workflow integration",
+            "Automated patch PR generator for simple config fixes"
         ])
     ]
 
-    card_w2 = 5.6
-    card_h2 = 2.3
-    row1_y = 1.8
-    row2_y = 4.3
+    for sec_title, sec_bullets in status_sections:
+        add_para(tf_p8, sec_title, size_pt=11.5, bold=True, color=TEXT_MAIN, space_after=2)
+        for b in sec_bullets:
+            add_para(tf_p8, f"- {b}", size_pt=9.5, bold=False, color=TEXT_MUTED, space_after=2)
+        add_para(tf_p8, "", size_pt=4, space_after=2)
 
-    for i, (num, title, bullets) in enumerate(capabilities):
-        cx = 0.8 if (i % 2 == 0) else 6.933
-        cy = row1_y if i < 2 else row2_y
+    # Right: Automated Testing Suite Breakdown
+    c_t8 = add_card(slide8, 6.863, 1.8, 5.67, 4.0, bg=CARD_BG, border=CARD_BORDER)
+    tb_t8 = slide8.shapes.add_textbox(Inches(7.083), Inches(1.95), Inches(5.23), Inches(3.7))
+    tf_t8 = tb_t8.text_frame
+    tf_t8.word_wrap = True
+    tf_t8.margin_left = tf_t8.margin_top = tf_t8.margin_right = tf_t8.margin_bottom = 0
 
-        c = add_card(slide9, cx, cy, card_w2, card_h2, bg=CARD_BG, border=CARD_BORDER)
-        tb_c = slide9.shapes.add_textbox(Inches(cx + 0.25), Inches(cy + 0.18), Inches(card_w2 - 0.5), Inches(card_h2 - 0.35))
-        tf_c = tb_c.text_frame
-        tf_c.word_wrap = True
-        tf_c.margin_left = tf_c.margin_top = tf_c.margin_right = tf_c.margin_bottom = 0
+    add_para(tf_t8, "62 AUTOMATED PYTEST SUITE BREAKDOWN", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=8)
+    test_suites = [
+        ("18 Ingestion & Vector RAG Tests", "AST parsing, markdown chunking, metadata retention, and ChromaDB cosine similarity retrieval."),
+        ("16 Multi-Agent Orchestration Tests", "Concurrent task dispatch, isolated domain prompts, and Groq/Mock LLM fallback resilience."),
+        ("14 Adversarial Critic Verification Tests", "Physical file existence verification, line reference bounds, and false-positive suppression heuristics."),
+        ("14 Deterministic Risk & API Gateway Tests", "Mathematical formula consistency, Go/No-Go release threshold, and Pydantic schema validation.")
+    ]
+    for ts_name, ts_desc in test_suites:
+        add_para(tf_t8, f"- {ts_name}", size_pt=11, bold=True, color=TEXT_MAIN, space_after=1)
+        add_para(tf_t8, f"  {ts_desc}", size_pt=9.5, bold=False, color=TEXT_MUTED, space_after=5)
 
-        add_para(tf_c, f"{num}  ·  {title}", size_pt=14, bold=True, color=TEXT_MAIN, space_after=8)
-        for b in bullets:
-            add_para(tf_c, f"• {b}", size_pt=11, bold=False, color=TEXT_MUTED, space_after=3)
+    c_bot8 = add_card(slide8, 0.8, 6.0, 11.733, 0.85, bg=SUCCESS_BG, border=CARD_BORDER)
+    tb_b8 = slide8.shapes.add_textbox(Inches(1.0), Inches(6.12), Inches(11.333), Inches(0.6))
+    tf_b8 = tb_b8.text_frame
+    tf_b8.word_wrap = True
+    tf_b8.margin_left = tf_b8.margin_top = tf_b8.margin_right = tf_b8.margin_bottom = 0
+
+    add_para(tf_b8, "Test Execution & Quality Note (5% Rubric):", size_pt=10.5, bold=True, color=SUCCESS_GREEN, space_after=2)
+    add_para(tf_b8, "All 62 unit and integration tests run locally and in CI with zero external API dependencies using a deterministic mock provider, ensuring fast, reproducible execution.", size_pt=11, bold=False, color=TEXT_MAIN, space_after=0)
+
+    add_footer(slide8, 8)
+    add_speaker_notes(slide8, {
+        "talking_points": [
+            "This slide presents an honest view of what is working today versus what is scheduled for the final evaluation.",
+            "Our core backend, ChromaDB vector store, multi-agent engine, Critic, and web console are fully operational.",
+            "To prove code quality, we have 62 automated unit and integration tests running in CI.",
+            "Our test suite covers AST parsing, vector search, agent prompts, Critic line checks, and risk calculation."
+        ],
+        "question": "How do you ensure your automated tests are reliable?",
+        "answer": "Our test suite exercises real file tree traversals, real ChromaDB vector insertions and cosine queries, real AST code parsing, and real mathematical risk calculations with zero mocking of internal business logic."
+    })
+
+    # =========================================================================
+    # SLIDE 9: Docker Containerization & Demo Repositories
+    # =========================================================================
+    slide9 = prs.slides.add_slide(blank_layout)
+    set_slide_background(slide9)
+    add_header(slide9, "Docker Architecture & Tested Repositories", "Multi-container setup via Docker Compose and evaluation across real codebases.")
+
+    # Left: Docker Architecture
+    c_dock = add_card(slide9, 0.8, 1.8, col_w2, card_h2, bg=CARD_BG, border=CARD_BORDER)
+    tb_dk = slide9.shapes.add_textbox(Inches(1.02), Inches(1.98), Inches(col_w2 - 0.44), Inches(card_h2 - 0.36))
+    tf_dk = tb_dk.text_frame
+    tf_dk.word_wrap = True
+    tf_dk.margin_left = tf_dk.margin_top = tf_dk.margin_right = tf_dk.margin_bottom = 0
+
+    add_para(tf_dk, "DOCKER COMPOSE SETUP", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=6)
+    dock_features = [
+        ("FastAPI Backend Container", "Runs python:3.11-slim under dedicated non-root user 'appuser' (UID 1000) for security. Mounts persistent volume for ChromaDB SQLite."),
+        ("Nginx Reverse Proxy", "Lightweight 21MB Alpine Nginx image. Serves compiled React 19 static assets and reverse-proxies /api/ requests, eliminating CORS friction."),
+        ("Isolated Bridge Network", "Both containers communicate over internal 'deploysafe-net' bridge network with Docker health checks on /api/v1/health."),
+        ("Single-Command Startup", "Runs with 'docker compose up --build -d', providing instant, reproducible deployment across Linux, macOS, and Windows.")
+    ]
+    for d_title, d_desc in dock_features:
+        add_para(tf_dk, f"- {d_title}:", size_pt=11, bold=True, color=TEXT_MAIN, space_after=1)
+        add_para(tf_dk, f"  {d_desc}", size_pt=9.5, bold=False, color=TEXT_MUTED, space_after=5)
+
+    # Right: Live Demo Repositories
+    c_demo = add_card(slide9, 6.863, 1.8, col_w2, card_h2, bg=CARD_BG, border=CARD_BORDER)
+    tb_dm = slide9.shapes.add_textbox(Inches(7.083), Inches(1.98), Inches(col_w2 - 0.44), Inches(card_h2 - 0.36))
+    tf_dm = tb_dm.text_frame
+    tf_dm.word_wrap = True
+    tf_dm.margin_left = tf_dm.margin_top = tf_dm.margin_right = tf_dm.margin_bottom = 0
+
+    add_para(tf_dm, "EVALUATION REPOSITORIES TESTED", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=6)
+    demo_points = [
+        ("web-scrape (Node.js)", "Detected unpinned package dependencies and missing production build script in package.json."),
+        ("bottle-app (Python WSGI)", "Detected missing production WSGI server (gunicorn) in Dockerfile and missing healthcheck endpoint."),
+        ("demo-microservice (Python)", "Detected missing Redis container service in docker-compose.yml and undeclared DATABASE_URL secret."),
+        ("Execution Speed Benchmark", "End-to-end multi-agent audit, Critic verification, and Groq LLM synthesis complete in ~5.0 seconds.")
+    ]
+    for dm_title, dm_desc in demo_points:
+        add_para(tf_dm, f"- {dm_title}:", size_pt=11, bold=True, color=TEXT_MAIN, space_after=1)
+        add_para(tf_dm, f"  {dm_desc}", size_pt=9.5, bold=False, color=TEXT_MUTED, space_after=5)
+
+    # Bottom Banner
+    c_bot9 = add_card(slide9, 0.8, 5.95, 11.733, 0.85, bg=ACCENT_BG, border=CARD_BORDER)
+    tb_b9 = slide9.shapes.add_textbox(Inches(1.0), Inches(6.08), Inches(11.333), Inches(0.6))
+    tf_b9 = tb_b9.text_frame
+    tf_b9.word_wrap = True
+    tf_b9.margin_left = tf_b9.margin_top = tf_b9.margin_right = tf_b9.margin_bottom = 0
+
+    add_para(tf_b9, "Deployment Verification Status:", size_pt=10.5, bold=True, color=ACCENT_BLUE, space_after=2)
+    add_para(tf_b9, "DeploySafe runs self-contained in Docker Compose with zero host dependencies other than Docker itself. Ready for cloud cluster deployment (ECS, Cloud Run, Kubernetes).", size_pt=11, bold=False, color=TEXT_MAIN, space_after=0)
 
     add_footer(slide9, 9)
     add_speaker_notes(slide9, {
         "talking_points": [
-            "Rather than showing abstract phase names, this slide details our completed capabilities by functional area.",
-            "Everything on this slide is implemented, tested, and operational today.",
-            "We have 62 passing automated tests covering our API, RAG store, agents, Critic, and Risk Engine.",
-            "The system supports multiple LLM providers, including Groq for fast inference and a local mock for offline testing."
+            "We containerized DeploySafe to production standards using Docker Compose.",
+            "The backend runs securely under a dedicated non-root user with persistent Chroma storage.",
+            "The frontend is compiled into static assets served by an ultra-light Nginx Alpine reverse proxy, eliminating CORS issues.",
+            "In our live tests across real repositories, the entire pipeline executes in ~5.0 seconds with zero hallucinations."
         ],
-        "question": "What is the test coverage of the backend?",
-        "answer": "Our test suite includes 62 unit and integration tests covering the ingestion pipeline, Chroma storage, agent orchestration, Critic validation, and the mathematical risk formula."
+        "question": "Why use a multi-stage Docker build for the frontend rather than running Node.js in production?",
+        "answer": "A multi-stage build compiles our React application into lightweight static files during the build phase and discards all Node.js build tooling, producing an ultra-secure 21MB Alpine Nginx container with zero unnecessary runtime dependencies."
     })
 
     # =========================================================================
-    # SLIDE 10: Live Demo + What Comes Next
+    # SLIDE 10: Project Roadmap & Individual Responsibilities (Grounded)
     # =========================================================================
     slide10 = prs.slides.add_slide(blank_layout)
     set_slide_background(slide10)
-    add_header(slide10, "Next: See It Run", "Live demonstration on our evaluation repository, followed by future roadmap.")
+    add_header(slide10, "Project Roadmap & Individual Responsibilities", "Next milestones for final evaluation and individual responsibility breakdown.")
 
-    # Top Box: High-Level Central Pipeline
-    c_flow = add_card(slide10, 0.8, 1.8, 11.733, 1.0, bg=ACCENT_BG, border=CARD_BORDER)
-    tb_fl = slide10.shapes.add_textbox(Inches(1.0), Inches(1.95), Inches(11.333), Inches(0.7))
-    tf_fl = tb_fl.text_frame
-    tf_fl.word_wrap = True
-    tf_fl.margin_left = tf_fl.margin_top = tf_fl.margin_right = tf_fl.margin_bottom = 0
-    add_para(tf_fl, "LIVE DEMO ARCHITECTURAL FLOW", size_pt=10, bold=True, color=ACCENT_BLUE, space_after=3)
-    add_para(tf_fl, "Repository    →    Run Analysis    →    Parallel Agents    →    Critic Evidence    →    Risk Score    →    Fix Recommendations", size_pt=13, bold=True, color=TEXT_MAIN, space_after=0)
+    # Left: Roadmap
+    c_road = add_card(slide10, 0.8, 1.8, col_w2, card_h2, bg=CARD_BG, border=CARD_BORDER)
+    tb_rd = slide10.shapes.add_textbox(Inches(1.02), Inches(1.98), Inches(col_w2 - 0.44), Inches(card_h2 - 0.36))
+    tf_rd = tb_rd.text_frame
+    tf_rd.word_wrap = True
+    tf_rd.margin_left = tf_rd.margin_top = tf_rd.margin_right = tf_rd.margin_bottom = 0
 
-    # Middle Box: 6 Demo Steps
-    c_demo = add_card(slide10, 0.8, 3.0, 11.733, 2.75, bg=CARD_BG, border=CARD_BORDER)
-    tb_demo = slide10.shapes.add_textbox(Inches(1.1), Inches(3.18), Inches(11.133), Inches(2.4))
-    tf_demo = tb_demo.text_frame
-    tf_demo.word_wrap = True
-    tf_demo.margin_left = tf_demo.margin_top = tf_demo.margin_right = tf_demo.margin_bottom = 0
-
-    add_para(tf_demo, "DEMONSTRATION SEQUENCE", size_pt=11, bold=True, color=TEXT_SUBTLE, space_after=8)
-    demo_steps = [
-        "1. Select Evaluation Repository — Target local demo-repos/deploysafe-analysis-demo",
-        "2. Trigger Multi-Agent Pipeline — Watch real-time execution status across all 6 domain agents",
-        "3. Review Chroma Vector RAG Context — Observe semantic retrieval from project documentation",
-        "4. Inspect Critic-Validated Findings — Review verified findings with line-accurate file citations",
-        "5. Examine Deterministic Risk Score — Understand the 100 / 100 CRITICAL score calculation",
-        "6. Export Multi-Format Deployment Report — Inspect generated HTML, Markdown, and JSON reports"
+    add_para(tf_rd, "ROADMAP FOR FINAL EVALUATION (A3)", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=6)
+    road_items = [
+        ("GitHub Action Bot Integration", "Trigger analysis automatically on pull request events and post sticky comments with the risk breakdown."),
+        ("Diff-Targeted Scans", "Analyze only files modified in the pull request to reduce analysis execution time to under 2.0 seconds."),
+        ("Automated Patch PR Generator", "Generate ready-to-merge fix PRs for common issues (e.g., adding missing services to docker-compose.yml or pinning tags)."),
+        ("Custom Policy Rules", "Allow teams to define organization-specific rules using declarative YAML policies.")
     ]
-    for ds in demo_steps:
-        add_para(tf_demo, ds, size_pt=12, bold=False, color=TEXT_MAIN, space_after=4)
+    for r_title, r_desc in road_items:
+        add_para(tf_rd, f"- {r_title}:", size_pt=11, bold=True, color=TEXT_MAIN, space_after=1)
+        add_para(tf_rd, f"  {r_desc}", size_pt=9.5, bold=False, color=TEXT_MUTED, space_after=5)
 
-    # Bottom Callout: Next Development
-    c_next = add_card(slide10, 0.8, 5.95, 11.733, 0.75, bg=CARD_BG, border=CARD_BORDER)
-    tb_nxt = slide10.shapes.add_textbox(Inches(1.1), Inches(6.08), Inches(11.133), Inches(0.55))
-    tf_nxt = tb_nxt.text_frame
-    tf_nxt.word_wrap = True
-    tf_nxt.margin_left = tf_nxt.margin_top = tf_nxt.margin_right = tf_nxt.margin_bottom = 0
+    # Right: Team Responsibility Matrix (Criterion C10)
+    c_team = add_card(slide10, 6.863, 1.8, col_w2, card_h2, bg=CARD_BG, border=CARD_BORDER)
+    tb_tm = slide10.shapes.add_textbox(Inches(7.083), Inches(1.98), Inches(col_w2 - 0.44), Inches(card_h2 - 0.36))
+    tf_tm = tb_tm.text_frame
+    tf_tm.word_wrap = True
+    tf_tm.margin_left = tf_tm.margin_top = tf_tm.margin_right = tf_tm.margin_bottom = 0
 
-    add_para(tf_nxt, "Next development (Phases 5 & 6): GitHub Actions CI workflow integration, automated PR commenting bot, and benchmark evaluations.", size_pt=11.5, bold=False, color=TEXT_MUTED, space_after=0)
+    add_para(tf_tm, "INDIVIDUAL RESPONSIBILITIES (CRITERION C10)", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=4)
+    add_para(tf_tm, "Yash Rao — Lead Architect & Developer", size_pt=12, bold=True, color=TEXT_MAIN, space_after=8)
+
+    roles = [
+        ("Backend & API Architecture", "Designed FastAPI endpoints (/analyze, /repositories, /health) and Pydantic data schemas."),
+        ("RAG & Ingestion Engine", "Implemented ChromaDB vector indexing and header-aware markdown AST chunking."),
+        ("Multi-Agent Logic & Prompts", "Engineered specialist agent prompts, Critic validation checks, and Groq LLM integration."),
+        ("Deterministic Risk Scoring", "Formulated the 0–100 mathematical risk calculation and Go/No-Go release threshold."),
+        ("Docker & Test Engineering", "Created Docker Compose setup, Nginx reverse proxy, and 62 automated unit/integration tests."),
+        ("Web Dashboard UI", "Built React 19 web console with real-time status polling and telemetry display.")
+    ]
+    for r_title, r_desc in roles:
+        add_para(tf_tm, f"- {r_title}:", size_pt=10, bold=True, color=TEXT_MAIN, space_after=1)
+        add_para(tf_tm, f"  {r_desc}", size_pt=9, bold=False, color=TEXT_MUTED, space_after=3)
+
+    # Bottom Banner
+    c_bot10 = add_card(slide10, 0.8, 5.95, 11.733, 0.85, bg=SUCCESS_BG, border=CARD_BORDER)
+    tb_b10 = slide10.shapes.add_textbox(Inches(1.0), Inches(6.08), Inches(11.333), Inches(0.6))
+    tf_b10 = tb_b10.text_frame
+    tf_b10.word_wrap = True
+    tf_b10.margin_left = tf_b10.margin_top = tf_b10.margin_right = tf_b10.margin_bottom = 0
+
+    add_para(tf_b10, "Mid-Term Evaluation Readiness (A2 · 30%):", size_pt=10.5, bold=True, color=SUCCESS_GREEN, space_after=2)
+    add_para(tf_b10, "Working prototype is functional, containerized, verified by 62 automated tests, and ready for live demonstration with Dr. Kiran Khatter & Mr. Naveen Singh.", size_pt=11, bold=False, color=TEXT_MAIN, space_after=0)
 
     add_footer(slide10, 10)
     add_speaker_notes(slide10, {
         "talking_points": [
-            "We will now transition to the live demonstration of DeploySafe running on our evaluation repository.",
-            "We will trigger an analysis run, watch the agents execute, inspect findings, and review the risk score.",
-            "Following the demo, we are excited to expand DeploySafe into GitHub Actions and PR commenting bots in Phase 5.",
-            "Thank you Professor, and we are ready for your questions."
+            "To conclude, DeploySafe provides automated pre-deployment risk analysis to catch configuration drift before production.",
+            "Our roadmap focuses on GitHub PR bot automation, diff-only scanning, and auto-fix PR generation.",
+            "Under Criterion C10, I led the end-to-end architecture, RAG pipeline, agent prompts, testing, and container deployment.",
+            "Thank you Dr. Kiran Khatter and Mr. Naveen Singh, and I warmly welcome your questions."
         ],
-        "question": "How will GitHub Actions integration work in Phase 5?",
-        "answer": "DeploySafe will run as a containerized action triggered on pull_request events, analyzing the git diff against the target branch and posting a risk summary comment."
+        "question": "What was the single most challenging architectural hurdle you solved in this midterm?",
+        "answer": "Eliminating hallucination in risk scoring. By strictly restricting the LLM to evidence-backed finding proposals and delegating verification to the Critic and scoring to pure Python arithmetic, we created a system that engineers and managers can mathematically trust."
     })
 
-    # Save Presentation
-    output_path = "DeploySafe_Midterm_Presentation_v2.pptx"
-    prs.save(output_path)
-    print(f"Successfully generated {output_path} with {len(prs.slides)} slides.")
+    # Save Presentation (handles PowerPoint file locks gracefully)
+    target_files = [
+        "DeploySafe_Midterm_Presentation_CSE4011.pptx",
+        "DeploySafe_Midterm_Presentation_v3.pptx",
+        "DeploySafe_Midterm_Presentation_v2.pptx"
+    ]
+
+    saved_files = []
+    locked_files = []
+
+    for target in target_files:
+        try:
+            prs.save(target)
+            saved_files.append(target)
+            print(f"Successfully saved {target} ({len(prs.slides)} slides).")
+        except PermissionError:
+            locked_files.append(target)
+            print(f"Notice: '{target}' is currently open/locked in PowerPoint.")
+
+    if saved_files:
+        print(f"\nDeck generation complete! Accessible files: {', '.join(saved_files)}")
+    if locked_files:
+        print(f"To update locked files ({', '.join(locked_files)}), close them in PowerPoint and re-run.")
 
 if __name__ == "__main__":
     create_presentation()

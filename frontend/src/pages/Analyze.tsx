@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Play,
   ShieldAlert,
@@ -113,6 +113,55 @@ export const Analyze: React.FC = () => {
   const [copiedSnippet, setCopiedSnippet] = useState(false);
   const [severityFilter, setSeverityFilter] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [knownRepos, setKnownRepos] = useState<Array<{ repository_id: string; repository_name: string; source_type: string; branch?: string }>>([]);
+
+  useEffect(() => {
+    const searchStr = window.location.search || (window.location.hash.includes('?') ? '?' + window.location.hash.split('?')[1] : '');
+    const params = new URLSearchParams(searchStr);
+    const repoParam = params.get('repo');
+    if (repoParam) {
+      setRepoPath(repoParam);
+    }
+
+    fetch('/api/v1/repositories')
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setKnownRepos(data);
+        }
+      })
+      .catch(() => {});
+
+    // Automatically load the latest report if available so metrics and findings are visible immediately
+    fetch('/api/v1/analysis/latest/report')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((repData: AnalysisReport | null) => {
+        if (repData && repData.run_id) {
+          setReport(repData);
+          setActiveRunId(repData.run_id);
+          setRunStatus(repData.status);
+          if (!repoParam && repData.repository_id) {
+            setRepoPath(repData.repository_id);
+          }
+          if (repData.branch) {
+            setBranch(repData.branch);
+          }
+          fetch(`/api/v1/analysis/${repData.run_id}/agents`)
+            .then((res) => (res.ok ? res.json() : []))
+            .then((agentList: AgentState[]) => {
+              if (Array.isArray(agentList)) {
+                const map: Record<string, AgentState> = {};
+                agentList.forEach((a) => {
+                  map[a.agent_name] = a;
+                });
+                setAgentStates(map);
+              }
+            })
+            .catch(() => {});
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Pre-seed demo repository metadata
   const handleSelectDemoPreset = () => {
@@ -190,46 +239,26 @@ export const Analyze: React.FC = () => {
   };
 
   const handleRunAnalysis = async () => {
+    const cleanPath = repoPath.trim();
+    if (!cleanPath) {
+      setError('Please enter a repository path, slug (e.g. owner/repo), or GitHub URL.');
+      return;
+    }
+
     setIsAnalyzing(true);
     setError(null);
     setSelectedFinding(null);
-    setRunStatus('PREPARING');
+    setRunStatus('RUNNING_AGENTS');
+    setAgentStates({});
 
     try {
-      // Step 1: Ensure demo repository is ingested and indexed if pointing to demo-repos
-      const targetRepoId = repoPath.trim().replace(/^demo-repos\//, '');
-
-      // Attempt ingestion if not already registered
-      try {
-        await fetch('/api/v1/repositories/ingest', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            source_type: 'local',
-            target: repoPath.trim(),
-            repository_id: targetRepoId,
-            branch: branch || 'main'
-          })
-        });
-
-        // Trigger indexing to ensure RAG has embeddings
-        await fetch(`/api/v1/repositories/${encodeURIComponent(targetRepoId)}/index`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-        });
-      } catch (ingestErr) {
-        // Fallback: Continue directly to analysis run
-        console.warn('Repository pre-ingest notice:', ingestErr);
-      }
-
-      setRunStatus('RUNNING_AGENTS');
-
-      // Step 2: Trigger Multi-Agent Deployment Analysis
+      // Trigger Multi-Agent Deployment Analysis
+      // Backend automatically resolves, auto-clones if needed, and indexes seamlessly
       const runRes = await fetch('/api/v1/analysis/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          repository_id: targetRepoId,
+          repository_id: cleanPath,
           branch: branch || 'main',
           options: { commit_sha: commitSha || undefined }
         })
@@ -317,14 +346,32 @@ export const Analyze: React.FC = () => {
       <Card title="Repository & Analysis Scope" subtitle="Configure target repository path, branch, and execution scope.">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="text-xs font-mono text-slate-400 block mb-1.5">Repository Path or ID</label>
+            <label className="text-xs font-mono text-slate-400 block mb-1.5">Repository (GitHub URL, slug, or local path)</label>
             <input
               type="text"
               value={repoPath}
               onChange={(e) => setRepoPath(e.target.value)}
-              placeholder="e.g. demo-repos/deploysafe-analysis-demo"
+              placeholder="e.g. yashrao2607/web-scrape, owner/repo, or https://github.com/..."
               className="w-full rounded-md bg-dark-950 border border-slate-800 px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500"
             />
+            {knownRepos.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                <span className="text-[10px] text-slate-500 font-mono">Known Repos:</span>
+                {knownRepos.slice(0, 4).map((r) => (
+                  <button
+                    key={r.repository_id}
+                    type="button"
+                    onClick={() => {
+                      setRepoPath(r.repository_id);
+                      if (r.branch) setBranch(r.branch);
+                    }}
+                    className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-emerald-400 hover:bg-slate-800 hover:border-emerald-500 transition-colors"
+                  >
+                    {r.repository_name || r.repository_id}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <label className="text-xs font-mono text-slate-400 block mb-1.5">Target Branch</label>
@@ -498,9 +545,9 @@ export const Analyze: React.FC = () => {
               {report.dedup_summary && (
                 <div className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300">
                   <span className="text-emerald-400 font-semibold">
-                    {report.dedup_summary.canonical_count}
+                    {report.dedup_summary.unique_canonical ?? report.dedup_summary.canonical_count ?? 0}
                   </span>{' '}
-                  canonical findings ({report.dedup_summary.duplicate_count} merged duplicates)
+                  canonical findings ({report.dedup_summary.duplicates_merged ?? report.dedup_summary.duplicate_count ?? 0} merged duplicates)
                 </div>
               )}
               <Button
@@ -513,6 +560,40 @@ export const Analyze: React.FC = () => {
             </div>
           </div>
         </Card>
+      )}
+
+      {/* Executive Brief & Recommendations Section */}
+      {report && (report.summary || (report.recommendations && report.recommendations.length > 0)) && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          {report.summary && (
+            <Card
+              className="lg:col-span-2 border-slate-800 bg-slate-950/60"
+              title="Executive Deployment Risk Brief"
+              subtitle="Synthesized by Report Agent from validated findings and grounded repository evidence."
+            >
+              <div className="text-xs text-slate-300 leading-relaxed font-sans space-y-2 whitespace-pre-line">
+                {report.summary}
+              </div>
+            </Card>
+          )}
+
+          {report.recommendations && report.recommendations.length > 0 && (
+            <Card
+              className="border-slate-800 bg-slate-950/60"
+              title="Deployment Action Items"
+              subtitle="High-impact remediation steps prioritized before deployment."
+            >
+              <ul className="space-y-2.5 text-xs text-slate-300">
+                {report.recommendations.map((rec, i) => (
+                  <li key={i} className="flex items-start gap-2 p-2.5 rounded bg-slate-900/80 border border-slate-800">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <span className="leading-snug">{rec}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
+        </div>
       )}
 
       {/* Analysis Severity Summary Cards (Step 21 & Step 27) */}
