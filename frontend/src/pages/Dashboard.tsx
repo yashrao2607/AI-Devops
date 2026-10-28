@@ -168,7 +168,7 @@ export const Dashboard: React.FC = () => {
           <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2.5">
             Deployment Readiness Dashboard
             <span className="text-xs px-2.5 py-0.5 rounded font-mono font-medium bg-emerald-950/80 text-emerald-400 border border-emerald-800/60">
-              Phase 4 Active
+              Production v1.0
             </span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">

@@ -324,23 +324,39 @@ class DeploySafeAnalysisFlow:
             report_state.duration_seconds = round(time.time() - r_start, 2)
             report_state.completed_at = datetime.utcnow()
 
-            # Finalize run
-            run.status = "COMPLETED"
+            # Finalize run status according to Phase 6 Step 5 Partial Failure Policy
+            failed_agents = [
+                name for name, st in run.agent_states.items()
+                if st.status == "FAILED"
+            ]
+            final_status = "PARTIAL" if failed_agents else "COMPLETED"
+
+            run.status = final_status
             run.completed_at = datetime.utcnow()
             run.duration_seconds = total_duration
+            report.status = final_status
+
+            if failed_agents:
+                ObservabilityService.record_event(
+                    run_id=self.run_id,
+                    event_type="RUN_PARTIAL",
+                    component="Orchestrator",
+                    message=f"Analysis completed with partial agent failure(s): {', '.join(failed_agents)}",
+                    status="WARNING"
+                )
 
             _ACTIVE_REPORTS[self.run_id] = report
             ObservabilityService.complete_trace(
                 run_id=self.run_id,
-                status="COMPLETED",
+                status=final_status,
                 risk_score=risk_eval.risk_score,
                 risk_level=risk_eval.risk_level,
                 provider=settings.get_active_provider(),
                 model=settings.GROQ_MODEL if settings.get_active_provider() == "groq" else settings.GEMINI_MODEL,
                 rag_chunks_retrieved=rag_count
             )
-            logger.info("DeploySafeAnalysisFlow completed successfully for run '%s' in %.2fs",
-                        self.run_id, total_duration)
+            logger.info("DeploySafeAnalysisFlow finished (%s) for run '%s' in %.2fs",
+                        final_status, self.run_id, total_duration)
             return report
 
         except Exception as e:

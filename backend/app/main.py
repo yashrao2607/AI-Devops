@@ -1,10 +1,11 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 from backend.app.core.config import settings
 from backend.app.core.logging import logger
-from backend.app.core.database import init_db
+from backend.app.core.database import init_db, get_db
 from backend.app.api.v1.health import router as health_router
 from backend.app.api.v1.flow import router as flow_router
 from backend.app.api.v1.repositories import router as repositories_router
@@ -68,7 +69,13 @@ app.include_router(findings_router, prefix="/api/v1/findings", tags=["Findings D
 app.include_router(observability_router, prefix="/api/v1", tags=["Observability & Tracing"])
 app.include_router(evaluation_router, prefix="/api/v1", tags=["Benchmark Evaluation"])
 
-# Root fallback
+# Root fallback & Health check
+@app.get("/health")
+def read_root_health(db: Session = Depends(get_db)):
+    from backend.app.api.v1.health import get_health
+    return get_health(db)
+
+
 @app.get("/")
 def read_root():
     return {
