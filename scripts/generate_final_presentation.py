@@ -7,24 +7,24 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.dml.color import RGBColor
 
 # -------------------------------------------------------------
-# Color Palette: Premium Technical & Academic Editorial Theme
+# Color Palette: Premium Editorial Theme with High Contrast & Visual Clarity
 # -------------------------------------------------------------
-BG_COLOR = RGBColor(248, 249, 250)         # #F8F9FA Clean light background
+BG_COLOR = RGBColor(248, 250, 252)         # #F8FAFC Slate 50 ultra-clean background
 CARD_BG = RGBColor(255, 255, 255)          # #FFFFFF Pure white card
-CARD_BORDER = RGBColor(226, 232, 240)      # #E2E8F0 Subtle border
-CARD_BORDER_DARK = RGBColor(203, 213, 225) # #CBD5E1 Slate border
+CARD_BORDER = RGBColor(226, 232, 240)      # #E2E8F0 Clean subtle border
+CARD_BORDER_DARK = RGBColor(203, 213, 225) # #CBD5E1 Slate 300 border
 TEXT_MAIN = RGBColor(15, 23, 42)           # #0F172A Slate 900
-TEXT_MUTED = RGBColor(71, 85, 105)         # #475569 Slate 600 body
-TEXT_SUBTLE = RGBColor(148, 163, 184)      # #94A3B8 Slate 400 caption
+TEXT_MUTED = RGBColor(51, 65, 85)          # #334155 Slate 700 readable body
+TEXT_SUBTLE = RGBColor(100, 116, 139)      # #64748B Slate 500 caption
 ACCENT_BLUE = RGBColor(37, 99, 235)        # #2563EB Primary Blue
 ACCENT_NAVY = RGBColor(30, 58, 138)        # #1E3A8A Dark Navy
-ACCENT_BG = RGBColor(239, 246, 255)        # #EFF6FF Blue tint
+ACCENT_BG = RGBColor(239, 246, 255)        # #EFF6FF Soft Blue tint
 BADGE_GRAY_BG = RGBColor(241, 245, 249)    # #F1F5F9 Badge background
-CRITICAL_RED = RGBColor(220, 38, 38)       # #DC2626 Critical / High
+CRITICAL_RED = RGBColor(220, 38, 38)       # #DC2626 Critical / Block
 CRITICAL_BG = RGBColor(254, 242, 242)      # #FEF2F2 Critical tint
-SUCCESS_GREEN = RGBColor(22, 163, 74)      # #16A34A Success / Validated
+SUCCESS_GREEN = RGBColor(22, 163, 74)      # #16A34A Success / Pass
 SUCCESS_BG = RGBColor(240, 253, 244)       # #F0FDF4 Green tint
-CODE_BG = RGBColor(248, 250, 252)          # #F8FAFC Code block background
+CODE_BG = RGBColor(241, 245, 249)          # #F1F5F9 Code block background
 PURPLE_ACCENT = RGBColor(126, 34, 206)     # #7E22CE Purple badge
 PURPLE_BG = RGBColor(250, 245, 255)        # #FAF5FF Purple tint
 
@@ -94,7 +94,7 @@ def create_presentation(output_path: str):
         return badge
 
     def add_header(slide, slide_num, title, subtitle, category="DEPLOYSAFE — AGENTIC PRE-DEPLOYMENT RISK PLATFORM"):
-        add_badge(slide, 0.8, 0.45, 4.2, 0.32, category, bg=ACCENT_BG, text_color=ACCENT_BLUE, font_size=9)
+        add_badge(slide, 0.8, 0.45, 4.4, 0.32, category, bg=ACCENT_BG, text_color=ACCENT_BLUE, font_size=9)
         
         # Slide number
         _, tf_num = add_textbox(slide, 11.5, 0.4, 1.0, 0.4)
@@ -113,7 +113,7 @@ def create_presentation(output_path: str):
         add_para(tf_t, subtitle, size_pt=12, bold=False, color=TEXT_MUTED, space_after=0)
 
     # =========================================================
-    # SLIDE 1: Title Slide
+    # SLIDE 1: Title Slide (Grand Hero Style)
     # =========================================================
     s1 = prs.slides.add_slide(blank_layout)
     set_slide_background(s1)
@@ -124,8 +124,8 @@ def create_presentation(output_path: str):
     
     add_para(tf1, "PROJECT FINAL DEFENSE & V2 PLATFORM RELEASE", size_pt=11, bold=True, color=ACCENT_BLUE, space_after=10)
     add_para(tf1, "DeploySafe: Agentic AI Pre-Deployment Risk Platform", size_pt=28, bold=True, color=TEXT_MAIN, space_after=8)
-    add_para(tf1, "Cross-Boundary Architectural Hazard Detection, Adversarial Reflection & Deterministic Safety Gating", size_pt=14, bold=False, color=TEXT_MUTED, space_after=18)
-    add_para(tf1, "Automating pre-release safety validation across Code, Infrastructure, Configuration, Dependencies, and Test Deficits before shipping to production.", size_pt=12, bold=False, color=TEXT_MUTED, space_after=0)
+    add_para(tf1, "An intelligent safety shield that catches hidden production outages before you deploy.", size_pt=14, bold=False, color=TEXT_MUTED, space_after=18)
+    add_para(tf1, "Eliminates deployment blind spots between Code, Docker, Cloud Configurations, and Dependencies using grounded, zero-hallucination multi-agent AI.", size_pt=12, bold=False, color=TEXT_MUTED, space_after=0)
 
     # 3 Metadata Cards at bottom
     m_y = 5.25
@@ -150,15 +150,15 @@ def create_presentation(output_path: str):
     add_card(s1, 0.8 + (m_w * 2) + 0.48, m_y, m_w, m_h, bg=SUCCESS_BG, border=SUCCESS_GREEN)
     _, tf_s = add_textbox(s1, 1.05 + (m_w * 2) + 0.48, m_y + 0.2, m_w - 0.5, m_h - 0.4)
     add_para(tf_s, "SYSTEM STATUS", size_pt=10, bold=True, color=SUCCESS_GREEN, space_after=4)
-    add_para(tf_s, "V2.0 Final Release: PASS", size_pt=14, bold=True, color=SUCCESS_GREEN, space_after=2)
-    add_para(tf_s, "98/98 Tests Passing • 0 Failures", size_pt=12, bold=False, color=TEXT_MUTED, space_after=0)
+    add_para(tf_s, "V2.0 Final Release: READY", size_pt=14, bold=True, color=SUCCESS_GREEN, space_after=2)
+    add_para(tf_s, "98/98 Tests Passing • 0 Regressions", size_pt=12, bold=False, color=TEXT_MUTED, space_after=0)
 
     # =========================================================
-    # SLIDE 2: Problem Statement & Motivation
+    # SLIDE 2: The Core Problem
     # =========================================================
     s2 = prs.slides.add_slide(blank_layout)
     set_slide_background(s2)
-    add_header(s2, 2, "The Pre-Deployment Blind Spot: Why CI/CD Fails", "Over 65% of catastrophic production outages pass green through standard unit & lint tests.")
+    add_header(s2, 2, "The Pre-Deployment Blind Spot: Why Good Code Breaks", "Over 65% of catastrophic production outages pass green through standard unit & lint tests.")
 
     col_w = 3.75
     col_gap = 0.24
@@ -169,37 +169,37 @@ def create_presentation(output_path: str):
     add_card(s2, 0.8, y_card, col_w, h_card)
     add_badge(s2, 1.05, y_card + 0.25, 1.8, 0.28, "SILOED RUNNERS", bg=CRITICAL_BG, text_color=CRITICAL_RED, font_size=9)
     _, tf = add_textbox(s2, 1.05, y_card + 0.65, col_w - 0.5, h_card - 0.85)
-    add_para(tf, "Imperative Script Blindness", size_pt=15, bold=True, color=TEXT_MAIN, space_after=10)
-    add_para(tf, "• Standard CI runs tests in isolation (pytest, npm test) with zero semantic cross-artifact reasoning.", size_pt=11, color=TEXT_MUTED, space_after=8)
-    add_para(tf, "• Static linters flag style nits but miss holistic architectural drift.", size_pt=11, color=TEXT_MUTED, space_after=8)
-    add_para(tf, "• A pull request can have 100% test pass rate while silently breaking Docker port mappings or database URLs.", size_pt=11, color=TEXT_MUTED, space_after=0)
+    add_para(tf, "Tests Run in Isolation", size_pt=15, bold=True, color=TEXT_MAIN, space_after=10)
+    add_para(tf, "• Unit tests check small functions in isolation, but miss the big picture.", size_pt=11, color=TEXT_MUTED, space_after=8)
+    add_para(tf, "• Linters check code style and semicolons, but cannot detect architectural drift.", size_pt=11, color=TEXT_MUTED, space_after=8)
+    add_para(tf, "• A pull request can have 100% test pass rate while silently breaking Docker networking or database credentials.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
     # Col 2: Seam Hazards
     x2 = 0.8 + col_w + col_gap
     add_card(s2, x2, y_card, col_w, h_card)
     add_badge(s2, x2 + 0.25, y_card + 0.25, 2.0, 0.28, "SEAM MISMATCHES", bg=CRITICAL_BG, text_color=CRITICAL_RED, font_size=9)
     _, tf2 = add_textbox(s2, x2 + 0.25, y_card + 0.65, col_w - 0.5, h_card - 0.85)
-    add_para(tf2, "Cross-Boundary Breakages", size_pt=15, bold=True, color=TEXT_MAIN, space_after=10)
-    add_para(tf2, "• Environment Drift: Code consumes DATABASE_URL but Docker Compose defines DB_URL.", size_pt=11, color=TEXT_MUTED, space_after=8)
-    add_para(tf2, "• Security Drift: Hardcoded credentials, unpinned container tags (:latest), or containers running as root.", size_pt=11, color=TEXT_MUTED, space_after=8)
-    add_para(tf2, "• Dependency Vulns: Direct or transitive packages affected by published CVEs.", size_pt=11, color=TEXT_MUTED, space_after=0)
+    add_para(tf2, "Breakages at the Seams", size_pt=15, bold=True, color=TEXT_MAIN, space_after=10)
+    add_para(tf2, "• Config Mismatches: Code consumes DATABASE_URL, but Docker defines DB_URL.", size_pt=11, color=TEXT_MUTED, space_after=8)
+    add_para(tf2, "• Container Drift: Unpinned tags (:latest) update upstream and crash deployments.", size_pt=11, color=TEXT_MUTED, space_after=8)
+    add_para(tf2, "• Security Leaks: Hardcoded API keys and unencrypted credentials slipping into git.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
     # Col 3: Naive LLM Flaws
     x3 = x2 + col_w + col_gap
     add_card(s2, x3, y_card, col_w, h_card)
     add_badge(s2, x3 + 0.25, y_card + 0.25, 2.0, 0.28, "LLM HALLUCINATIONS", bg=CRITICAL_BG, text_color=CRITICAL_RED, font_size=9)
     _, tf3 = add_textbox(s2, x3 + 0.25, y_card + 0.65, col_w - 0.5, h_card - 0.85)
-    add_para(tf3, "The Generic AI Trap", size_pt=15, bold=True, color=TEXT_MAIN, space_after=10)
-    add_para(tf3, "• Standard LLMs hallucinate non-existent files, wrong line numbers, and fake security issues.", size_pt=11, color=TEXT_MUTED, space_after=8)
-    add_para(tf3, "• Single-prompt analysis lacks grounding, verification, and deterministic scoring.", size_pt=11, color=TEXT_MUTED, space_after=8)
-    add_para(tf3, "• Result: High developer alert fatigue and immediate rejection of ungrounded AI tooling.", size_pt=11, color=TEXT_MUTED, space_after=0)
+    add_para(tf3, "Why Raw AI Fails", size_pt=15, bold=True, color=TEXT_MAIN, space_after=10)
+    add_para(tf3, "• Generic LLMs hallucinate non-existent files and invent fake line numbers.", size_pt=11, color=TEXT_MUTED, space_after=8)
+    add_para(tf3, "• Single prompts lack real code grounding and mathematical scoring.", size_pt=11, color=TEXT_MUTED, space_after=8)
+    add_para(tf3, "• Developers get alert fatigue and immediately reject untrusted AI tools.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
     # =========================================================
     # SLIDE 3: Architectural Overview
     # =========================================================
     s3 = prs.slides.add_slide(blank_layout)
     set_slide_background(s3)
-    add_header(s3, 3, "DeploySafe Core Architecture & Orchestration Flow", "Dynamic planning, parallel domain agents, adversarial reflection, and deterministic scoring.")
+    add_header(s3, 3, "DeploySafe Solution: The Multi-Agent Safety Flow", "Dynamic planning, parallel domain agents, adversarial reflection, and deterministic safety gates.")
 
     step_w = 2.76
     step_gap = 0.23
@@ -211,9 +211,9 @@ def create_presentation(output_path: str):
     add_badge(s3, 1.0, y_flow + 0.25, 1.4, 0.28, "STAGE 1", bg=ACCENT_BG, text_color=ACCENT_BLUE)
     _, tf = add_textbox(s3, 1.0, y_flow + 0.65, step_w - 0.4, h_flow - 0.85)
     add_para(tf, "Dynamic Planning", size_pt=14, bold=True, color=TEXT_MAIN, space_after=8)
-    add_para(tf, "• Git diff extraction & AST file discovery.", size_pt=11, color=TEXT_MUTED, space_after=6)
-    add_para(tf, "• Pre-ingestion regex secret scrubbing.", size_pt=11, color=TEXT_MUTED, space_after=6)
-    add_para(tf, "• Planner dynamically activates domain agents based on touched file types.", size_pt=11, color=TEXT_MUTED, space_after=6)
+    add_para(tf, "• Reads git commit diffs & file trees.", size_pt=11, color=TEXT_MUTED, space_after=6)
+    add_para(tf, "• Scrubs secrets before sending to AI.", size_pt=11, color=TEXT_MUTED, space_after=6)
+    add_para(tf, "• Planner activates only the agents needed for the modified files.", size_pt=11, color=TEXT_MUTED, space_after=6)
     add_para(tf, "• Safe limits: 2,000 files & 200MB.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
     # Step 2: 5 Domain Agents
@@ -225,7 +225,7 @@ def create_presentation(output_path: str):
     add_para(tf, "• Code Analysis Agent", size_pt=11, bold=True, color=TEXT_MAIN, space_after=4)
     add_para(tf, "• Config & Infra Agent", size_pt=11, bold=True, color=TEXT_MAIN, space_after=4)
     add_para(tf, "• Dependency & CVE Agent", size_pt=11, bold=True, color=TEXT_MAIN, space_after=4)
-    add_para(tf, "• Test Path Analysis Agent", size_pt=11, bold=True, color=TEXT_MAIN, space_after=4)
+    add_para(tf, "• Test Path Coverage Agent", size_pt=11, bold=True, color=TEXT_MAIN, space_after=4)
     add_para(tf, "• Security & IAM Agent", size_pt=11, bold=True, color=TEXT_MAIN, space_after=4)
     add_para(tf, "• ChromaDB Vector RAG context injection.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
@@ -235,10 +235,10 @@ def create_presentation(output_path: str):
     add_badge(s3, x + 0.2, y_flow + 0.25, 1.8, 0.28, "STAGE 3 (CORE)", bg=PURPLE_BG, text_color=PURPLE_ACCENT)
     _, tf = add_textbox(s3, x + 0.2, y_flow + 0.65, step_w - 0.4, h_flow - 0.85)
     add_para(tf, "Critic Reflection", size_pt=14, bold=True, color=TEXT_MAIN, space_after=8)
-    add_para(tf, "• Adversarial verification of all candidate findings.", size_pt=11, color=TEXT_MUTED, space_after=6)
+    add_para(tf, "• Adversarial audit of every candidate finding.", size_pt=11, color=TEXT_MUTED, space_after=6)
     add_para(tf, "• Physical File Existence check.", size_pt=11, color=TEXT_MUTED, space_after=6)
-    add_para(tf, "• Line Bounds Range validation.", size_pt=11, color=TEXT_MUTED, space_after=6)
-    add_para(tf, "• Literal Code Snippet matching.", size_pt=11, color=TEXT_MUTED, space_after=6)
+    add_para(tf, "• Line Number Range check.", size_pt=11, color=TEXT_MUTED, space_after=6)
+    add_para(tf, "• Literal Code Snippet match.", size_pt=11, color=TEXT_MUTED, space_after=6)
     add_para(tf, "• Drops hallucinations to 0.0% false positives.", size_pt=11, bold=True, color=SUCCESS_GREEN, space_after=0)
 
     # Step 4: Scoring & Gating
@@ -247,17 +247,17 @@ def create_presentation(output_path: str):
     add_badge(s3, x + 0.2, y_flow + 0.25, 1.4, 0.28, "STAGE 4", bg=ACCENT_BG, text_color=ACCENT_BLUE)
     _, tf = add_textbox(s3, x + 0.2, y_flow + 0.65, step_w - 0.4, h_flow - 0.85)
     add_para(tf, "Gating & Output", size_pt=14, bold=True, color=TEXT_MAIN, space_after=8)
-    add_para(tf, "• Deterministic 0–100 mathematical risk scoring.", size_pt=11, color=TEXT_MUTED, space_after=6)
+    add_para(tf, "• Deterministic 0–100 mathematical risk score.", size_pt=11, color=TEXT_MUTED, space_after=6)
     add_para(tf, "• Automated Gate: ALLOWED, REVIEW_REQUIRED, BLOCKED.", size_pt=11, color=TEXT_MUTED, space_after=6)
     add_para(tf, "• Fingerprint Diff engine.", size_pt=11, color=TEXT_MUTED, space_after=6)
     add_para(tf, "• Emits CLI exit codes & CI status.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
     # =========================================================
-    # SLIDE 4: Specialized Domain Agents Deep Dive
+    # SLIDE 4: The 5 Specialized Domain Agents
     # =========================================================
     s4 = prs.slides.add_slide(blank_layout)
     set_slide_background(s4)
-    add_header(s4, 4, "Specialized Domain Agents: Targeted Hazard Detection", "Each agent is bound to a strict persona, deterministic toolset, and structured output schema.")
+    add_header(s4, 4, "Meet the 5 Specialized Domain Agents", "Each agent specializes in one critical aspect of your software repository.")
 
     card_w = 3.75
     card_gap = 0.24
@@ -267,25 +267,25 @@ def create_presentation(output_path: str):
     # Agent 1: Code
     add_card(s4, 0.8, row1_y, card_w, row_h)
     _, tf = add_textbox(s4, 1.0, row1_y + 0.2, card_w - 0.4, row_h - 0.4)
-    add_para(tf, "1. Code Analysis Agent", size_pt=14, bold=True, color=ACCENT_BLUE, space_after=4)
-    add_para(tf, "• Evaluates AST, structural code smells, unhandled async exceptions, resource leaks.", size_pt=11, color=TEXT_MUTED, space_after=4)
-    add_para(tf, "• Analyzes commit diff additions/deletions against full file context.", size_pt=11, color=TEXT_MUTED, space_after=0)
+    add_para(tf, "1. Code Quality Agent", size_pt=14, bold=True, color=ACCENT_BLUE, space_after=4)
+    add_para(tf, "• Catches silent error swallowing, resource leaks, and unhandled async crashes.", size_pt=11, color=TEXT_MUTED, space_after=4)
+    add_para(tf, "• Analyzes pull request changes against the full file context.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
     # Agent 2: Config & Infra
     x2 = 0.8 + card_w + card_gap
     add_card(s4, x2, row1_y, card_w, row_h)
     _, tf = add_textbox(s4, x2 + 0.2, row1_y + 0.2, card_w - 0.4, row_h - 0.4)
-    add_para(tf, "2. Config & Infra Agent", size_pt=14, bold=True, color=ACCENT_BLUE, space_after=4)
-    add_para(tf, "• Validates Dockerfile, docker-compose.yml, K8s manifests, and .env files.", size_pt=11, color=TEXT_MUTED, space_after=4)
-    add_para(tf, "• Detects unpinned tags, root users, debug flags enabled in production.", size_pt=11, color=TEXT_MUTED, space_after=0)
+    add_para(tf, "2. Config & Docker Agent", size_pt=14, bold=True, color=ACCENT_BLUE, space_after=4)
+    add_para(tf, "• Scans Dockerfiles, compose configs, and Kubernetes manifests.", size_pt=11, color=TEXT_MUTED, space_after=4)
+    add_para(tf, "• Catches unpinned container tags (:latest), root users, and debug flags.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
     # Agent 3: Dependencies
     x3 = x2 + card_w + card_gap
     add_card(s4, x3, row1_y, card_w, row_h)
     _, tf = add_textbox(s4, x3 + 0.2, row1_y + 0.2, card_w - 0.4, row_h - 0.4)
     add_para(tf, "3. Dependency & CVE Agent", size_pt=14, bold=True, color=ACCENT_BLUE, space_after=4)
-    add_para(tf, "• Scans requirements.txt, package.json, pyproject.toml, Pipfile.", size_pt=11, color=TEXT_MUTED, space_after=4)
-    add_para(tf, "• Cross-references advisory databases for known CVEs and breaking deprecations.", size_pt=11, color=TEXT_MUTED, space_after=0)
+    add_para(tf, "• Inspects package.json, requirements.txt, and lockfiles.", size_pt=11, color=TEXT_MUTED, space_after=4)
+    add_para(tf, "• Flags known CVE vulnerabilities and broken deprecated libraries.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
     # Row 2 (2 wide cards)
     row2_y = 4.45
@@ -294,52 +294,52 @@ def create_presentation(output_path: str):
     # Agent 4: Test Deficit
     add_card(s4, 0.8, row2_y, card2_w, row_h)
     _, tf = add_textbox(s4, 1.0, row2_y + 0.2, card2_w - 0.4, row_h - 0.4)
-    add_para(tf, "4. Test Path & Coverage Agent", size_pt=14, bold=True, color=ACCENT_BLUE, space_after=4)
-    add_para(tf, "• Identifies untested critical execution paths touched in diffs (auth, billing, payment tokens).", size_pt=11, color=TEXT_MUTED, space_after=4)
-    add_para(tf, "• Verifies that high-risk modified functions have corresponding test assertions.", size_pt=11, color=TEXT_MUTED, space_after=0)
+    add_para(tf, "4. Test Coverage Agent", size_pt=14, bold=True, color=ACCENT_BLUE, space_after=4)
+    add_para(tf, "• Identifies untested critical paths modified in pull requests (auth, payments, billing).", size_pt=11, color=TEXT_MUTED, space_after=4)
+    add_para(tf, "• Warns developers before risky modified code ships without regression tests.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
     # Agent 5: Security & Secrets
     x_sec = 0.8 + card2_w + card_gap
     add_card(s4, x_sec, row2_y, card2_w, row_h)
     _, tf = add_textbox(s4, x_sec + 0.2, row2_y + 0.2, card2_w - 0.4, row_h - 0.4)
-    add_para(tf, "5. Security & IAM Agent", size_pt=14, bold=True, color=ACCENT_BLUE, space_after=4)
-    add_para(tf, "• Detects accidental cloud credentials (AWS, GCP, Azure, DB passwords, JWT secrets).", size_pt=11, color=TEXT_MUTED, space_after=4)
-    add_para(tf, "• Identifies insecure CORS wildcard origins, SQL injection risk, and missing rate limiters.", size_pt=11, color=TEXT_MUTED, space_after=0)
+    add_para(tf, "5. Security & Secrets Agent", size_pt=14, bold=True, color=ACCENT_BLUE, space_after=4)
+    add_para(tf, "• Detects leaked AWS/GCP tokens, private keys, database passwords, and JWT keys.", size_pt=11, color=TEXT_MUTED, space_after=4)
+    add_para(tf, "• Identifies insecure wildcard CORS origins, SQL injection hazards, and open endpoints.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
     # =========================================================
     # SLIDE 5: Adversarial Reflection & Zero Hallucination
     # =========================================================
     s5 = prs.slides.add_slide(blank_layout)
     set_slide_background(s5)
-    add_header(s5, 5, "Eliminating AI Hallucinations: Adversarial Critic Agent", "How DeploySafe achieves 100% evidence validity and 0.0% false positives on clean baselines.")
+    add_header(s5, 5, "Zero Hallucinations: The Critic Reflection Engine", "How DeploySafe achieves 100% evidence validity and 0.0% false positives on clean codebases.")
 
     # Left: Explanation Card
     add_card(s5, 0.8, 1.95, 5.7, 4.9)
     _, tf = add_textbox(s5, 1.05, 2.15, 5.2, 4.5)
     add_para(tf, "The 4-Point Physical Verification Gate", size_pt=16, bold=True, color=TEXT_MAIN, space_after=10)
-    add_para(tf, "Every finding emitted by an agent must survive strict physical inspection by the Critic Agent (critic_agent.py):", size_pt=11, color=TEXT_MUTED, space_after=10)
-    add_para(tf, "1. File Existence: Does the file actually exist in the repository filesystem? If not -> REJECT.", size_pt=11, bold=True, color=TEXT_MAIN, space_after=8)
-    add_para(tf, "2. Line Number Bounds: Is the reported line number valid within 1 to Total File Lines? If out-of-bounds -> REJECT.", size_pt=11, bold=True, color=TEXT_MAIN, space_after=8)
-    add_para(tf, "3. Literal Code Match: Does the provided code snippet exist in the physical file at that location? If mismatched -> REJECT.", size_pt=11, bold=True, color=TEXT_MAIN, space_after=8)
-    add_para(tf, "4. Evidence Grounding: Is the finding a real deployment hazard or trivial style nitpick? If nitpick -> REJECT.", size_pt=11, bold=True, color=TEXT_MAIN, space_after=0)
+    add_para(tf, "Every finding must survive strict physical inspection before reaching developers:", size_pt=11, color=TEXT_MUTED, space_after=10)
+    add_para(tf, "1. File Existence: Does the file really exist in the repository? If not -> REJECT.", size_pt=11, bold=True, color=TEXT_MAIN, space_after=8)
+    add_para(tf, "2. Line Number Bounds: Is the reported line number valid on disk? If out of bounds -> REJECT.", size_pt=11, bold=True, color=TEXT_MAIN, space_after=8)
+    add_para(tf, "3. Literal Code Match: Does the code snippet match the physical text? If mismatch -> REJECT.", size_pt=11, bold=True, color=TEXT_MAIN, space_after=8)
+    add_para(tf, "4. Evidence Grounding: Is this a genuine deployment hazard or trivial style nit? If nit -> REJECT.", size_pt=11, bold=True, color=TEXT_MAIN, space_after=0)
 
     # Right: Metric Verification Box
     add_card(s5, 6.8, 1.95, 5.733, 4.9, bg=CARD_BG, border=SUCCESS_GREEN)
     add_badge(s5, 7.1, 2.2, 2.5, 0.3, "EMPIRICAL BENCHMARK", bg=SUCCESS_BG, text_color=SUCCESS_GREEN)
     _, tf = add_textbox(s5, 7.1, 2.65, 5.133, 4.0)
-    add_para(tf, "Benchmark Results on Clean Baseline", size_pt=16, bold=True, color=TEXT_MAIN, space_after=10)
-    add_para(tf, "• Unvalidated Candidate Findings: 3 findings generated by raw LLM prompts.", size_pt=11, color=TEXT_MUTED, space_after=8)
-    add_para(tf, "• Critic Filter Verdict: All 3 ungrounded findings dropped due to snippet mismatch.", size_pt=11, color=CRITICAL_RED, space_after=12)
+    add_para(tf, "Proven on Clean Benchmark Repository", size_pt=16, bold=True, color=TEXT_MAIN, space_after=10)
+    add_para(tf, "• Unvalidated AI Candidates: 3 phantom findings generated by raw LLM prompts.", size_pt=11, color=TEXT_MUTED, space_after=8)
+    add_para(tf, "• Critic Filter Verdict: All 3 dropped due to code mismatch.", size_pt=11, color=CRITICAL_RED, space_after=12)
     add_para(tf, "• Final Verified Findings on Clean Baseline: 0", size_pt=13, bold=True, color=SUCCESS_GREEN, space_after=6)
     add_para(tf, "• Final False Positive Rate: 0.0%", size_pt=14, bold=True, color=SUCCESS_GREEN, space_after=14)
-    add_para(tf, "Key Takeaway: The Critic reflection step is what transforms DeploySafe from an untrusted toy into a robust production-grade safety gate.", size_pt=11, color=TEXT_MAIN, space_after=0)
+    add_para(tf, "Key Takeaway: The Critic reflection step is what transforms DeploySafe from an untrusted toy into a trusted enterprise safety gate.", size_pt=11, color=TEXT_MAIN, space_after=0)
 
     # =========================================================
     # SLIDE 6: Vector RAG Subsystem
     # =========================================================
     s6 = prs.slides.add_slide(blank_layout)
     set_slide_background(s6)
-    add_header(s6, 6, "Retrieval-Augmented Generation (RAG) Architecture", "ChromaDB vector store providing repository-level architectural context to domain agents.")
+    add_header(s6, 6, "Repository Context: Vector RAG Knowledge Base", "ChromaDB vector store providing architectural context so AI never misinterprets intentional code.")
 
     col_w = 3.75
     col_gap = 0.24
@@ -348,47 +348,47 @@ def create_presentation(output_path: str):
 
     # Col 1: Ingestion & Indexing
     add_card(s6, 0.8, y_card, col_w, h_card)
-    add_badge(s6, 1.05, y_card + 0.25, 1.8, 0.28, "INGESTION & EMBED", bg=ACCENT_BG, text_color=ACCENT_BLUE)
+    add_badge(s6, 1.05, y_card + 0.25, 1.8, 0.28, "KNOWLEDGE BASE", bg=ACCENT_BG, text_color=ACCENT_BLUE)
     _, tf = add_textbox(s6, 1.05, y_card + 0.65, col_w - 0.5, h_card - 0.85)
-    add_para(tf, "Document Chunking", size_pt=15, bold=True, color=TEXT_MAIN, space_after=10)
-    add_para(tf, "• Chunks READMEs, architecture guides, runbooks, and API specs.", size_pt=11, color=TEXT_MUTED, space_after=8)
+    add_para(tf, "Smart Document Ingestion", size_pt=15, bold=True, color=TEXT_MAIN, space_after=10)
+    add_para(tf, "• Indexes READMEs, architecture docs, runbooks, and API specs.", size_pt=11, color=TEXT_MUTED, space_after=8)
     add_para(tf, "• Primary Embedding: Google text-embedding-004 (768 dimensions).", size_pt=11, color=TEXT_MUTED, space_after=8)
-    add_para(tf, "• Fallback: Local deterministic hashing embedding when API is offline.", size_pt=11, color=TEXT_MUTED, space_after=0)
+    add_para(tf, "• Fallback: Local deterministic hashing when API is offline.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
     # Col 2: Vector Store
     x2 = 0.8 + col_w + col_gap
     add_card(s6, x2, y_card, col_w, h_card)
-    add_badge(s6, x2 + 0.25, y_card + 0.25, 1.8, 0.28, "PERSISTENCE", bg=ACCENT_BG, text_color=ACCENT_BLUE)
+    add_badge(s6, x2 + 0.25, y_card + 0.25, 1.8, 0.28, "FAST RETRIEVAL", bg=ACCENT_BG, text_color=ACCENT_BLUE)
     _, tf2 = add_textbox(s6, x2 + 0.25, y_card + 0.65, col_w - 0.5, h_card - 0.85)
-    add_para(tf2, "ChromaDB Store", size_pt=15, bold=True, color=TEXT_MAIN, space_after=10)
+    add_para(tf2, "Isolated ChromaDB Store", size_pt=15, bold=True, color=TEXT_MAIN, space_after=10)
     add_para(tf2, "• Isolated Chroma collection per repository ID.", size_pt=11, color=TEXT_MUTED, space_after=8)
-    add_para(tf2, "• Cosine similarity search with metadata filtering (file_path, type).", size_pt=11, color=TEXT_MUTED, space_after=8)
-    add_para(tf2, "• Query latency: < 45ms per top-k retrieval.", size_pt=11, color=TEXT_MUTED, space_after=0)
+    add_para(tf2, "• Cosine similarity search with metadata filtering.", size_pt=11, color=TEXT_MUTED, space_after=8)
+    add_para(tf2, "• Blazing fast retrieval: < 45ms per query.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
     # Col 3: Agent Injection
     x3 = x2 + col_w + col_gap
     add_card(s6, x3, y_card, col_w, h_card)
-    add_badge(s6, x3 + 0.25, y_card + 0.25, 1.8, 0.28, "GROUNDING", bg=ACCENT_BG, text_color=ACCENT_BLUE)
+    add_badge(s6, x3 + 0.25, y_card + 0.25, 1.8, 0.28, "ARCHITECTURAL FIT", bg=ACCENT_BG, text_color=ACCENT_BLUE)
     _, tf3 = add_textbox(s6, x3 + 0.25, y_card + 0.65, col_w - 0.5, h_card - 0.85)
-    add_para(tf3, "Context Injection", size_pt=15, bold=True, color=TEXT_MAIN, space_after=10)
-    add_para(tf3, "• Agents receive architectural context before analyzing diffs.", size_pt=11, color=TEXT_MUTED, space_after=8)
-    add_para(tf3, "• Example: Knowing that auth_service requires strict JWT validation according to docs/architecture.md.", size_pt=11, color=TEXT_MUTED, space_after=8)
-    add_para(tf3, "• Prevents false positives where unconventional code is intentional per architecture.", size_pt=11, color=TEXT_MUTED, space_after=0)
+    add_para(tf3, "Context-Aware Agents", size_pt=15, bold=True, color=TEXT_MAIN, space_after=10)
+    add_para(tf3, "• Agents check architectural guidelines before flagging code.", size_pt=11, color=TEXT_MUTED, space_after=8)
+    add_para(tf3, "• Understands custom microservice conventions and project patterns.", size_pt=11, color=TEXT_MUTED, space_after=8)
+    add_para(tf3, "• Prevents false positives where unconventional code is intentional.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
     # =========================================================
-    # SLIDE 7: Mathematical Risk Scoring & Gate Policies (CLEAN REDESIGN)
+    # SLIDE 7: Mathematical Risk Scoring & Gate Policies
     # =========================================================
     s7 = prs.slides.add_slide(blank_layout)
     set_slide_background(s7)
     add_header(s7, 7, "Mathematical Deterministic Risk Engine & Gate Policy", "Transparent, calibrated scoring formula replacing black-box AI sentiment.")
 
-    # Left: Formula Card (Redesigned with clean visual hierarchy)
+    # Left: Formula Card
     add_card(s7, 0.8, 1.95, 5.7, 4.9)
     _, tf_l = add_textbox(s7, 1.05, 2.15, 5.2, 1.0)
     add_para(tf_l, "Deterministic Scoring Formula", size_pt=16, bold=True, color=TEXT_MAIN, space_after=4)
     add_para(tf_l, "Mathematical score calculated strictly from critic-validated findings:", size_pt=11, color=TEXT_MUTED, space_after=0)
     
-    # Formula Code Box (Clean sub-card)
+    # Formula Code Box
     add_card(s7, 1.05, 3.15, 5.2, 2.1, bg=CODE_BG, border=CARD_BORDER_DARK)
     _, tf_c = add_textbox(s7, 1.25, 3.3, 4.8, 1.8)
     add_para(tf_c, "Risk Score = Min(100, Σ (Weight_i * Multiplier_i))", size_pt=11, bold=True, color=ACCENT_NAVY, font_name=CODE_FONT, space_after=6)
@@ -397,11 +397,10 @@ def create_presentation(output_path: str):
     add_para(tf_c, "• MEDIUM finding   : 15 points", size_pt=11, bold=False, color=TEXT_MUTED, font_name=CODE_FONT, space_after=3)
     add_para(tf_c, "• LOW finding      :  7 points", size_pt=11, bold=False, color=TEXT_MUTED, font_name=CODE_FONT, space_after=0)
 
-    # Explanation text below code block
     _, tf_sub = add_textbox(s7, 1.05, 5.45, 5.2, 1.2)
     add_para(tf_sub, "Zero Black-Box Guesswork: The exact same findings always yield the exact same score across runs with 100% mathematical reproducibility.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
-    # Right: Gate Policy Card (3 clean stacked rows)
+    # Right: Gate Policy Card
     add_card(s7, 6.8, 1.95, 5.733, 4.9)
     _, tf_r = add_textbox(s7, 7.05, 2.15, 5.2, 0.5)
     add_para(tf_r, "Automated Gate Thresholds", size_pt=16, bold=True, color=TEXT_MAIN, space_after=0)
@@ -425,7 +424,7 @@ def create_presentation(output_path: str):
     add_para(tf_p3, "Score >= 70 or Critical >= 1. Hard blocker in CI/CD pipeline.", size_pt=10, color=TEXT_MUTED, space_after=0)
 
     # =========================================================
-    # SLIDE 8: Phase 7 / V2 Enterprise Enhancements (REFINED & NO CLIPPING)
+    # SLIDE 8: Phase 7 / V2 Enterprise Enhancements
     # =========================================================
     s8 = prs.slides.add_slide(blank_layout)
     set_slide_background(s8)
@@ -441,7 +440,7 @@ def create_presentation(output_path: str):
     add_badge(s8, 0.95, y_v2 + 0.25, 1.8, 0.28, "V2 GOVERNANCE", bg=ACCENT_BG, text_color=ACCENT_BLUE)
     _, tf = add_textbox(s8, 0.95, y_v2 + 0.65, c_w - 0.3, h_v2 - 0.8)
     add_para(tf, "deploysafe.yml", size_pt=14, bold=True, color=TEXT_MAIN, space_after=8)
-    add_para(tf, "• Version-controlled repository rules", size_pt=10, color=TEXT_MUTED, space_after=6)
+    add_para(tf, "• Version-controlled repo rules", size_pt=10, color=TEXT_MUTED, space_after=6)
     add_para(tf, "• Custom risk thresholds", size_pt=10, color=TEXT_MUTED, space_after=6)
     add_para(tf, "• Path exclusions & gate overrides", size_pt=10, color=TEXT_MUTED, space_after=6)
     add_para(tf, "• Traversal & injection defense", size_pt=10, bold=True, color=SUCCESS_GREEN, space_after=0)
@@ -491,9 +490,9 @@ def create_presentation(output_path: str):
     _, tf = add_textbox(s9, 1.05, 2.15, 5.2, 4.5)
     add_para(tf, "The Dangers of Autonomous Code Writes", size_pt=16, bold=True, color=TEXT_MAIN, space_after=10)
     add_para(tf, "Allowing AI agents to commit code directly into deployment branches creates unacceptable enterprise risks:", size_pt=11, color=TEXT_MUTED, space_after=10)
-    add_para(tf, "• Supply Chain Vulnerability: Malicious pull requests or prompt injections could trick agents into injecting backdoors.", size_pt=11, color=CRITICAL_RED, space_after=8)
-    add_para(tf, "• Semantic Regressions: AI fixes may resolve a lint or type error but subtly break runtime business logic.", size_pt=11, color=TEXT_MUTED, space_after=8)
-    add_para(tf, "• Developer Disempowerment: Engineers must retain ownership and accountability over all code pushed to production.", size_pt=11, color=TEXT_MUTED, space_after=0)
+    add_para(tf, "• Supply Chain Risk: Malicious pull requests or prompt injections could trick agents into injecting backdoors.", size_pt=11, color=CRITICAL_RED, space_after=8)
+    add_para(tf, "• Semantic Regressions: AI fixes may resolve a lint error but subtly break runtime business logic.", size_pt=11, color=TEXT_MUTED, space_after=8)
+    add_para(tf, "• Developer Ownership: Human engineers must always retain ultimate accountability over all code pushed to production.", size_pt=11, color=TEXT_MUTED, space_after=0)
 
     # Right: DeploySafe Solution Card
     add_card(s9, 6.8, 1.95, 5.733, 4.9, bg=CARD_BG, border=ACCENT_BLUE)
@@ -506,7 +505,7 @@ def create_presentation(output_path: str):
     add_para(tf, "4. One-Click Copy: Engineers copy the patch, test locally, and commit with human provenance.", size_pt=11, color=SUCCESS_GREEN, space_after=0)
 
     # =========================================================
-    # SLIDE 10: Empirical Benchmark & Verification (REDESIGNED TABLE)
+    # SLIDE 10: Empirical Benchmark & Verification
     # =========================================================
     s10 = prs.slides.add_slide(blank_layout)
     set_slide_background(s10)
@@ -556,7 +555,6 @@ def create_presentation(output_path: str):
     _, tf_th = add_textbox(s10, 1.05, t_y + 0.15, 11.2, 0.4)
     add_para(tf_th, "Evaluation Benchmark Breakdown Across Physical Test Repositories", size_pt=13, bold=True, color=TEXT_MAIN, space_after=0)
 
-    # 5 visual table rows
     cases = [
         ("EVAL-01: Config Hazard", "Unpinned Docker tag & debug mode", "CRITICAL / HIGH", "PASS (100% Detected)"),
         ("EVAL-02: Secret Exposure", "AWS credentials & database password leak", "CRITICAL", "PASS (Scrubbed & Flagged)"),
