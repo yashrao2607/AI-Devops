@@ -88,7 +88,7 @@ class RepositoryLoader:
         )
 
     @classmethod
-    def load_github(cls, url: str, branch: Optional[str] = None, repository_id: Optional[str] = None) -> RepositorySnapshot:
+    def load_github(cls, url: str, branch: Optional[str] = None, repository_id: Optional[str] = None, token: Optional[str] = None) -> RepositorySnapshot:
         """Safely clones a public or authenticated GitHub repository."""
         # Normalize shorthand format (e.g., owner/repo -> https://github.com/owner/repo)
         clean_url = url.strip()
@@ -110,9 +110,14 @@ class RepositoryLoader:
         os.makedirs(cloned_base, exist_ok=True)
         dest_dir = os.path.join(cloned_base, repo_id)
 
+        # Non-interactive git environment to prevent hanging on credentials
+        git_env = os.environ.copy()
+        git_env["GIT_TERMINAL_PROMPT"] = "0"
+
+        effective_token = (token or settings.GITHUB_TOKEN or "").strip()
         clone_url = clean_url
-        if settings.GITHUB_TOKEN and settings.GITHUB_TOKEN.strip() and not settings.GITHUB_TOKEN.startswith("YOUR_"):
-            clone_url = f"https://x-access-token:{settings.GITHUB_TOKEN}@github.com/{owner}/{repo_name}.git"
+        if effective_token and not effective_token.startswith("YOUR_"):
+            clone_url = f"https://x-access-token:{effective_token}@github.com/{owner}/{repo_name}.git"
 
         # Check if already cloned with files
         has_existing_clone = (
@@ -124,10 +129,10 @@ class RepositoryLoader:
         if has_existing_clone:
             logger.info("Repository '%s' already cloned at %s, updating...", repo_id, dest_dir)
             try:
-                subprocess.run(["git", "-C", dest_dir, "fetch", "--depth", "1"], capture_output=True, timeout=20)
+                subprocess.run(["git", "-C", dest_dir, "fetch", "--depth", "1"], capture_output=True, timeout=20, env=git_env)
                 if branch and branch.lower() not in ("main", "head", "default"):
-                    subprocess.run(["git", "-C", dest_dir, "checkout", branch], capture_output=True, timeout=10)
-                subprocess.run(["git", "-C", dest_dir, "reset", "--hard", f"origin/{branch or 'HEAD'}"], capture_output=True, timeout=10)
+                    subprocess.run(["git", "-C", dest_dir, "checkout", branch], capture_output=True, timeout=10, env=git_env)
+                subprocess.run(["git", "-C", dest_dir, "reset", "--hard", f"origin/{branch or 'HEAD'}"], capture_output=True, timeout=10, env=git_env)
             except Exception as e:
                 logger.warning("Could not refresh existing git clone (%s), continuing with current files.", str(e))
         else:
@@ -140,10 +145,32 @@ class RepositoryLoader:
 
             try:
                 logger.info("Cloning GitHub repository: %s/%s into %s", owner, repo_name, temp_clone)
-                res = subprocess.run(cmd, capture_output=True, text=True, timeout=90)
+                res = subprocess.run(cmd, capture_output=True, text=True, timeout=90, env=git_env)
+
                 if res.returncode != 0:
-                    err_msg = res.stderr.replace(settings.GITHUB_TOKEN or "", "***TOKEN***")
+                    err_msg = res.stderr.strip()
+                    if effective_token:
+                        err_msg = err_msg.replace(effective_token, "***TOKEN***")
+
+                    # If specified branch failed, retry with remote's default branch
+                    if branch and branch.lower() not in ("main", "head", "default") and ("Remote branch" in err_msg or "not found in upstream" in err_msg):
+                        logger.warning("Branch '%s' not found for %s/%s. Retrying with default branch...", branch, owner, repo_name)
+                        retry_cmd = ["git", "clone", "--depth", "1", clone_url, temp_clone]
+                        retry_res = subprocess.run(retry_cmd, capture_output=True, text=True, timeout=90, env=git_env)
+                        if retry_res.returncode == 0:
+                            res = retry_res
+                        else:
+                            err_msg = retry_res.stderr.strip()
+                            if effective_token:
+                                err_msg = err_msg.replace(effective_token, "***TOKEN***")
+
+                if res.returncode != 0:
                     shutil.rmtree(temp_clone, ignore_errors=True)
+                    if "could not read Username" in err_msg or "Authentication failed" in err_msg or ("repository" in err_msg.lower() and "not found" in err_msg.lower()):
+                        raise RepositoryLoaderError(
+                            f"Repository '{owner}/{repo_name}' was not found or is private. "
+                            f"If this is a private repository, please ensure your GitHub Token is configured in Platform Settings or .env. (Git details: {err_msg})"
+                        )
                     raise RepositoryLoaderError(f"Git clone failed: {err_msg}")
 
                 # Copy cloned content to persistent dest_dir safely
@@ -163,7 +190,7 @@ class RepositoryLoader:
         actual_branch = branch or "main"
         try:
             res_b = subprocess.run(["git", "-C", dest_dir, "rev-parse", "--abbrev-ref", "HEAD"],
-                                   capture_output=True, text=True, timeout=5)
+                                   capture_output=True, text=True, timeout=5, env=git_env)
             if res_b.returncode == 0 and res_b.stdout.strip():
                 actual_branch = res_b.stdout.strip()
         except Exception:
@@ -172,7 +199,7 @@ class RepositoryLoader:
         commit_sha = None
         try:
             res_c = subprocess.run(["git", "-C", dest_dir, "rev-parse", "HEAD"],
-                                   capture_output=True, text=True, timeout=5)
+                                   capture_output=True, text=True, timeout=5, env=git_env)
             if res_c.returncode == 0:
                 commit_sha = res_c.stdout.strip()
         except Exception:

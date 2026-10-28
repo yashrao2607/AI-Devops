@@ -26,9 +26,11 @@ RUN useradd -m -u 1000 appuser && \
     mkdir -p /app/data /app/chroma_db /app/cloned_repos /app/backend/app && \
     chown -R appuser:appuser /app
 
-# Copy application source code
+# Copy application source code and benchmark evaluation fixtures
 COPY --chown=appuser:appuser backend/app /app/backend/app
 COPY --chown=appuser:appuser demo-repos /app/demo-repos
+COPY --chown=appuser:appuser evaluation /app/evaluation
+COPY --chown=appuser:appuser evaluation-report.json /app/evaluation-report.json
 
 # Switch to non-root user
 USER appuser

@@ -33,17 +33,23 @@ def get_evaluation_results():
     if _LATEST_EVALUATION_REPORT:
         return _LATEST_EVALUATION_REPORT
 
-    # Check if report exists on disk
-    report_file = "evaluation-report.json"
-    if os.path.exists(report_file):
-        try:
-            with open(report_file, "r", encoding="utf-8") as f:
-                import json
-                data = json.load(f)
-                _LATEST_EVALUATION_REPORT = EvaluationSummary.model_validate(data)
-                return _LATEST_EVALUATION_REPORT
-        except Exception:
-            pass
+    # Check if report exists on disk in candidate locations
+    candidates = [
+        "evaluation-report.json",
+        os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))), "evaluation-report.json"),
+        "/app/evaluation-report.json",
+        os.path.join(os.getcwd(), "evaluation-report.json")
+    ]
+    for report_file in candidates:
+        if os.path.exists(report_file):
+            try:
+                with open(report_file, "r", encoding="utf-8") as f:
+                    import json
+                    data = json.load(f)
+                    _LATEST_EVALUATION_REPORT = EvaluationSummary.model_validate(data)
+                    return _LATEST_EVALUATION_REPORT
+            except Exception:
+                pass
 
     return None
 

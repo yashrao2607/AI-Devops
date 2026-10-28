@@ -12,7 +12,7 @@ from backend.app.core.logging import logger
 
 router = APIRouter()
 
-def resolve_repository_snapshot(identifier: str, branch: Optional[str] = "main") -> RepositorySnapshot:
+def resolve_repository_snapshot(identifier: str, branch: Optional[str] = "main", token: Optional[str] = None) -> RepositorySnapshot:
     """
     Robustly resolves a repository snapshot from any input format:
     1. In-memory snapshot ID, slug, or target URL.
@@ -35,7 +35,7 @@ def resolve_repository_snapshot(identifier: str, branch: Optional[str] = "main")
     if is_github_url or is_github_slug:
         logger.info("Repository '%s' not cached. Auto-cloning from GitHub...", raw)
         try:
-            snapshot = RepositoryLoader.load_github(url=raw, branch=branch)
+            snapshot = RepositoryLoader.load_github(url=raw, branch=branch, token=token)
             register_snapshot(snapshot, target_alias=raw)
 
             # Auto-index into Chroma for semantic RAG coverage if not yet indexed
@@ -63,6 +63,7 @@ def resolve_repository_snapshot(identifier: str, branch: Optional[str] = "main")
 class RunAnalysisRequest(BaseModel):
     repository_id: str = Field(description="Ingested repository identifier, slug, or GitHub URL")
     branch: Optional[str] = "main"
+    github_token: Optional[str] = None
     options: Optional[dict] = Field(default_factory=dict)
 
 @router.post("/run", response_model=AnalysisReport)
@@ -72,7 +73,8 @@ def trigger_analysis(payload: RunAnalysisRequest):
     Automatically resolves, clones if needed, and indexes the repository seamlessly.
     Coordinates Code, Dependency, Config, Test, RAG, Security, and Critic agents.
     """
-    snapshot = resolve_repository_snapshot(identifier=payload.repository_id, branch=payload.branch)
+    token = payload.github_token or (payload.options.get("github_token") if payload.options else None)
+    snapshot = resolve_repository_snapshot(identifier=payload.repository_id, branch=payload.branch, token=token)
 
     flow = DeploySafeAnalysisFlow()
     try:

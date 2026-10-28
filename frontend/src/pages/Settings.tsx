@@ -10,18 +10,51 @@ interface HealthData {
   active_llm_provider: string;
   gemini_configured: boolean;
   groq_configured: boolean;
+  github_configured?: boolean;
   database_status: string;
 }
 
 export const SettingsPage: React.FC = () => {
   const [health, setHealth] = useState<HealthData | null>(null);
+  const [tokenInput, setTokenInput] = useState('');
+  const [tokenMsg, setTokenMsg] = useState<string | null>(null);
+  const [isSavingToken, setIsSavingToken] = useState(false);
 
-  useEffect(() => {
+  const fetchHealth = () => {
     fetch('/api/v1/health')
       .then((res) => res.json())
       .then((data) => setHealth(data))
       .catch(() => setHealth(null));
+  };
+
+  useEffect(() => {
+    fetchHealth();
   }, []);
+
+  const handleSaveToken = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingToken(true);
+    setTokenMsg(null);
+    try {
+      const res = await fetch('/api/v1/settings/github-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: tokenInput })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTokenMsg(data.message || 'Token saved successfully.');
+        setTokenInput('');
+        fetchHealth();
+      } else {
+        setTokenMsg('Failed to update token.');
+      }
+    } catch (err: any) {
+      setTokenMsg(err.message || 'Failed to update token.');
+    } finally {
+      setIsSavingToken(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -31,7 +64,7 @@ export const SettingsPage: React.FC = () => {
           Platform Settings & Environment
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Inspect backend configuration, provider status, and security disclosures.
+          Inspect backend configuration, provider status, repository credentials, and security disclosures.
         </p>
       </div>
 
@@ -64,6 +97,13 @@ export const SettingsPage: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-between p-2.5 rounded bg-slate-900 border border-slate-800">
+              <span className="text-slate-400">GitHub Access Token (Private Repos):</span>
+              <Badge variant={health?.github_configured ? 'success' : 'neutral'}>
+                {health?.github_configured ? 'KEY CONFIGURED' : 'NOT CONFIGURED'}
+              </Badge>
+            </div>
+
+            <div className="flex items-center justify-between p-2.5 rounded bg-slate-900 border border-slate-800">
               <span className="text-slate-400">Active Provider:</span>
               <span className="text-emerald-400 font-semibold">{health?.active_llm_provider || 'diagnostic_mock'}</span>
             </div>
@@ -91,6 +131,34 @@ export const SettingsPage: React.FC = () => {
           </div>
         </Card>
       </div>
+
+      {/* GitHub Token Management */}
+      <Card title="GitHub Personal Access Token" subtitle="Allows DeploySafe to safely clone and analyze your private repositories.">
+        <form onSubmit={handleSaveToken} className="space-y-3">
+          <p className="text-xs text-slate-300 font-sans leading-relaxed">
+            Provide a GitHub Personal Access Token (classic or fine-grained) with <code className="text-emerald-400 font-mono bg-dark-950 px-1 py-0.5 rounded border border-slate-800">repo:read</code> scope to analyze unseen private repositories.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input
+              type="password"
+              value={tokenInput}
+              onChange={(e) => setTokenInput(e.target.value)}
+              placeholder="Paste GitHub Personal Access Token (e.g. ghp_... or gho_...)"
+              className="flex-1 rounded-md bg-dark-950 border border-slate-800 px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500"
+            />
+            <button
+              type="submit"
+              disabled={isSavingToken}
+              className="px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-semibold font-mono transition"
+            >
+              {isSavingToken ? 'Saving...' : 'Save Token'}
+            </button>
+          </div>
+          {tokenMsg && (
+            <p className="text-xs font-mono text-emerald-400 mt-1">{tokenMsg}</p>
+          )}
+        </form>
+      </Card>
 
       <Card title="Need Help Adding API Keys?" subtitle="Follow the step-by-step setup guide.">
         <p className="text-xs text-slate-300 font-sans leading-relaxed">

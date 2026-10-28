@@ -103,6 +103,7 @@ export const Analyze: React.FC = () => {
   const [repoPath, setRepoPath] = useState('demo-repos/deploysafe-analysis-demo');
   const [branch, setBranch] = useState('main');
   const [commitSha, setCommitSha] = useState('');
+  const [customToken, setCustomToken] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [activeRunId, setActiveRunId] = useState<string | null>(null);
   const [report, setReport] = useState<AnalysisReport | null>(null);
@@ -260,7 +261,11 @@ export const Analyze: React.FC = () => {
         body: JSON.stringify({
           repository_id: cleanPath,
           branch: branch || 'main',
-          options: { commit_sha: commitSha || undefined }
+          github_token: customToken.trim() || undefined,
+          options: {
+            commit_sha: commitSha || undefined,
+            github_token: customToken.trim() || undefined
+          }
         })
       });
 
@@ -344,20 +349,20 @@ export const Analyze: React.FC = () => {
 
       {/* Target Repository Input & Scope Card */}
       <Card title="Repository & Analysis Scope" subtitle="Configure target repository path, branch, and execution scope.">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label className="text-xs font-mono text-slate-400 block mb-1.5">Repository (GitHub URL, slug, or local path)</label>
+            <label className="text-xs font-mono text-slate-400 block mb-1.5">Repository (GitHub / Local)</label>
             <input
               type="text"
               value={repoPath}
               onChange={(e) => setRepoPath(e.target.value)}
-              placeholder="e.g. yashrao2607/web-scrape, owner/repo, or https://github.com/..."
+              placeholder="e.g. owner/repo, https://github.com/..."
               className="w-full rounded-md bg-dark-950 border border-slate-800 px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500"
             />
             {knownRepos.length > 0 && (
               <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                <span className="text-[10px] text-slate-500 font-mono">Known Repos:</span>
-                {knownRepos.slice(0, 4).map((r) => (
+                <span className="text-[10px] text-slate-500 font-mono">Known:</span>
+                {knownRepos.slice(0, 3).map((r) => (
                   <button
                     key={r.repository_id}
                     type="button"
@@ -390,6 +395,16 @@ export const Analyze: React.FC = () => {
               value={commitSha}
               onChange={(e) => setCommitSha(e.target.value)}
               placeholder="e.g. 5e6cc9a"
+              className="w-full rounded-md bg-dark-950 border border-slate-800 px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-mono text-slate-400 block mb-1.5">GitHub Token (Private Repos)</label>
+            <input
+              type="password"
+              value={customToken}
+              onChange={(e) => setCustomToken(e.target.value)}
+              placeholder="Use default or enter token"
               className="w-full rounded-md bg-dark-950 border border-slate-800 px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-emerald-500"
             />
           </div>

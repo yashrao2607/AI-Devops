@@ -48,6 +48,8 @@ class EvaluationSummary(BaseModel):
     cases: List[EvaluationCaseResult]
 
 
+_ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
 class EvaluationEngine:
     """Automated benchmark evaluator for DeploySafe multi-agent detectors."""
 
@@ -55,9 +57,26 @@ class EvaluationEngine:
 
     @classmethod
     def load_cases(cls, cases_file: Optional[str] = None) -> List[Dict[str, Any]]:
-        target_path = cases_file or cls.DEFAULT_CASES_FILE
-        if not os.path.exists(target_path):
-            raise FileNotFoundError(f"Evaluation benchmark file not found: {target_path}")
+        candidates = []
+        if cases_file:
+            candidates.append(cases_file)
+            candidates.append(os.path.abspath(cases_file))
+
+        candidates.extend([
+            os.path.join("evaluation", "cases.json"),
+            os.path.join(_ROOT_DIR, "evaluation", "cases.json"),
+            "/app/evaluation/cases.json",
+            os.path.join(os.getcwd(), "evaluation", "cases.json")
+        ])
+
+        target_path = None
+        for p in candidates:
+            if p and os.path.exists(p):
+                target_path = p
+                break
+
+        if not target_path:
+            raise FileNotFoundError(f"Evaluation benchmark file not found: {candidates}")
         with open(target_path, "r", encoding="utf-8") as f:
             return json.load(f)
 
@@ -71,9 +90,20 @@ class EvaluationEngine:
         expected_cat = case_spec.get("expected_category", "")
         expected_files = case_spec.get("expected_files", [])
 
-        abs_path = os.path.abspath(rel_path)
-        if not os.path.exists(abs_path):
-            raise FileNotFoundError(f"Evaluation fixture path does not exist: {abs_path}")
+        candidates = [
+            rel_path,
+            os.path.abspath(rel_path),
+            os.path.join(_ROOT_DIR, rel_path),
+            os.path.join(os.getcwd(), rel_path),
+            os.path.join("/app", rel_path)
+        ]
+        abs_path = None
+        for p in candidates:
+            if p and os.path.exists(p):
+                abs_path = os.path.abspath(p)
+                break
+        if not abs_path:
+            raise FileNotFoundError(f"Evaluation fixture path does not exist: {candidates}")
 
         t0 = time.time()
         snapshot = RepositoryLoader.load_local(abs_path, repository_id=f"eval_{case_id.lower()}")
@@ -194,3 +224,14 @@ class EvaluationEngine:
         with open(abs_out, "w", encoding="utf-8") as f:
             json.dump(summary.model_dump(mode="json"), f, indent=2)
         logger.info("Saved evaluation benchmark report to: %s", abs_out)
+
+        # Also write to root directory and /app if available
+        for extra in [_ROOT_DIR, "/app"]:
+            if os.path.isdir(extra):
+                try:
+                    target = os.path.join(extra, os.path.basename(output_path))
+                    if target != abs_out:
+                        with open(target, "w", encoding="utf-8") as f:
+                            json.dump(summary.model_dump(mode="json"), f, indent=2)
+                except Exception:
+                    pass

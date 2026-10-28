@@ -42,6 +42,10 @@ class Settings(BaseSettings):
     def has_groq(self) -> bool:
         return bool(self.GROQ_API_KEY and self.GROQ_API_KEY.strip() and not self.GROQ_API_KEY.startswith("YOUR_"))
 
+    @property
+    def has_github(self) -> bool:
+        return bool(self.GITHUB_TOKEN and self.GITHUB_TOKEN.strip() and not self.GITHUB_TOKEN.startswith("YOUR_"))
+
     def get_active_provider(self) -> str:
         """Determines the active provider based on priority and configuration."""
         if self.PRIMARY_LLM_PROVIDER == "gemini" and self.has_gemini:

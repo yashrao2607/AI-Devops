@@ -39,6 +39,7 @@ class HealthResponse(BaseModel):
     active_llm_provider: str
     gemini_configured: bool
     groq_configured: bool
+    github_configured: bool = False
     database_status: str
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
