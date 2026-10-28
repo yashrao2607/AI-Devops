@@ -5,7 +5,7 @@ to determine whether code is ALLOWED, REQUIRES REVIEW, or is BLOCKED from deploy
 """
 
 import os
-from typing import Dict, List, Literal, Optional
+from typing import Dict, List, Literal, Optional, Any
 from pydantic import BaseModel, Field
 
 from backend.app.core.config import settings
@@ -62,6 +62,22 @@ class GatePolicyEngine:
             review_threshold=review_thresh,
             block_on_critical=block_crit,
             max_high_count=max_high
+        )
+
+    @classmethod
+    def policy_from_repo_config(cls, repo_config: Any) -> GatePolicyConfig:
+        """Derives a deterministic gate policy from custom repository configuration."""
+        default = cls.get_default_policy()
+        if not repo_config:
+            return default
+        max_risk = getattr(repo_config, "risk_threshold", default.max_risk_score)
+        block_crit = getattr(repo_config, "block_on_critical", default.block_on_critical)
+        review_thresh = max(10.0, round(max_risk * 0.7, 1))
+        return GatePolicyConfig(
+            max_risk_score=float(max_risk),
+            review_threshold=float(review_thresh),
+            block_on_critical=bool(block_crit),
+            max_high_count=1 if getattr(repo_config, "block_on_high", False) else default.max_high_count
         )
 
     @classmethod

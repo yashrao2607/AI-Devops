@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 from backend.app.models.analysis_schemas import Finding
 from backend.app.agents.analysis_flow import DeploySafeAnalysisFlow
 from backend.app.services.risk_engine import RiskEngine
+from backend.app.services.patch_service import PatchService, PatchPreview
 from backend.app.core.logging import logger
 
 router = APIRouter()
@@ -132,3 +133,17 @@ def update_finding_status(finding_id: str, payload: UpdateFindingStatusPayload):
                 finding_id, status_upper, target_report.run_id, target_report.risk_score)
 
     return target_finding
+
+
+@router.get("/{finding_id}/patch", response_model=PatchPreview)
+def get_finding_patch(finding_id: str):
+    """
+    Generates a proposed unified diff remediation preview for a validated finding (Phase 7 Steps 14 & 15).
+    Labeled strictly as AI-generated proposal requiring human approval.
+    """
+    reports = DeploySafeAnalysisFlow.list_reports()
+    for r in reports:
+        for f in r.findings:
+            if f.id == finding_id:
+                return PatchService.generate_patch_preview(f)
+    raise HTTPException(status_code=404, detail=f"Finding '{finding_id}' not found.")

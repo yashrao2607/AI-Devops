@@ -10,6 +10,7 @@ from backend.app.models.analysis_schemas import (
 from backend.app.agents.analysis_flow import DeploySafeAnalysisFlow
 from backend.app.services.report_service import ReportService
 from backend.app.services.comparison import ComparisonService
+from backend.app.services.change_impact import ChangeImpactService, ChangeImpactReport
 from backend.app.core.logging import logger
 
 router = APIRouter()
@@ -155,3 +156,16 @@ def compare_run(
             base_report = prior_reports[0]
 
     return ComparisonService.compare_reports(target_report, base_report)
+
+
+@router.get("/{run_id}/impact", response_model=ChangeImpactReport)
+def get_run_impact(run_id: str):
+    """
+    Returns deterministic Change Impact Analysis for the files analyzed in this run (Phase 7 Step 7).
+    """
+    target_report = DeploySafeAnalysisFlow.get_report(run_id)
+    if not target_report:
+        raise HTTPException(status_code=404, detail=f"Target report for run '{run_id}' not found.")
+
+    affected_files = list({f.file_path for f in target_report.findings if f.file_path})
+    return ChangeImpactService.analyze_impact(target_report.repository_id, affected_files)

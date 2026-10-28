@@ -9,6 +9,7 @@ from backend.app.services.rag.discovery import FileDiscoveryService, DiscoveredF
 from backend.app.services.rag.indexer import RepositoryIndexer, IndexSummary, _INDEX_STATUS_REGISTRY
 from backend.app.services.rag.retriever import RepositoryRetriever, SearchResponse
 from backend.app.services.rag.vector_store import ChromaVectorStore
+from backend.app.services.history_analytics import HistoryAnalyticsService, RepositoryAnalyticsReport
 from backend.app.core.logging import logger
 
 router = APIRouter()
@@ -306,4 +307,14 @@ def get_repository_summary(repository_id: str):
         "analyzed_at": latest_report.analyzed_at.isoformat() if latest_report else None,
         "summary": latest_report.summary if latest_report else "No deployment risk analyses have been recorded for this repository."
     }
+
+
+@router.get("/{repository_id}/analytics", response_model=RepositoryAnalyticsReport)
+def get_repository_analytics(repository_id: str):
+    """
+    Returns historical risk score trends, recurring issues, and resolution velocity (Phase 7 Steps 8 & 9).
+    """
+    snapshot = lookup_snapshot(repository_id)
+    actual_id = snapshot.repository_id if snapshot else repository_id
+    return HistoryAnalyticsService.analyze_repository_history(actual_id)
 

@@ -137,11 +137,29 @@ interface RunComparisonResult {
   message?: string | null;
 }
 
+interface ComponentImpact {
+  changed_file: string;
+  primary_component: string;
+  affected_components: string[];
+  risk_radius: string;
+  rationale: string;
+  recommended_checks: string[];
+}
+
+interface ChangeImpactReport {
+  repository_id: string;
+  total_changed_files: number;
+  impacted_components: string[];
+  highest_risk_radius: string;
+  details: ComponentImpact[];
+  summary: string;
+}
+
 export const Runs: React.FC = () => {
   const [runs, setRuns] = useState<RunItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
-  const [modalTab, setModalTab] = useState<'details' | 'compare'>('details');
+  const [modalTab, setModalTab] = useState<'details' | 'compare' | 'impact'>('details');
   const [runSummary, setRunSummary] = useState<RunSummaryData | null>(null);
   const [agentTelemetry, setAgentTelemetry] = useState<AgentTelemetry[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -151,6 +169,10 @@ export const Runs: React.FC = () => {
   const [comparison, setComparison] = useState<RunComparisonResult | null>(null);
   const [compareLoading, setCompareLoading] = useState(false);
   const [selectedBaseRunId, setSelectedBaseRunId] = useState<string>('');
+
+  // Change Impact State (Phase 7 V2)
+  const [impactReport, setImpactReport] = useState<ChangeImpactReport | null>(null);
+  const [impactLoading, setImpactLoading] = useState(false);
 
   const fetchRuns = async () => {
     setLoading(true);
@@ -192,11 +214,27 @@ export const Runs: React.FC = () => {
     }
   };
 
-  const openRunDetail = async (runId: string, initialTab: 'details' | 'compare' = 'details') => {
+  const fetchImpactData = async (runId: string) => {
+    setImpactLoading(true);
+    try {
+      const res = await fetch(`/api/v1/runs/${runId}/impact`);
+      if (res.ok) {
+        const data: ChangeImpactReport = await res.json();
+        setImpactReport(data);
+      }
+    } catch (e) {
+      console.error('Failed to load impact report:', e);
+    } finally {
+      setImpactLoading(false);
+    }
+  };
+
+  const openRunDetail = async (runId: string, initialTab: 'details' | 'compare' | 'impact' = 'details') => {
     setSelectedRunId(runId);
     setModalTab(initialTab);
     setDetailLoading(true);
     setComparison(null);
+    setImpactReport(null);
     setSelectedBaseRunId('');
 
     try {
@@ -483,6 +521,22 @@ export const Runs: React.FC = () => {
                   </span>
                 )}
               </button>
+              <button
+                onClick={() => {
+                  setModalTab('impact');
+                  if (!impactReport && selectedRunId) {
+                    fetchImpactData(selectedRunId);
+                  }
+                }}
+                className={`py-3 px-4 font-semibold border-b-2 transition-colors flex items-center gap-2 ${
+                  modalTab === 'impact'
+                    ? 'border-cyan-400 text-cyan-400 bg-cyan-950/20'
+                    : 'border-transparent text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <AlertTriangle className="w-3.5 h-3.5 text-cyan-400" />
+                Change Impact (V2)
+              </button>
             </div>
 
             {/* Modal Body */}
@@ -642,7 +696,7 @@ export const Runs: React.FC = () => {
                     </div>
                   )}
                 </>
-              ) : (
+              ) : modalTab === 'compare' ? (
                 /* Before / After Comparison Tab (Steps 13 & 14) */
                 <div className="space-y-6">
                   {/* Baseline Selection Control */}
@@ -898,6 +952,111 @@ export const Runs: React.FC = () => {
                           </div>
                         </div>
                       )}
+                    </>
+                  )}
+                </div>
+              ) : (
+                /* Change Impact Analysis Tab (Phase 7 Step 7) */
+                <div className="space-y-6">
+                  {impactLoading ? (
+                    <div className="py-16 text-center">
+                      <RefreshCw className="w-8 h-8 text-cyan-400 animate-spin mx-auto mb-3" />
+                      <p className="text-xs text-slate-400 font-mono">Analyzing cross-component blast radius...</p>
+                    </div>
+                  ) : !impactReport || impactReport.details.length === 0 ? (
+                    <Card className="border-dashed border-slate-800 py-12 text-center">
+                      <div className="w-12 h-12 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500 mb-3">
+                        <FileCode className="w-6 h-6" />
+                      </div>
+                      <h3 className="text-sm font-semibold text-white">No Direct Component Impact Detected</h3>
+                      <p className="text-xs text-slate-400 max-w-md mx-auto mt-1">
+                        No critical configuration, containerization, or dependency boundary shifts detected in this run.
+                      </p>
+                    </Card>
+                  ) : (
+                    <>
+                      {/* Top Summary Banner */}
+                      <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                          <div className="text-xs font-semibold text-white">Architectural Blast Radius</div>
+                          <div className="text-[11px] text-slate-400 mt-0.5">{impactReport.summary}</div>
+                        </div>
+                        <Badge
+                          variant={
+                            impactReport.highest_risk_radius === 'HIGH'
+                              ? 'critical'
+                              : impactReport.highest_risk_radius === 'MEDIUM'
+                              ? 'moderate'
+                              : 'low'
+                          }
+                          size="sm"
+                        >
+                          {impactReport.highest_risk_radius} BLAST RADIUS
+                        </Badge>
+                      </div>
+
+                      {/* Impacted Components Chips */}
+                      <div>
+                        <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-2">
+                          Impacted Architectural Layers:
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {impactReport.impacted_components.map((comp) => (
+                            <span
+                              key={comp}
+                              className="px-2.5 py-1 rounded-lg bg-cyan-950/40 border border-cyan-800/60 text-cyan-300 font-mono text-xs font-semibold"
+                            >
+                              {comp}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Component Impact Breakdown Table */}
+                      <div className="rounded-xl bg-slate-950 border border-slate-800 overflow-hidden">
+                        <table className="w-full text-left text-xs font-mono">
+                          <thead>
+                            <tr className="border-b border-slate-800 bg-slate-900/60 text-slate-400">
+                              <th className="py-2.5 px-3">Modified File</th>
+                              <th className="py-2.5 px-3">Component</th>
+                              <th className="py-2.5 px-3">Affected Layers</th>
+                              <th className="py-2.5 px-3">Radius</th>
+                              <th className="py-2.5 px-3">Rationale & Checks</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800/60 text-[11px]">
+                            {impactReport.details.map((item, idx) => (
+                              <tr key={idx} className="hover:bg-slate-900/30">
+                                <td className="py-2.5 px-3 text-emerald-400 font-semibold">{item.changed_file}</td>
+                                <td className="py-2.5 px-3 text-slate-300">{item.primary_component}</td>
+                                <td className="py-2.5 px-3 text-cyan-300">
+                                  {item.affected_components.join(', ')}
+                                </td>
+                                <td className="py-2.5 px-3">
+                                  <Badge
+                                    variant={
+                                      item.risk_radius === 'HIGH'
+                                        ? 'critical'
+                                        : item.risk_radius === 'MEDIUM'
+                                        ? 'moderate'
+                                        : 'low'
+                                    }
+                                    size="sm"
+                                  >
+                                    {item.risk_radius}
+                                  </Badge>
+                                </td>
+                                <td className="py-2.5 px-3 text-slate-400">
+                                  <div>{item.rationale}</div>
+                                  <div className="text-[10px] text-indigo-400 mt-0.5">
+                                    Checks: {item.recommended_checks.join(', ')}
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </>
                   )}
                 </div>

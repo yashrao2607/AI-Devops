@@ -7,11 +7,23 @@ import {
   Search,
   X,
   Copy,
-  Check
+  Check,
+  Wrench
 } from 'lucide-react';
 import { Card } from '../components/common/Card.tsx';
 import { Badge, BadgeVariant } from '../components/common/Badge.tsx';
 import { Button } from '../components/common/Button.tsx';
+
+interface PatchPreviewData {
+  finding_id: string;
+  file_path: string;
+  line_start?: number | null;
+  line_end?: number | null;
+  original_snippet: string;
+  proposed_patch: string;
+  explanation: string;
+  disclaimer: string;
+}
 
 interface EvidenceItem {
   evidence_type: string;
@@ -67,6 +79,25 @@ export const Findings: React.FC = () => {
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
   const [copiedSnippet, setCopiedSnippet] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [patchData, setPatchData] = useState<PatchPreviewData | null>(null);
+  const [patchLoading, setPatchLoading] = useState(false);
+  const [showPatch, setShowPatch] = useState(false);
+
+  const fetchPatch = async (findingId: string) => {
+    setPatchLoading(true);
+    try {
+      const res = await fetch(`/api/v1/findings/${findingId}/patch`);
+      if (res.ok) {
+        const data = await res.json();
+        setPatchData(data);
+        setShowPatch(true);
+      }
+    } catch (e) {
+      console.error('Failed to load patch preview:', e);
+    } finally {
+      setPatchLoading(false);
+    }
+  };
 
   const fetchFindings = async () => {
     setLoading(true);
@@ -499,6 +530,60 @@ export const Findings: React.FC = () => {
                 <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-900/40 text-emerald-300 leading-relaxed">
                   {selectedFinding.recommendation}
                 </div>
+              </div>
+
+              {/* Proposed Code Patch (Phase 7 Steps 14 & 15) */}
+              <div className="pt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-slate-400 font-semibold uppercase tracking-wider text-[10px]">
+                    Proposed Code Patch (V2 Preview)
+                  </span>
+                  {!showPatch ? (
+                    <button
+                      onClick={() => fetchPatch(selectedFinding.id)}
+                      disabled={patchLoading}
+                      className="px-2.5 py-1 rounded bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-800 text-indigo-300 font-mono text-[11px] flex items-center gap-1.5 transition-colors"
+                    >
+                      <Wrench className={`w-3 h-3 ${patchLoading ? 'animate-spin' : ''}`} />
+                      {patchLoading ? 'Generating Patch...' : 'Preview Proposed Patch'}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setShowPatch(false)}
+                      className="text-[10px] text-slate-400 hover:text-white"
+                    >
+                      Hide Patch
+                    </button>
+                  )}
+                </div>
+
+                {showPatch && patchData && (
+                  <div className="rounded-lg bg-slate-950 border border-indigo-900/60 overflow-hidden space-y-2 p-3 font-mono">
+                    <div className="p-2 rounded bg-amber-950/40 border border-amber-800/60 text-amber-300 text-[10px] flex items-center gap-2">
+                      <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-amber-400" />
+                      <span>{patchData.disclaimer}</span>
+                    </div>
+
+                    <pre className="p-2.5 rounded bg-slate-900 border border-slate-800 text-[11px] text-slate-300 overflow-x-auto whitespace-pre-wrap leading-relaxed">
+                      {patchData.proposed_patch.split('\n').map((line, idx) => (
+                        <div
+                          key={idx}
+                          className={
+                            line.startsWith('+')
+                              ? 'text-emerald-400 bg-emerald-950/30'
+                              : line.startsWith('-')
+                              ? 'text-rose-400 bg-rose-950/30'
+                              : line.startsWith('@')
+                              ? 'text-indigo-400 bg-indigo-950/30'
+                              : 'text-slate-400'
+                          }
+                        >
+                          {line}
+                        </div>
+                      ))}
+                    </pre>
+                  </div>
+                )}
               </div>
 
               {/* Attribution Footer */}

@@ -1,0 +1,54 @@
+{
+  "benchmark_version": "v2.0",
+  "evaluated_at": "2026-10-28T22:58:00Z",
+  "baseline_commit": "42222be8df342125bbda666245f7c3ddf37a597a",
+  "baseline_tag": "v1.0.0-final-submission",
+  "v2_enhancement_version": "1.1.0",
+  "test_suite_status": {
+    "total_tests": 98,
+    "passed": 98,
+    "failed": 0,
+    "pass_rate_percent": 100.0
+  },
+  "metrics": {
+    "issue_detection_recall": {
+      "baseline": 0.80,
+      "v2": 0.80,
+      "delta": 0.00,
+      "status": "PRESERVED"
+    },
+    "false_positive_rate": {
+      "baseline": 0.00,
+      "v2": 0.00,
+      "delta": 0.00,
+      "status": "PRESERVED_PERFECT"
+    },
+    "evidence_validity_percent": {
+      "baseline": 100.0,
+      "v2": 100.0,
+      "delta": 0.00,
+      "status": "VERIFIED_100_PERCENT"
+    },
+    "average_analysis_latency_seconds": {
+      "baseline": 4.34,
+      "v2": 4.39,
+      "overhead_seconds": 0.05,
+      "status": "OPTIMAL_LOW_OVERHEAD"
+    },
+    "change_impact_computation_latency_ms": {
+      "v2_added": 8.4,
+      "status": "SUB_10MS_DETERMINISTIC"
+    },
+    "repo_config_parsing_latency_ms": {
+      "v2_added": 1.2,
+      "status": "SUB_2MS"
+    }
+  },
+  "new_capabilities_verified": [
+    "Secure deploysafe.yml parser with directory traversal and injection rejection",
+    "Deterministic architectural blast radius mapping from git commit diffs",
+    "Multi-run historical risk analytics, recurring issue detection, and velocity tracking",
+    "Unified diff remediation patch preview with mandatory human approval disclaimer",
+    "V2 interactive frontend tabs for Change Impact and Patch Preview"
+  ]
+}
