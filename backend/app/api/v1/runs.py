@@ -1,9 +1,15 @@
 from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, HTTPException, Query, Response
 from pydantic import BaseModel, Field
-from backend.app.models.analysis_schemas import AnalysisRun, AnalysisReport, Finding
+from backend.app.models.analysis_schemas import (
+    AnalysisRun,
+    AnalysisReport,
+    Finding,
+    RunComparisonResult
+)
 from backend.app.agents.analysis_flow import DeploySafeAnalysisFlow
 from backend.app.services.report_service import ReportService
+from backend.app.services.comparison import ComparisonService
 from backend.app.core.logging import logger
 
 router = APIRouter()
@@ -118,3 +124,34 @@ def get_formatted_report(
         return Response(content=html_text, media_type="text/html")
     else:
         return report
+
+
+@router.get("/{run_id}/compare", response_model=RunComparisonResult)
+def compare_run(
+    run_id: str,
+    base_run_id: Optional[str] = Query(None, description="Optional baseline run ID. If omitted, uses the immediate previous run for the repository.")
+):
+    """
+    Compares the specified run against a baseline run (Steps 13 & 14).
+    Categorizes findings into resolved, new, persistent, changed, and computes deterministic score delta.
+    """
+    target_report = DeploySafeAnalysisFlow.get_report(run_id)
+    if not target_report:
+        raise HTTPException(status_code=404, detail=f"Target report for run '{run_id}' not found.")
+
+    base_report = None
+    if base_run_id:
+        base_report = DeploySafeAnalysisFlow.get_report(base_run_id)
+        if not base_report:
+            raise HTTPException(status_code=404, detail=f"Baseline report for run '{base_run_id}' not found.")
+    else:
+        all_reports = DeploySafeAnalysisFlow.list_reports()
+        prior_reports = [
+            r for r in all_reports
+            if r.repository_id == target_report.repository_id and r.run_id != target_report.run_id
+        ]
+        if prior_reports:
+            prior_reports.sort(key=lambda r: r.analyzed_at, reverse=True)
+            base_report = prior_reports[0]
+
+    return ComparisonService.compare_reports(target_report, base_report)

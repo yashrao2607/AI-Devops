@@ -243,3 +243,41 @@ class DashboardSummary(BaseModel):
     recent_runs: List[Dict[str, Any]] = Field(default_factory=list)
     top_findings: List[Finding] = Field(default_factory=list)
 
+
+# ------------------------------------------------------------------------------
+# Phase 6 Run Comparison Models (Steps 13 & 14)
+# ------------------------------------------------------------------------------
+class ComparisonFindingItem(BaseModel):
+    fingerprint: str
+    finding_id: str
+    title: str
+    file_path: str
+    line_start: Optional[int] = None
+    severity: Literal["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+    category: str
+    status: str
+    score_contribution: float = 0.0
+
+
+class RunComparisonResult(BaseModel):
+    has_baseline: bool
+    base_run_id: Optional[str] = None
+    target_run_id: str
+    repository_id: str
+    repository_name: str
+    base_score: Optional[float] = None
+    target_score: float
+    score_delta: Optional[float] = None
+    risk_trend: Literal["IMPROVED", "DEGRADED", "UNCHANGED", "INITIAL_BASELINE"]
+    base_findings_count: int = 0
+    target_findings_count: int = 0
+    resolved_count: int = 0
+    new_count: int = 0
+    persistent_count: int = 0
+    changed_count: int = 0
+    resolved_findings: List[ComparisonFindingItem] = Field(default_factory=list)
+    new_findings: List[ComparisonFindingItem] = Field(default_factory=list)
+    persistent_findings: List[ComparisonFindingItem] = Field(default_factory=list)
+    changed_findings: List[Dict[str, Any]] = Field(default_factory=list)
+    message: Optional[str] = None
+
