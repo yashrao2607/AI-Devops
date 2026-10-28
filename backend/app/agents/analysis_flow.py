@@ -27,6 +27,8 @@ from backend.app.agents.specialized.critic_agent import CriticAgent
 from backend.app.agents.specialized.report_agent import ReportGenerationAgent
 from backend.app.services.deduplication import FindingDeduplicationService
 from backend.app.services.risk_engine import RiskEngine
+from backend.app.services.observability import ObservabilityService, AgentTraceRecord, ToolTraceRecord
+from backend.app.core.config import settings
 from backend.app.core.logging import logger
 
 # Global in-memory registry of active and completed analysis runs for live telemetry
@@ -84,6 +86,12 @@ class DeploySafeAnalysisFlow:
             started_at=datetime.utcnow()
         )
         _ACTIVE_ANALYSIS_RUNS[self.run_id] = run
+        ObservabilityService.start_trace(
+            run_id=self.run_id,
+            repository_name=snapshot.repository_name,
+            commit_sha=snapshot.commit_sha,
+            pr_number=(options or {}).get("pr_number")
+        )
 
         try:
             # ------------------------------------------------------------------
@@ -121,12 +129,26 @@ class DeploySafeAnalysisFlow:
             context.changed_files = git_diff_res.changed_files
             context.git_diff = git_diff_res.diff_text
 
+            ObservabilityService.record_event(
+                run_id=self.run_id,
+                event_type="CONTEXT_PREPARED",
+                component="RepositoryLoader",
+                message=f"Discovered {len(all_file_paths)} files, {rag_count} RAG chunks, {len(context.changed_files)} changed files"
+            )
+
             # ------------------------------------------------------------------
             # Phase B: Plan Analysis (Step 6)
             # ------------------------------------------------------------------
             run.status = "PLANNING"
             plan = self._create_analysis_plan(context)
             logger.info("Orchestrator planned %d tasks: %s", len(plan.planned_tasks), plan.planned_tasks)
+
+            ObservabilityService.record_event(
+                run_id=self.run_id,
+                event_type="PLAN_GENERATED",
+                component="Orchestrator",
+                message=f"Orchestrator planned {len(plan.planned_tasks)} tasks: {', '.join(plan.planned_tasks)}"
+            )
 
             # Initialize states for planned agents
             for task in plan.planned_tasks:
@@ -164,6 +186,32 @@ class DeploySafeAnalysisFlow:
                     state.findings_count = len(f_list)
                     state.duration_seconds = round(time.time() - a_start, 2)
                     state.completed_at = datetime.utcnow()
+                    agent_dur_ms = round((time.time() - a_start) * 1000.0, 2)
+                    ObservabilityService.record_agent_trace(
+                        self.run_id,
+                        AgentTraceRecord(
+                            agent_name=task_name,
+                            role=agent_obj.__class__.__name__,
+                            status="COMPLETED",
+                            start_time=state.started_at.isoformat(),
+                            end_time=state.completed_at.isoformat(),
+                            duration_ms=agent_dur_ms,
+                            tool_calls_count=len(agent_tools),
+                            findings_count=len(f_list)
+                        )
+                    )
+                    for t in agent_tools:
+                        ObservabilityService.record_tool_trace(
+                            self.run_id,
+                            ToolTraceRecord(
+                                tool_name=t,
+                                agent_name=task_name,
+                                status="SUCCESS",
+                                duration_ms=round(agent_dur_ms / max(1, len(agent_tools)), 2),
+                                input_summary=f"Invoked by {task_name}",
+                                output_summary=f"Completed {agent_obj.__class__.__name__}"
+                            )
+                        )
                     return f_list, agent_tools
                 except Exception as ex:
                     logger.error("Agent '%s' failed during analysis: %s", task_name, str(ex))
@@ -171,6 +219,20 @@ class DeploySafeAnalysisFlow:
                     state.error = str(ex)
                     state.duration_seconds = round(time.time() - a_start, 2)
                     state.completed_at = datetime.utcnow()
+                    ObservabilityService.record_agent_trace(
+                        self.run_id,
+                        AgentTraceRecord(
+                            agent_name=task_name,
+                            role=agent_obj.__class__.__name__,
+                            status="FAILED",
+                            start_time=state.started_at.isoformat(),
+                            end_time=state.completed_at.isoformat(),
+                            duration_ms=round((time.time() - a_start) * 1000.0, 2),
+                            tool_calls_count=len(agent_tools),
+                            findings_count=0,
+                            error=str(ex)
+                        )
+                    )
                     return [], agent_tools
 
             with ThreadPoolExecutor(max_workers=4) as executor:
@@ -268,12 +330,28 @@ class DeploySafeAnalysisFlow:
             run.duration_seconds = total_duration
 
             _ACTIVE_REPORTS[self.run_id] = report
+            ObservabilityService.complete_trace(
+                run_id=self.run_id,
+                status="COMPLETED",
+                risk_score=risk_eval.risk_score,
+                risk_level=risk_eval.risk_level,
+                provider=settings.get_active_provider(),
+                model=settings.GROQ_MODEL if settings.get_active_provider() == "groq" else settings.GEMINI_MODEL,
+                rag_chunks_retrieved=rag_count
+            )
             logger.info("DeploySafeAnalysisFlow completed successfully for run '%s' in %.2fs",
                         self.run_id, total_duration)
             return report
 
         except Exception as e:
             logger.error("DeploySafeAnalysisFlow run '%s' failed: %s", self.run_id, str(e), exc_info=True)
+            ObservabilityService.record_event(
+                run_id=self.run_id,
+                event_type="RUN_FAILED",
+                component="Orchestrator",
+                message=f"Analysis failed: {str(e)}",
+                status="ERROR"
+            )
             run.status = "FAILED"
             run.error = str(e)
             run.completed_at = datetime.utcnow()

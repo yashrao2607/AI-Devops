@@ -1,0 +1,427 @@
+{
+  "run_id": "run_97fe95a2db4a",
+  "repository_id": "case_02_secret_leak",
+  "repository_name": "case_02_secret_leak",
+  "commit_sha": null,
+  "branch": "main",
+  "analyzed_at": "2026-10-28T16:47:55.709845",
+  "duration_seconds": 0.31,
+  "status": "COMPLETED",
+  "agents_executed": [
+    "code_analysis",
+    "test_analysis",
+    "security_analysis",
+    "critic",
+    "report"
+  ],
+  "tools_used": [
+    "repo_tools",
+    "safe_executor",
+    "run_tests_safe",
+    "get_test_files",
+    "get_file_content",
+    "code_check",
+    "run_security_scan"
+  ],
+  "risk_score": 60.0,
+  "risk_level": "HIGH",
+  "score_breakdown": {
+    "risk_score": 60.0,
+    "risk_level": "HIGH",
+    "raw_score": 60.0,
+    "contributors": [
+      {
+        "finding_id": "F-TST-001",
+        "title": "INFERRED: Zero automated test files discovered in repository",
+        "severity": "HIGH",
+        "confidence": "HIGH",
+        "impact_level": "HIGH",
+        "points": 25.0,
+        "file_path": "settings.py",
+        "line_start": 1
+      },
+      {
+        "finding_id": "F-SEC-001",
+        "title": "Potential Hardcoded Secret: AWS_ACCESS_KEY",
+        "severity": "CRITICAL",
+        "confidence": "HIGH",
+        "impact_level": "HIGH",
+        "points": 35.0,
+        "file_path": "settings.py",
+        "line_start": 2
+      }
+    ],
+    "excluded_findings": [
+      {
+        "finding_id": "F-SEC-002",
+        "title": "Potential Hardcoded Secret: DATABASE_URI_WITH_CREDS",
+        "status": "DUPLICATE",
+        "reason": "Excluded as duplicate of primary finding (dedup_group: DEDUP-EFA4537B)"
+      },
+      {
+        "finding_id": "F-SEC-003",
+        "title": "Potential Hardcoded Secret: GENERIC_API_TOKEN",
+        "status": "DUPLICATE",
+        "reason": "Excluded as duplicate of primary finding (dedup_group: DEDUP-EFA4537B)"
+      }
+    ],
+    "severity_breakdown": {
+      "CRITICAL": 35.0,
+      "HIGH": 25.0,
+      "MEDIUM": 0.0,
+      "LOW": 0.0
+    },
+    "formula_explanation": "DeploySafe Deterministic Formula: Score = min(100.0, round(sum(severity_weight * confidence_multiplier * impact_multiplier))). Weights: Critical=35, High=25, Medium=15, Low=7. Multipliers: High=1.0, Medium=0.8, Low=0.6. Only Critic-Validated findings contribute points."
+  },
+  "dedup_summary": {
+    "total_input": 4,
+    "unique_canonical": 2,
+    "duplicates_merged": 2,
+    "groups_formed": 1,
+    "groups": {
+      "DEDUP-EFA4537B": [
+        "F-SEC-001",
+        "F-SEC-002",
+        "F-SEC-003"
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "F-TST-001",
+      "category": "TEST",
+      "severity": "HIGH",
+      "confidence": "HIGH",
+      "title": "INFERRED: Zero automated test files discovered in repository",
+      "summary": "The repository contains production source code but zero unit or integration test files.",
+      "impact": "Unverified releases lack automated safety nets against regressions and runtime crashes.",
+      "recommendation": "Introduce a standard test runner (e.g., pytest or jest) with baseline sanity test coverage.",
+      "repository_id": "case_02_secret_leak",
+      "commit_sha": null,
+      "file_path": "settings.py",
+      "line_start": 1,
+      "line_end": 1,
+      "evidence": "Zero files discovered matching test categories or naming patterns.",
+      "evidence_items": [],
+      "source": "deterministic+agent",
+      "agent": "TestAgent",
+      "status": "VALIDATED",
+      "tool_name": null,
+      "rule_id": null,
+      "retrieval_context": null,
+      "related_files": [],
+      "critic_notes": "Verified: Finding is substantiated by concrete repository evidence in 'settings.py' (L1-L1). Ground-truth verified with high confidence.",
+      "dedup_group_id": null,
+      "merged_finding_ids": [],
+      "merged_agents": [
+        "TestAgent"
+      ],
+      "validation_reason": null,
+      "score_contribution": 25.0,
+      "impact_level": "HIGH",
+      "created_at": "2026-10-28T16:47:53.619671",
+      "updated_at": "2026-10-28T16:47:53.619671"
+    },
+    {
+      "id": "F-SEC-001",
+      "category": "SECURITY",
+      "severity": "CRITICAL",
+      "confidence": "HIGH",
+      "title": "Potential Hardcoded Secret: AWS_ACCESS_KEY",
+      "summary": "Security scanner detected an exposure matching rule AWS_ACCESS_KEY: High-entropy AWS Access Key pattern.",
+      "impact": "Credentials or sensitive data checked into the repository can be compromised during build, image push, or deployment pipelines.",
+      "recommendation": "Extract the secret into an external secret management store or environment variable, and rotate exposed credentials immediately.",
+      "repository_id": "case_02_secret_leak",
+      "commit_sha": null,
+      "file_path": "settings.py",
+      "line_start": 2,
+      "line_end": 2,
+      "evidence": "AWS_ACCESS_KEY_ID = \"***REDACTED_SECRET***\"",
+      "evidence_items": [
+        {
+          "evidence_type": "SCANNER",
+          "file_path": "settings.py",
+          "line_start": 2,
+          "line_end": 2,
+          "snippet": "AWS_ACCESS_KEY_ID = \"***REDACTED_SECRET***\"",
+          "source": "scanner:deploy_safe_security_engine",
+          "source_tool": "deploy_safe_security_engine",
+          "repository_id": "case_02_secret_leak",
+          "commit_sha": null
+        },
+        {
+          "evidence_type": "SCANNER",
+          "file_path": "settings.py",
+          "line_start": 4,
+          "line_end": 4,
+          "snippet": "DATABASE_URL = \"***REDACTED_SECRET***:5432/app\"",
+          "source": "scanner:deploy_safe_security_engine",
+          "source_tool": "deploy_safe_security_engine",
+          "repository_id": "case_02_secret_leak",
+          "commit_sha": null
+        },
+        {
+          "evidence_type": "SCANNER",
+          "file_path": "settings.py",
+          "line_start": 5,
+          "line_end": 5,
+          "snippet": "STRIPE_***REDACTED_SECRET***",
+          "source": "scanner:deploy_safe_security_engine",
+          "source_tool": "deploy_safe_security_engine",
+          "repository_id": "case_02_secret_leak",
+          "commit_sha": null
+        }
+      ],
+      "source": "deterministic+agent",
+      "agent": "SecurityAgent",
+      "status": "VALIDATED",
+      "tool_name": "deploy_safe_security_engine",
+      "rule_id": "AWS_ACCESS_KEY",
+      "retrieval_context": null,
+      "related_files": [],
+      "critic_notes": "Verified: Finding is substantiated by concrete repository evidence in 'settings.py' (L2-L2). Ground-truth verified with high confidence.",
+      "dedup_group_id": "DEDUP-EFA4537B",
+      "merged_finding_ids": [
+        "F-SEC-002",
+        "F-SEC-003"
+      ],
+      "merged_agents": [
+        "SecurityAgent"
+      ],
+      "validation_reason": null,
+      "score_contribution": 35.0,
+      "impact_level": "HIGH",
+      "created_at": "2026-10-28T16:47:53.646432",
+      "updated_at": "2026-10-28T16:47:53.646432"
+    },
+    {
+      "id": "F-SEC-002",
+      "category": "SECURITY",
+      "severity": "CRITICAL",
+      "confidence": "HIGH",
+      "title": "Potential Hardcoded Secret: DATABASE_URI_WITH_CREDS",
+      "summary": "Security scanner detected an exposure matching rule DATABASE_URI_WITH_CREDS: Database connection string containing raw credentials.",
+      "impact": "Credentials or sensitive data checked into the repository can be compromised during build, image push, or deployment pipelines.",
+      "recommendation": "Extract the secret into an external secret management store or environment variable, and rotate exposed credentials immediately.",
+      "repository_id": "case_02_secret_leak",
+      "commit_sha": null,
+      "file_path": "settings.py",
+      "line_start": 4,
+      "line_end": 4,
+      "evidence": "DATABASE_URL = \"***REDACTED_SECRET***:5432/app\"",
+      "evidence_items": [
+        {
+          "evidence_type": "SCANNER",
+          "file_path": "settings.py",
+          "line_start": 4,
+          "line_end": 4,
+          "snippet": "DATABASE_URL = \"***REDACTED_SECRET***:5432/app\"",
+          "source": "scanner:deploy_safe_security_engine",
+          "source_tool": "deploy_safe_security_engine",
+          "repository_id": "case_02_secret_leak",
+          "commit_sha": null
+        }
+      ],
+      "source": "deterministic+agent",
+      "agent": "SecurityAgent",
+      "status": "DUPLICATE",
+      "tool_name": "deploy_safe_security_engine",
+      "rule_id": "DATABASE_URI_WITH_CREDS",
+      "retrieval_context": null,
+      "related_files": [],
+      "critic_notes": "Duplicate of primary finding F-SEC-001 (Potential Hardcoded Secret: AWS_ACCESS_KEY)",
+      "dedup_group_id": "DEDUP-EFA4537B",
+      "merged_finding_ids": [],
+      "merged_agents": [],
+      "validation_reason": null,
+      "score_contribution": 0.0,
+      "impact_level": "HIGH",
+      "created_at": "2026-10-28T16:47:53.646432",
+      "updated_at": "2026-10-28T16:47:53.646432"
+    },
+    {
+      "id": "F-SEC-003",
+      "category": "SECURITY",
+      "severity": "HIGH",
+      "confidence": "HIGH",
+      "title": "Potential Hardcoded Secret: GENERIC_API_TOKEN",
+      "summary": "Security scanner detected an exposure matching rule GENERIC_API_TOKEN: Hardcoded API authorization token.",
+      "impact": "Credentials or sensitive data checked into the repository can be compromised during build, image push, or deployment pipelines.",
+      "recommendation": "Extract the secret into an external secret management store or environment variable, and rotate exposed credentials immediately.",
+      "repository_id": "case_02_secret_leak",
+      "commit_sha": null,
+      "file_path": "settings.py",
+      "line_start": 5,
+      "line_end": 5,
+      "evidence": "STRIPE_***REDACTED_SECRET***",
+      "evidence_items": [
+        {
+          "evidence_type": "SCANNER",
+          "file_path": "settings.py",
+          "line_start": 5,
+          "line_end": 5,
+          "snippet": "STRIPE_***REDACTED_SECRET***",
+          "source": "scanner:deploy_safe_security_engine",
+          "source_tool": "deploy_safe_security_engine",
+          "repository_id": "case_02_secret_leak",
+          "commit_sha": null
+        }
+      ],
+      "source": "deterministic+agent",
+      "agent": "SecurityAgent",
+      "status": "DUPLICATE",
+      "tool_name": "deploy_safe_security_engine",
+      "rule_id": "GENERIC_API_TOKEN",
+      "retrieval_context": null,
+      "related_files": [],
+      "critic_notes": "Duplicate of primary finding F-SEC-001 (Potential Hardcoded Secret: AWS_ACCESS_KEY)",
+      "dedup_group_id": "DEDUP-EFA4537B",
+      "merged_finding_ids": [],
+      "merged_agents": [],
+      "validation_reason": null,
+      "score_contribution": 0.0,
+      "impact_level": "HIGH",
+      "created_at": "2026-10-28T16:47:53.646432",
+      "updated_at": "2026-10-28T16:47:53.646432"
+    }
+  ],
+  "validated_findings": [
+    {
+      "id": "F-TST-001",
+      "category": "TEST",
+      "severity": "HIGH",
+      "confidence": "HIGH",
+      "title": "INFERRED: Zero automated test files discovered in repository",
+      "summary": "The repository contains production source code but zero unit or integration test files.",
+      "impact": "Unverified releases lack automated safety nets against regressions and runtime crashes.",
+      "recommendation": "Introduce a standard test runner (e.g., pytest or jest) with baseline sanity test coverage.",
+      "repository_id": "case_02_secret_leak",
+      "commit_sha": null,
+      "file_path": "settings.py",
+      "line_start": 1,
+      "line_end": 1,
+      "evidence": "Zero files discovered matching test categories or naming patterns.",
+      "evidence_items": [],
+      "source": "deterministic+agent",
+      "agent": "TestAgent",
+      "status": "VALIDATED",
+      "tool_name": null,
+      "rule_id": null,
+      "retrieval_context": null,
+      "related_files": [],
+      "critic_notes": "Verified: Finding is substantiated by concrete repository evidence in 'settings.py' (L1-L1). Ground-truth verified with high confidence.",
+      "dedup_group_id": null,
+      "merged_finding_ids": [],
+      "merged_agents": [
+        "TestAgent"
+      ],
+      "validation_reason": null,
+      "score_contribution": 25.0,
+      "impact_level": "HIGH",
+      "created_at": "2026-10-28T16:47:53.619671",
+      "updated_at": "2026-10-28T16:47:53.619671"
+    },
+    {
+      "id": "F-SEC-001",
+      "category": "SECURITY",
+      "severity": "CRITICAL",
+      "confidence": "HIGH",
+      "title": "Potential Hardcoded Secret: AWS_ACCESS_KEY",
+      "summary": "Security scanner detected an exposure matching rule AWS_ACCESS_KEY: High-entropy AWS Access Key pattern.",
+      "impact": "Credentials or sensitive data checked into the repository can be compromised during build, image push, or deployment pipelines.",
+      "recommendation": "Extract the secret into an external secret management store or environment variable, and rotate exposed credentials immediately.",
+      "repository_id": "case_02_secret_leak",
+      "commit_sha": null,
+      "file_path": "settings.py",
+      "line_start": 2,
+      "line_end": 2,
+      "evidence": "AWS_ACCESS_KEY_ID = \"***REDACTED_SECRET***\"",
+      "evidence_items": [
+        {
+          "evidence_type": "SCANNER",
+          "file_path": "settings.py",
+          "line_start": 2,
+          "line_end": 2,
+          "snippet": "AWS_ACCESS_KEY_ID = \"***REDACTED_SECRET***\"",
+          "source": "scanner:deploy_safe_security_engine",
+          "source_tool": "deploy_safe_security_engine",
+          "repository_id": "case_02_secret_leak",
+          "commit_sha": null
+        },
+        {
+          "evidence_type": "SCANNER",
+          "file_path": "settings.py",
+          "line_start": 4,
+          "line_end": 4,
+          "snippet": "DATABASE_URL = \"***REDACTED_SECRET***:5432/app\"",
+          "source": "scanner:deploy_safe_security_engine",
+          "source_tool": "deploy_safe_security_engine",
+          "repository_id": "case_02_secret_leak",
+          "commit_sha": null
+        },
+        {
+          "evidence_type": "SCANNER",
+          "file_path": "settings.py",
+          "line_start": 5,
+          "line_end": 5,
+          "snippet": "STRIPE_***REDACTED_SECRET***",
+          "source": "scanner:deploy_safe_security_engine",
+          "source_tool": "deploy_safe_security_engine",
+          "repository_id": "case_02_secret_leak",
+          "commit_sha": null
+        }
+      ],
+      "source": "deterministic+agent",
+      "agent": "SecurityAgent",
+      "status": "VALIDATED",
+      "tool_name": "deploy_safe_security_engine",
+      "rule_id": "AWS_ACCESS_KEY",
+      "retrieval_context": null,
+      "related_files": [],
+      "critic_notes": "Verified: Finding is substantiated by concrete repository evidence in 'settings.py' (L2-L2). Ground-truth verified with high confidence.",
+      "dedup_group_id": "DEDUP-EFA4537B",
+      "merged_finding_ids": [
+        "F-SEC-002",
+        "F-SEC-003"
+      ],
+      "merged_agents": [
+        "SecurityAgent"
+      ],
+      "validation_reason": null,
+      "score_contribution": 35.0,
+      "impact_level": "HIGH",
+      "created_at": "2026-10-28T16:47:53.646432",
+      "updated_at": "2026-10-28T16:47:53.646432"
+    }
+  ],
+  "needs_review_findings": [],
+  "rejected_findings": [],
+  "finding_counts_by_severity": {
+    "CRITICAL": 1,
+    "HIGH": 1,
+    "MEDIUM": 0,
+    "LOW": 0
+  },
+  "summary": "The case_02_secret_leak repository is a lightweight Python codebase whose primary artifact resides in a single settings.py file. The technology stack is limited to Python, and the intended deployment target appears to be a cloud environment (e.g., AWS) given the presence of an AWS access key pattern. No test harness or CI pipeline artifacts were detected, indicating that the repository is currently being treated as production code without automated validation.\n\nTwo critical blockers prevent safe promotion to production. First, a hard\u2011coded AWS_ACCESS_KEY was found on line 2 of settings.py, representing a high\u2011severity secret leak that could grant unrestricted access to the organization\u2019s AWS resources. Second, the absence of any automated unit or integration tests (as flagged by the test analysis agent) leaves the code unexercised, increasing the risk of runtime errors, regression, and undetected security regressions.\n\nIf the repository is deployed in its current state, the most likely failure mode is a credential compromise leading to unauthorized cloud resource manipulation, data exfiltration, or service disruption. The blast radius extends to any AWS services that the leaked key can access, potentially affecting the entire production environment. Additionally, without test coverage, functional defects could surface in production, causing service outages or data integrity issues that would be harder to diagnose and remediate.",
+  "recommendations": [
+    "Immediately remove the hard\u2011coded AWS_ACCESS_KEY from settings.py and replace it with a secure secret management solution (e.g., AWS Secrets Manager, environment variables, or IAM roles). Rotate the exposed key and audit its usage.",
+    "Introduce a comprehensive test suite for the repository: add unit tests for configuration loading and integration tests for any downstream services. Integrate these tests into a CI pipeline to enforce test execution on every commit.",
+    "Implement a secret scanning and linting step in the CI/CD pipeline (e.g., using git\u2011secret, truffleHog, or GitHub secret scanning) to prevent future hard\u2011coded credential check\u2011ins and enforce policy compliance."
+  ],
+  "gate_result": {
+    "allowed": false,
+    "status": "BLOCKED",
+    "reasons": [
+      "Blocked: Found 1 validated CRITICAL deployment risks.",
+      "Review Required: Risk score (60.0/100) falls in the team review zone [45.0 - 65.0]."
+    ],
+    "exit_code": 1,
+    "risk_score": 60.0,
+    "policy_applied": {
+      "max_risk_score": 65.0,
+      "review_threshold": 45.0,
+      "block_on_critical": true,
+      "max_high_count": 2
+    }
+  }
+}

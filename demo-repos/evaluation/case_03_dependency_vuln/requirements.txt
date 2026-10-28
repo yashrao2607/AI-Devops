@@ -1,0 +1,6 @@
+# Outdated manifest with known high-severity vulnerabilities
+requests==2.6.0
+pyyaml==5.1
+urllib3==1.24.1
+jinja2==2.10.0
+flask==0.12.2

@@ -1,0 +1,87 @@
+name: DeploySafe Pre-Deployment Risk Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main, master]
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: deploysafe-${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  deploysafe-audit:
+    name: DeploySafe Agentic Risk Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout Repository Code & Commit History
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🐍 Set up Python 3.11 Runtime
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'backend/requirements.txt'
+
+      - name: 📦 Install DeploySafe Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: 🛡️ Run DeploySafe Multi-Agent Deployment Risk Analysis
+        id: deploysafe
+        env:
+          PYTHONPATH: .
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          DEPLOYSAFE_GATE_MAX_RISK: '65.0'
+          DEPLOYSAFE_GATE_BLOCK_CRITICAL: 'true'
+        run: |
+          PR_NUM="${{ github.event.pull_request.number }}"
+          PR_ARG=""
+          if [ -n "$PR_NUM" ]; then
+            PR_ARG="--pr $PR_NUM --publish-github"
+          fi
+
+          python -m backend.app.cli analyze \
+            --repo . \
+            --branch "${{ github.head_ref || github.ref_name }}" \
+            --commit "${{ github.sha }}" \
+            --github-repo "${{ github.repository }}" \
+            $PR_ARG \
+            --ci \
+            --output-json deploysafe-report.json \
+            --output-md deploysafe-summary.md
+
+      - name: 📝 Append DeploySafe Result to GitHub Step Summary
+        if: always()
+        run: |
+          if [ -f deploysafe-summary.md ]; then
+            cat deploysafe-summary.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ⚠️ DeploySafe analysis summary file was not generated." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: 📤 Upload DeploySafe Audit Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploysafe-audit-reports
+          path: |
+            deploysafe-report.json
+            deploysafe-summary.md
+          retention-days: 30

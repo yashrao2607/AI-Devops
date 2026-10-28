@@ -1,0 +1,57 @@
+[
+  {
+    "case_id": "EVAL-01",
+    "name": "Unpinned Container & Debug Configuration Risk",
+    "path": "demo-repos/evaluation/case_01_config_risk",
+    "expected_category": "CONFIGURATION",
+    "expected_severity_range": ["HIGH", "CRITICAL"],
+    "expected_files": ["Dockerfile"],
+    "expected_issue_type": "CONTAINER_UNPINNED_OR_DEBUG_ENABLED",
+    "is_clean": false,
+    "notes": "Tests ConfigAgent detection of unpinned latest tag and debug flag in container."
+  },
+  {
+    "case_id": "EVAL-02",
+    "name": "Hardcoded Cloud & Database Credentials Leak",
+    "path": "demo-repos/evaluation/case_02_secret_leak",
+    "expected_category": "SECURITY",
+    "expected_severity_range": ["CRITICAL"],
+    "expected_files": ["settings.py"],
+    "expected_issue_type": "HARDCODED_SECRETS_EXPOSURE",
+    "is_clean": false,
+    "notes": "Tests SecurityAgent & SecretRedaction detection of plaintext AWS and database credentials."
+  },
+  {
+    "case_id": "EVAL-03",
+    "name": "Vulnerable & Deprecated Dependencies",
+    "path": "demo-repos/evaluation/case_03_dependency_vuln",
+    "expected_category": "DEPENDENCY",
+    "expected_severity_range": ["HIGH", "CRITICAL"],
+    "expected_files": ["requirements.txt"],
+    "expected_issue_type": "VULNERABLE_OUTDATED_DEPENDENCY",
+    "is_clean": false,
+    "notes": "Tests DependencyAgent detection of known CVE-affected packages."
+  },
+  {
+    "case_id": "EVAL-04",
+    "name": "Missing Test Coverage on Financial/Auth Critical Path",
+    "path": "demo-repos/evaluation/case_04_test_deficit",
+    "expected_category": "TEST",
+    "expected_severity_range": ["MEDIUM", "HIGH"],
+    "expected_files": ["auth_service.py"],
+    "expected_issue_type": "MISSING_REGRESSION_TESTS",
+    "is_clean": false,
+    "notes": "Tests TestAgent identification of untested sensitive payment logic."
+  },
+  {
+    "case_id": "EVAL-05",
+    "name": "Hardened Clean Repository Baseline",
+    "path": "demo-repos/evaluation/case_05_clean_baseline",
+    "expected_category": "NONE",
+    "expected_severity_range": ["LOW"],
+    "expected_files": [],
+    "expected_issue_type": "CLEAN_BASELINE",
+    "is_clean": true,
+    "notes": "Tests false positive rate; system should detect 0 critical or high findings."
+  }
+]

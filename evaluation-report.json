@@ -1,0 +1,110 @@
+{
+  "timestamp": "2026-10-28T16:39:03.258389",
+  "total_cases": 5,
+  "passed_cases": 4,
+  "detection_recall": 80.0,
+  "precision": 40.0,
+  "total_false_positives": 6,
+  "average_evidence_validity": 100.0,
+  "average_latency_seconds": 4.34,
+  "cases": [
+    {
+      "case_id": "EVAL-01",
+      "case_name": "Unpinned Container & Debug Configuration Risk",
+      "path": "demo-repos/evaluation/case_01_config_risk",
+      "expected_category": "CONFIGURATION",
+      "expected_files": [
+        "Dockerfile"
+      ],
+      "is_clean": false,
+      "risk_score": 50.0,
+      "risk_level": "HIGH",
+      "detected_findings_count": 3,
+      "true_positives": 1,
+      "false_positives": 2,
+      "missed_risks": 0,
+      "evidence_validity_rate": 100.0,
+      "latency_seconds": 5.28,
+      "status": "PASS",
+      "notes": "Tests ConfigAgent detection of unpinned latest tag and debug flag in container."
+    },
+    {
+      "case_id": "EVAL-02",
+      "case_name": "Hardcoded Cloud & Database Credentials Leak",
+      "path": "demo-repos/evaluation/case_02_secret_leak",
+      "expected_category": "SECURITY",
+      "expected_files": [
+        "settings.py"
+      ],
+      "is_clean": false,
+      "risk_score": 60.0,
+      "risk_level": "HIGH",
+      "detected_findings_count": 4,
+      "true_positives": 1,
+      "false_positives": 3,
+      "missed_risks": 0,
+      "evidence_validity_rate": 100.0,
+      "latency_seconds": 2.66,
+      "status": "PASS",
+      "notes": "Tests SecurityAgent & SecretRedaction detection of plaintext AWS and database credentials."
+    },
+    {
+      "case_id": "EVAL-03",
+      "case_name": "Vulnerable & Deprecated Dependencies",
+      "path": "demo-repos/evaluation/case_03_dependency_vuln",
+      "expected_category": "DEPENDENCY",
+      "expected_files": [
+        "requirements.txt"
+      ],
+      "is_clean": false,
+      "risk_score": 0.0,
+      "risk_level": "LOW",
+      "detected_findings_count": 0,
+      "true_positives": 0,
+      "false_positives": 0,
+      "missed_risks": 1,
+      "evidence_validity_rate": 100.0,
+      "latency_seconds": 5.41,
+      "status": "FAIL",
+      "notes": "Tests DependencyAgent detection of known CVE-affected packages."
+    },
+    {
+      "case_id": "EVAL-04",
+      "case_name": "Missing Test Coverage on Financial/Auth Critical Path",
+      "path": "demo-repos/evaluation/case_04_test_deficit",
+      "expected_category": "TEST",
+      "expected_files": [
+        "auth_service.py"
+      ],
+      "is_clean": false,
+      "risk_score": 0.0,
+      "risk_level": "LOW",
+      "detected_findings_count": 2,
+      "true_positives": 1,
+      "false_positives": 1,
+      "missed_risks": 0,
+      "evidence_validity_rate": 100.0,
+      "latency_seconds": 2.36,
+      "status": "PASS",
+      "notes": "Tests TestAgent identification of untested sensitive payment logic."
+    },
+    {
+      "case_id": "EVAL-05",
+      "case_name": "Hardened Clean Repository Baseline",
+      "path": "demo-repos/evaluation/case_05_clean_baseline",
+      "expected_category": "NONE",
+      "expected_files": [],
+      "is_clean": true,
+      "risk_score": 0.0,
+      "risk_level": "LOW",
+      "detected_findings_count": 0,
+      "true_positives": 1,
+      "false_positives": 0,
+      "missed_risks": 0,
+      "evidence_validity_rate": 100.0,
+      "latency_seconds": 5.99,
+      "status": "PASS",
+      "notes": "Tests false positive rate; system should detect 0 critical or high findings."
+    }
+  ]
+}

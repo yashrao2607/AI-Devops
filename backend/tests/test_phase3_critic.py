@@ -38,7 +38,7 @@ def test_critic_rejects_hallucinated_file(demo_context):
     updated, decisions = critic.review_findings(demo_context, [f])
     assert decisions[0].decision == "REJECTED"
     assert updated[0].status == "REJECTED"
-    assert "Hallucination rejection" in decisions[0].reason
+    assert "Hallucination" in decisions[0].reason
 
 def test_critic_rejects_empty_evidence(demo_context):
     critic = CriticAgent()

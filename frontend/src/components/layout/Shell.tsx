@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, LayoutDashboard, Terminal, FolderGit2, 
   History, AlertTriangle, Bot, FileText, Settings, 
-  Server, GitBranch, RefreshCw, Cpu
+  Server, GitBranch, RefreshCw, Cpu, Activity, Award
 } from 'lucide-react';
 import { StatusIndicator } from '../common/StatusIndicator.tsx';
 
@@ -13,6 +13,8 @@ export type NavItem =
   | 'runs' 
   | 'findings' 
   | 'agents' 
+  | 'observability'
+  | 'evaluation'
   | 'reports' 
   | 'settings';
 
@@ -65,6 +67,8 @@ export const Shell: React.FC<ShellProps> = ({ currentTab, onSelectTab, children 
     { id: 'runs' as NavItem, label: 'Runs', icon: <History className="w-4 h-4" /> },
     { id: 'findings' as NavItem, label: 'Findings', icon: <AlertTriangle className="w-4 h-4" /> },
     { id: 'agents' as NavItem, label: 'Agents', icon: <Bot className="w-4 h-4" /> },
+    { id: 'observability' as NavItem, label: 'Observability', icon: <Activity className="w-4 h-4" /> },
+    { id: 'evaluation' as NavItem, label: 'Evaluation', icon: <Award className="w-4 h-4" /> },
     { id: 'reports' as NavItem, label: 'Reports', icon: <FileText className="w-4 h-4" /> },
     { id: 'settings' as NavItem, label: 'Settings', icon: <Settings className="w-4 h-4" /> },
   ];

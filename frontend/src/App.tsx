@@ -6,12 +6,14 @@ import { Repositories } from './pages/Repositories.tsx';
 import { Runs } from './pages/Runs.tsx';
 import { Findings } from './pages/Findings.tsx';
 import { Agents } from './pages/Agents.tsx';
+import { Observability } from './pages/Observability.tsx';
+import { Evaluation } from './pages/Evaluation.tsx';
 import { Reports } from './pages/Reports.tsx';
 import { SettingsPage } from './pages/Settings.tsx';
 
 export default function App() {
   const parseTabFromLocation = (): NavItem => {
-    const validTabs: NavItem[] = ['overview', 'analyze', 'repositories', 'runs', 'findings', 'agents', 'reports', 'settings'];
+    const validTabs: NavItem[] = ['overview', 'analyze', 'repositories', 'runs', 'findings', 'agents', 'observability', 'evaluation', 'reports', 'settings'];
     
     // Check hash first (e.g. #analyze or #analyze?repo=...)
     const hash = window.location.hash.replace(/^#/, '').split('?')[0].toLowerCase();
@@ -62,6 +64,10 @@ export default function App() {
         return <Findings />;
       case 'agents':
         return <Agents />;
+      case 'observability':
+        return <Observability />;
+      case 'evaluation':
+        return <Evaluation />;
       case 'reports':
         return <Reports />;
       case 'settings':

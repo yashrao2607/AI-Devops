@@ -12,6 +12,8 @@ from backend.app.api.v1.analysis import router as analysis_router
 from backend.app.api.v1.dashboard import router as dashboard_router
 from backend.app.api.v1.runs import router as runs_router
 from backend.app.api.v1.findings import router as findings_router
+from backend.app.api.v1.observability import router as observability_router
+from backend.app.api.v1.evaluation import router as evaluation_router
 
 # Startup actions
 async def lifespan(app: FastAPI):
@@ -63,6 +65,8 @@ app.include_router(analysis_router, prefix="/api/v1/analysis", tags=["Multi-Agen
 app.include_router(dashboard_router, prefix="/api/v1/dashboard", tags=["Dashboard & Executive Metrics"])
 app.include_router(runs_router, prefix="/api/v1/runs", tags=["Runs & Findings Management"])
 app.include_router(findings_router, prefix="/api/v1/findings", tags=["Findings Directory"])
+app.include_router(observability_router, prefix="/api/v1", tags=["Observability & Tracing"])
+app.include_router(evaluation_router, prefix="/api/v1", tags=["Benchmark Evaluation"])
 
 # Root fallback
 @app.get("/")
